@@ -41,3 +41,7 @@ yarn-error.log*
 /playwright-report/
 /blob-report/
 /playwright/*
+
+# open-next
+cloudflare-env.d.ts
+.open-next
