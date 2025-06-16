@@ -12,5 +12,9 @@
     "observability": {
         "enabled": true,
         "head_sampling_rate": 0.1
+    },
+    "env": {
+        "AUTH_URL": "https://chat.portdex.ai",
+        "AUTH_TRUST_HOST": "true"
     }
 }
