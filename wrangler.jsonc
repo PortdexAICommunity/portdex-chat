@@ -13,7 +13,7 @@
         "enabled": true,
         "head_sampling_rate": 0.1
     },
-    "env": {
+    "vars": {
         "AUTH_URL": "https://chat.portdex.ai",
         "AUTH_TRUST_HOST": "true"
     }
