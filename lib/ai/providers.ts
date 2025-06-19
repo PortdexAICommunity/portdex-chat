@@ -1,37 +1,39 @@
 import {
-  customProvider,
-  extractReasoningMiddleware,
-  wrapLanguageModel,
-} from 'ai';
-import { xai } from '@ai-sdk/xai';
-import { isTestEnvironment } from '../constants';
+	customProvider,
+	extractReasoningMiddleware,
+	wrapLanguageModel,
+} from "ai";
+import { xai } from "@ai-sdk/xai";
+import { isTestEnvironment } from "../constants";
 import {
-  artifactModel,
-  chatModel,
-  reasoningModel,
-  titleModel,
-} from './models.test';
+	artifactModel,
+	chatModel,
+	reasoningModel,
+	titleModel,
+} from "./models.test";
+import { qwen } from "qwen-ai-provider";
+import { portdex } from "./portdex";
 
 export const myProvider = isTestEnvironment
-  ? customProvider({
-      languageModels: {
-        'chat-model': chatModel,
-        'chat-model-reasoning': reasoningModel,
-        'title-model': titleModel,
-        'artifact-model': artifactModel,
-      },
-    })
-  : customProvider({
-      languageModels: {
-        'chat-model': xai('grok-2-vision-1212'),
-        'chat-model-reasoning': wrapLanguageModel({
-          model: xai('grok-3-mini-beta'),
-          middleware: extractReasoningMiddleware({ tagName: 'think' }),
-        }),
-        'title-model': xai('grok-2-1212'),
-        'artifact-model': xai('grok-2-1212'),
-      },
-      imageModels: {
-        'small-model': xai.image('grok-2-image'),
-      },
-    });
+	? customProvider({
+			languageModels: {
+				"chat-model": chatModel,
+				"chat-model-reasoning": reasoningModel,
+				"title-model": titleModel,
+				"artifact-model": artifactModel,
+			},
+	  })
+	: customProvider({
+			languageModels: {
+				"chat-model": qwen("qwen-plus-latest"),
+				"chat-model-reasoning": wrapLanguageModel({
+					model: portdex("thinker"),
+					middleware: extractReasoningMiddleware({ tagName: "think" }),
+				}),
+				"title-model": portdex("maker"),
+				"artifact-model": portdex("maker"),
+			},
+			// imageModels: {
+			//   'small-model': qwen.('qwen-vl-max'),
+			// },
+	  });
