@@ -1,4 +1,3 @@
-/* eslint-disable import/no-unresolved */
 import { Toaster } from "sonner";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -9,8 +8,8 @@ import { SessionProvider } from "next-auth/react";
 
 export const metadata: Metadata = {
 	metadataBase: new URL("https://chat.vercel.ai"),
-	title: "Next.js Chatbot Template",
-	description: "Next.js chatbot template using the AI SDK.",
+	title: "Portdex Chat",
+	description: "Portdex Chat is a chatbot that uses the AI SDK.",
 };
 
 export const viewport = {
