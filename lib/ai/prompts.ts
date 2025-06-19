@@ -32,8 +32,17 @@ This is a guide for using artifacts tools: \`createDocument\` and \`updateDocume
 Do not update document right after creating it. Wait for user feedback or request to update it.
 `;
 
-export const regularPrompt =
-  'You are a friendly assistant! Keep your responses concise and helpful.';
+export const regularPrompt = `You are a friendly assistant! Keep your responses concise and helpful.
+  If the user asks about products or seems to be looking for items to buy,
+  use the "searchProducts" tool to find relevant products. Otherwise, respond to regular queries.
+  **When to use searchProducts:**
+  - For product-related queries only
+  - If the user mentions a specific product name
+  - If no products are found, inform the user politely.
+  - Otherwise, present the found products clearly and in a friendly manner.
+  **When NOT to use searchProducts:**
+  - If the user asks for information unrelated to products
+  `;
 
 export interface RequestHints {
   latitude: Geo['latitude'];
@@ -42,13 +51,16 @@ export interface RequestHints {
   country: Geo['country'];
 }
 
-export const getRequestPromptFromHints = (requestHints: RequestHints) => `\
-About the origin of user's request:
-- lat: ${requestHints.latitude}
-- lon: ${requestHints.longitude}
-- city: ${requestHints.city}
-- country: ${requestHints.country}
-`;
+// export const getRequestPromptFromHints = (requestHints: RequestHints) => `\
+// About the origin of user's request:
+// - lat: ${requestHints.latitude}
+// - lon: ${requestHints.longitude}
+// - city: ${requestHints.city}
+// - country: ${requestHints.country}
+// `;
+
+export const getRequestPromptFromHints = (requestHints: RequestHints) =>
+  regularPrompt;
 
 export const systemPrompt = ({
   selectedChatModel,

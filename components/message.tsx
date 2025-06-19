@@ -1,24 +1,25 @@
 'use client';
 
+import type { Vote } from '@/lib/db/schema';
+import { cn, sanitizeText } from '@/lib/utils';
+import type { UseChatHelpers } from '@ai-sdk/react';
 import type { UIMessage } from 'ai';
 import cx from 'classnames';
+import equal from 'fast-deep-equal';
 import { AnimatePresence, motion } from 'framer-motion';
 import { memo, useState } from 'react';
-import type { Vote } from '@/lib/db/schema';
 import { DocumentToolCall, DocumentToolResult } from './document';
+import { DocumentPreview } from './document-preview';
 import { PencilEditIcon, SparklesIcon } from './icons';
 import { Markdown } from './markdown';
 import { MessageActions } from './message-actions';
+import { MessageEditor } from './message-editor';
+import { MessageReasoning } from './message-reasoning';
 import { PreviewAttachment } from './preview-attachment';
-import { Weather } from './weather';
-import equal from 'fast-deep-equal';
-import { cn, sanitizeText } from '@/lib/utils';
+import { ProductSearchResults } from './product-search-results';
 import { Button } from './ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
-import { MessageEditor } from './message-editor';
-import { DocumentPreview } from './document-preview';
-import { MessageReasoning } from './message-reasoning';
-import type { UseChatHelpers } from '@ai-sdk/react';
+import { Weather } from './weather';
 
 const PurePreviewMessage = ({
   chatId,
@@ -183,6 +184,12 @@ const PurePreviewMessage = ({
                           args={args}
                           isReadonly={isReadonly}
                         />
+                      ) : toolName === 'searchProducts' ? (
+                        <DocumentToolCall
+                          type="create"
+                          args={args}
+                          isReadonly={isReadonly}
+                        />
                       ) : null}
                     </div>
                   );
@@ -211,6 +218,11 @@ const PurePreviewMessage = ({
                           type="request-suggestions"
                           result={result}
                           isReadonly={isReadonly}
+                        />
+                      ) : toolName === 'searchProducts' ? (
+                        <ProductSearchResults
+                          result={result}
+                          isLoading={isLoading}
                         />
                       ) : (
                         <pre>{JSON.stringify(result, null, 2)}</pre>
