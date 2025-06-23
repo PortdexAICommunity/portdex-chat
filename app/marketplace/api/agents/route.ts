@@ -16,8 +16,10 @@ export async function GET() {
   if (!agentsSection) return NextResponse.json({ agents: [] });
 
   const agents: DataTypes[] = [];
-  let match;
-  while ((match = AGENT_REGEX.exec(agentsSection)) !== null) {
+  let match: RegExpExecArray | null = null;
+  while (AGENT_REGEX.exec(agentsSection) !== null) {
+    match = AGENT_REGEX.exec(agentsSection);
+    if (!match) break;
     const [, name, url, creator, date, description, tagsRaw] = match;
     const tags =
       tagsRaw.match(/`([^`]+)`/g)?.map((t) => t.replace(/`/g, '')) || [];

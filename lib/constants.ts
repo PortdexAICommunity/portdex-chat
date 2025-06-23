@@ -218,97 +218,6 @@ export const marketplaceItems: MarketplaceItem[] = [
   },
 ];
 
-export const assistants: DataTypes[] = [
-  {
-    id: '1',
-    name: 'Tech Paper Explainer',
-    creator: 'AdjeShen',
-    description:
-      'Breaks down complex technical and research papers into simple summaries for engineers and product teams.',
-    category: 'Engineering',
-    icon: '📘',
-    gradient: 'from-green-400 to-purple-500',
-    date: '2025-05-09',
-  },
-  {
-    id: '2',
-    name: 'Startup Strategy Coach',
-    creator: 'egornomic',
-    description:
-      'Helps founders with go-to-market strategies, business models, and lean startup planning.',
-    category: 'Startup',
-    icon: '🚀',
-    gradient: 'from-indigo-400 to-blue-500',
-    date: '2025-04-15',
-  },
-  {
-    id: '3',
-    name: 'Technical Writing Assistant',
-    creator: 'q2019715',
-    description:
-      'Helps you rewrite documentation, API references, and blog posts with technical clarity.',
-    category: 'Content',
-    icon: '📝',
-    gradient: 'from-orange-400 to-yellow-500',
-    date: '2025-03-13',
-  },
-  {
-    id: '4',
-    name: 'DevOps & Infra Coach',
-    creator: 'arvinxx',
-    description:
-      'Get expert suggestions on infra design, cost optimization, CI/CD pipelines, and cloud architecture.',
-    category: 'DevOps',
-    icon: '🛠️',
-    gradient: 'from-cyan-400 to-blue-500',
-    date: '2025-03-11',
-  },
-  {
-    id: '5',
-    name: 'AI Prompt Engineer',
-    creator: 'He-Xun',
-    description:
-      'Generates powerful prompts and workflows to automate research, code generation, and content using LLMs.',
-    category: 'AI',
-    icon: '🤖',
-    gradient: 'from-purple-200 to-pink-200',
-    date: '2025-03-07',
-  },
-  {
-    id: '6',
-    name: 'Policy & Tax Assistant (India)',
-    creator: 'lindongjie1992',
-    description:
-      'Provides clarity on GST, startup policies, and tax-saving schemes relevant to Indian tech businesses.',
-    category: 'Business',
-    icon: '📊',
-    gradient: 'from-yellow-400 to-orange-500',
-    date: '2025-02-26',
-  },
-  {
-    id: '7',
-    name: 'Video Content Summarizer',
-    creator: 'shinishiho',
-    description:
-      'Summarizes podcasts, tech talks, and tutorials from YouTube into digestible notes.',
-    category: 'Media',
-    icon: '🎙️',
-    gradient: 'from-gray-400 to-gray-600',
-    date: '2025-02-24',
-  },
-  {
-    id: '8',
-    name: 'Remote Work Productivity Guide',
-    creator: 'WeR-Best',
-    description:
-      'Helps remote developers and managers optimize focus, routines, and async workflows.',
-    category: 'Productivity',
-    icon: '🧠',
-    gradient: 'from-green-400 to-teal-500',
-    date: '2025-02-23',
-  },
-];
-
 export const plugins: DataTypes[] = [
   {
     id: '1',
@@ -384,37 +293,59 @@ export const plugins: DataTypes[] = [
 
 export const aiModels: DataTypes[] = [
   {
-    id: 'ai-1',
-    name: 'DevCode Pro',
-    creator: 'CodeAI Inc.',
+    id: 'dall-e-3',
+    name: 'DALL-E 3',
+    creator: 'OpenAI',
     description:
-      'AI model optimized for intelligent code completion, bug detection, and real-time refactoring for developers.',
-    category: 'AI Model',
-    icon: '🧠',
-    gradient: 'from-purple-500 to-indigo-600',
-    date: '2025-04-01',
+      'Advanced AI image generation model capable of producing high-quality, creative pictures from text prompts.',
+    category: 'Image Generation',
+    icon: 'https://cdn.activepieces.com/pieces/openai.png',
+    gradient: 'linear-gradient(135deg, #00f2fe 0%, #4facfe 100%)',
+    date: '2024-05-15',
   },
   {
-    id: 'ai-2',
-    name: 'BizGPT Executive',
-    creator: 'EnterpriseAI',
+    id: 'dall-e-2',
+    name: 'DALL-E 2',
+    creator: 'OpenAI',
     description:
-      'An AI assistant for executives and managers that generates summaries, memos, and strategic insights.',
-    category: 'AI Model',
-    icon: '📊',
-    gradient: 'from-yellow-500 to-orange-600',
-    date: '2025-03-28',
+      "Second generation of OpenAI's image generation model, known for creative visuals.",
+    category: 'Image Generation',
+    icon: 'https://cdn.activepieces.com/pieces/openai.png',
+    gradient: 'linear-gradient(135deg, #ffb347 0%, #ffcc33 100%)',
+    date: '2023-03-01',
   },
   {
-    id: 'ai-3',
-    name: 'CloudOps LLM',
-    creator: 'DevCloud',
+    id: 'sdxl-lightning-4step',
+    name: 'SDXL Lightning 4-Step',
+    creator: 'Bytedance via Replicate',
     description:
-      'Built to assist DevOps teams with Terraform scripts, CI/CD setups, and cloud service automation.',
-    category: 'AI Model',
-    icon: '☁️',
-    gradient: 'from-blue-400 to-cyan-500',
-    date: '2025-03-15',
+      'Ultra-fast diffusion-based image synthesis model, optimized for quick results.',
+    category: 'Image Generation',
+    icon: 'https://cdn.activepieces.com/pieces/replicate.png',
+    gradient: 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)',
+    date: '2024-04-10',
+  },
+  {
+    id: 'stable-diffusion',
+    name: 'Stable Diffusion',
+    creator: 'Stability AI via Replicate',
+    description:
+      'Open-source diffusion model for generating images from natural language descriptions.',
+    category: 'Image Generation',
+    icon: 'https://cdn.activepieces.com/pieces/replicate.png',
+    gradient: 'linear-gradient(135deg, #f7971e 0%, #ffd200 100%)',
+    date: '2023-10-18',
+  },
+  {
+    id: 'flux-schnell',
+    name: 'Flux Schnell',
+    creator: 'Black Forest Labs via Replicate',
+    description:
+      'Fast and flexible model for creative image generation, available on Replicate.',
+    category: 'Image Generation',
+    icon: 'https://cdn.activepieces.com/pieces/replicate.png',
+    gradient: 'linear-gradient(135deg, #f953c6 0%, #b91d73 100%)',
+    date: '2024-01-22',
   },
 ];
 
