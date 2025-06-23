@@ -1,26 +1,26 @@
 "use client";
 
-import type { Attachment, UIMessage } from "ai";
-import { useChat } from "@ai-sdk/react";
-import { useEffect, useState } from "react";
-import useSWR, { useSWRConfig } from "swr";
 import { ChatHeader } from "@/components/chat-header";
-import type { Vote } from "@/lib/db/schema";
-import { fetcher, fetchWithErrorHandlers, generateUUID } from "@/lib/utils";
-import { Artifact } from "./artifact";
-import { MultimodalInput } from "./multimodal-input";
-import { Messages } from "./messages";
-import type { VisibilityType } from "./visibility-selector";
 import { useArtifactSelector } from "@/hooks/use-artifact";
-import { unstable_serialize } from "swr/infinite";
-import { getChatHistoryPaginationKey } from "./sidebar-history";
-import { toast } from "./toast";
+import { useAutoResume } from "@/hooks/use-auto-resume";
+import { useChatVisibility } from "@/hooks/use-chat-visibility";
+import type { Vote } from "@/lib/db/schema";
+import { ChatSDKError } from "@/lib/errors";
+import { fetcher, fetchWithErrorHandlers, generateUUID } from "@/lib/utils";
+import { useChat } from "@ai-sdk/react";
+import type { Attachment, UIMessage } from "ai";
 import type { Session } from "next-auth";
 import { useSearchParams } from "next/navigation";
-import { useChatVisibility } from "@/hooks/use-chat-visibility";
-import { useAutoResume } from "@/hooks/use-auto-resume";
-import { ChatSDKError } from "@/lib/errors";
+import { useEffect, useState } from "react";
+import useSWR, { useSWRConfig } from "swr";
+import { unstable_serialize } from "swr/infinite";
+import { Artifact } from "./artifact";
 import { HomeMarketplace } from "./marketplace/home-marketplace";
+import { Messages } from "./messages";
+import { MultimodalInput } from "./multimodal-input";
+import { getChatHistoryPaginationKey } from "./sidebar-history";
+import { toast } from "./toast";
+import type { VisibilityType } from "./visibility-selector";
 
 export function Chat({
 	id,
@@ -103,7 +103,7 @@ export function Chat({
 
 	const { data: votes } = useSWR<Array<Vote>>(
 		messages.length >= 2 ? `/api/vote?chatId=${id}` : null,
-		fetcher
+		fetcher as any
 	);
 
 	const [attachments, setAttachments] = useState<Array<Attachment>>([]);

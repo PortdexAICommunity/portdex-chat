@@ -1,17 +1,17 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, User, Star, Download, Sparkles } from 'lucide-react';
 import type { Assistant, Plugin } from '@/lib/types';
+import { motion } from 'framer-motion';
+import { Calendar, Download, Sparkles, Star, User } from 'lucide-react';
 
 interface DetailDialogProps {
   isOpen: boolean;
@@ -141,7 +141,7 @@ export function DetailDialog({
                     '🎨 Customizable themes',
                   ].map((feature, index) => (
                     <motion.div
-                      key={index}
+                      key={feature}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
