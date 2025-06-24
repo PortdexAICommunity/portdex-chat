@@ -13,7 +13,7 @@ export default async function Layout({
   children: React.ReactNode;
 }) {
   const [session, cookieStore] = await Promise.all([auth(), cookies()]);
-  const isCollapsed = cookieStore.get('sidebar:state')?.value !== 'true';
+  // const isCollapsed = cookieStore.get('sidebar:state')?.value !== 'true';
 
   return (
     <>
@@ -21,7 +21,7 @@ export default async function Layout({
         src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"
         strategy="beforeInteractive"
       />
-      <SidebarProvider defaultOpen={!isCollapsed}>
+      <SidebarProvider defaultOpen={false}>
         <AppSidebar user={session?.user} />
         <SidebarInset>{children}</SidebarInset>
       </SidebarProvider>
