@@ -1,7 +1,7 @@
+import type { Document } from '@/lib/db/schema';
 import type { CoreAssistantMessage, CoreToolMessage, UIMessage } from 'ai';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import type { Document } from '@/lib/db/schema';
 import { ChatSDKError, type ErrorCode } from './errors';
 
 export function cn(...inputs: ClassValue[]) {
@@ -12,7 +12,7 @@ export const fetcher = async (url: string) => {
   const response = await fetch(url);
 
   if (!response.ok) {
-    const { code, cause } = await response.json();
+    const { code, cause } = (await response.json()) as any;
     throw new ChatSDKError(code as ErrorCode, cause);
   }
 
@@ -27,7 +27,7 @@ export async function fetchWithErrorHandlers(
     const response = await fetch(input, init);
 
     if (!response.ok) {
-      const { code, cause } = await response.json();
+      const { code, cause } = (await response.json()) as any;
       throw new ChatSDKError(code as ErrorCode, cause);
     }
 

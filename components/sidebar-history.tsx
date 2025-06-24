@@ -1,11 +1,5 @@
 'use client';
 
-import { isToday, isYesterday, subMonths, subWeeks } from 'date-fns';
-import { useParams, useRouter } from 'next/navigation';
-import type { User } from 'next-auth';
-import { useState } from 'react';
-import { toast } from 'sonner';
-import { motion } from 'framer-motion';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,9 +18,15 @@ import {
 } from '@/components/ui/sidebar';
 import type { Chat } from '@/lib/db/schema';
 import { fetcher } from '@/lib/utils';
-import { ChatItem } from './sidebar-history-item';
+import { isToday, isYesterday, subMonths, subWeeks } from 'date-fns';
+import { motion } from 'framer-motion';
+import type { User } from 'next-auth';
+import { useParams, useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { toast } from 'sonner';
 import useSWRInfinite from 'swr/infinite';
 import { LoaderIcon } from './icons';
+import { ChatItem } from './sidebar-history-item';
 
 type GroupedChats = {
   today: Chat[];
@@ -79,7 +79,7 @@ const groupChatsByDate = (chats: Chat[]): GroupedChats => {
 export function getChatHistoryPaginationKey(
   pageIndex: number,
   previousPageData: ChatHistory,
-) {
+): string | null {
   if (previousPageData && previousPageData.hasMore === false) {
     return null;
   }
@@ -103,7 +103,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
     isValidating,
     isLoading,
     mutate,
-  } = useSWRInfinite<ChatHistory>(getChatHistoryPaginationKey, fetcher, {
+  } = useSWRInfinite<any>(getChatHistoryPaginationKey, fetcher, {
     fallbackData: [],
   });
 
@@ -131,7 +131,9 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
           if (chatHistories) {
             return chatHistories.map((chatHistory) => ({
               ...chatHistory,
-              chats: chatHistory.chats.filter((chat) => chat.id !== deleteId),
+              chats: chatHistory.chats.filter(
+                (chat: { id: string | null }) => chat.id !== deleteId,
+              ),
             }));
           }
         });
