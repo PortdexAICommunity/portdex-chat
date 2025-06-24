@@ -196,7 +196,7 @@ function PureMultimodalInput({
   return (
     <div className="relative w-full flex flex-col gap-4">
       <AnimatePresence>
-        {!isAtBottom && (
+        {messages.length !== 0 && !isAtBottom && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -216,11 +216,11 @@ function PureMultimodalInput({
             >
               <ArrowDown />
             </Button>
-          </motion.div>
+          </motion.div> 
         )}
       </AnimatePresence>
 
-      {messages.length === 0 &&
+      {/* {messages.length === 0 &&
         attachments.length === 0 &&
         uploadQueue.length === 0 && (
           <SuggestedActions
@@ -228,7 +228,7 @@ function PureMultimodalInput({
             chatId={chatId}
             selectedVisibilityType={selectedVisibilityType}
           />
-        )}
+        )} */}
 
       <input
         type="file"
@@ -265,11 +265,11 @@ function PureMultimodalInput({
       <Textarea
         data-testid="multimodal-input"
         ref={textareaRef}
-        placeholder="Send a message..."
+        placeholder="Ask Portdex Chat about..."
         value={input}
         onChange={handleInput}
         className={cx(
-          'min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-2xl !text-base bg-muted pb-10 dark:border-zinc-700',
+          'min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-2xl !text-base bg-muted pb-10',
           className,
         )}
         rows={2}
