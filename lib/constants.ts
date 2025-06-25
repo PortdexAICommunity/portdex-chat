@@ -1,5 +1,5 @@
 import { generateDummyPassword } from './db/utils';
-import type { DataTypes, MarketplaceItem } from './types';
+import type { DataTypes, HomeMarketplaceItem, MarketplaceItem } from './types';
 
 export const isProductionEnvironment = process.env.NODE_ENV === 'production';
 export const isDevelopmentEnvironment = process.env.NODE_ENV === 'development';
@@ -419,4 +419,84 @@ export const siteTemplates: DataTypes[] = [
     gradient: 'from-sky-500 to-blue-600',
     date: '2025-04-08',
   },
+];
+
+export const homeMarketplaceItems: HomeMarketplaceItem[] = [
+  {
+    id: 'crypto-fraud-detector',
+    title: 'Crypto Fraud Detection Agent',
+    description: 'Detect and analyze potential crypto scams, phishing, and fraud using AI.',
+    category: 'Finance',
+    icon: '🛡️',
+    gradient: 'from-emerald-500 to-emerald-700',
+    date: '2025-06-01',
+    type: 'assistant',
+    creator: 'Portdex'
+  },
+  {
+    id: 'finance-realtime-chat',
+    title: 'Finance Realtime Chat',
+    description: 'Chat with an AI agent about budgeting, investing, or financial planning in real-time.',
+    category: 'Finance',
+    icon: '💬',
+    gradient: 'from-green-500 to-green-700',
+    date: '2025-06-01',
+    type: 'plugin',
+    creator: 'Portdex'
+  },
+  {
+    id: 'crypto-investment-recommendation',
+    title: 'Crypto Investment Advisor',
+    description: 'Get personalized cryptocurrency investment suggestions based on your risk profile and goals.',
+    category: 'Finance',
+    icon: '📈',
+    gradient: 'from-purple-500 to-purple-700',
+    date: '2025-06-01',
+    type: 'plugin',
+    creator: 'Portdex'
+  },
+  {
+    id: 'market-research-agent',
+    title: 'Market Research Agent',
+    description: 'Perform AI-powered research on stocks, tokens, trends, and global financial data.',
+    category: 'Finance',
+    icon: '📊',
+    gradient: 'from-indigo-500 to-indigo-700',
+    date: '2025-06-01',
+    type: 'plugin',
+    creator: 'Portdex'
+  },
+  {
+    id: 'legal-crypto-compliance',
+    title: 'Crypto Compliance Advisor',
+    description: 'Understand crypto regulations, KYC/AML requirements, and legal obligations with AI assistance.',
+    category: 'Finance',
+    icon: '⚖️',
+    gradient: 'from-yellow-500 to-yellow-700',
+    date: '2025-06-01',
+    type: 'assistant',
+    creator: 'Portdex'
+  },
+  {
+    id: 'real-time-market-analyzer',
+    title: 'Realtime Market Analyzer',
+    description: 'Live analysis of crypto and financial markets using AI-driven signals and indicators.',
+    category: 'Finance',
+    icon: '⏱️',
+    gradient: 'from-red-500 to-red-700',
+    date: '2025-06-01',
+    type: 'assistant',
+    creator: 'Portdex'
+  },
+  {
+    id: 'find-financial-advisors',
+    title: 'Find Financial Advisors',
+    description: 'Discover and connect with qualified financial advisors based on your needs.',
+    category: 'Finance',
+    icon: '🧑‍💼',
+    gradient: 'from-sky-500 to-sky-700',
+    date: '2025-06-01',
+    type: 'plugin',
+    creator: 'Portdex'
+  }
 ];
