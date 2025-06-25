@@ -19,6 +19,12 @@ export const Footer = () => {
 
 							<div className="grid grid-cols-2 lg:grid-cols-3 lg:gap-y-2 lg:gap-x-8 place-items-start">
 								<Link
+									href="/about"
+									className="block mt-3 text-sm font-medium text-gray-500 duration-700 dark:text-gray-300 hover:text-gray-400 dark:hover:text-gray-200 hover:underline"
+								>
+									About us
+								</Link>
+								<Link
 									href="/blockchain"
 									className="block mt-3 text-sm font-medium text-gray-500 duration-700 dark:text-gray-300 hover:text-gray-400 dark:hover:text-gray-200 hover:underline"
 								>

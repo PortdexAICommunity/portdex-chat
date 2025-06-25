@@ -9,7 +9,7 @@ import { Navbar } from "@/components/navbar";
 
 export const experimental_ppr = true;
 
-export default async function BlockchainLayout({
+export default async function HomeLayout({
 	children,
 }: {
 	children: React.ReactNode;
