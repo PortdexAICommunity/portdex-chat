@@ -1,5 +1,5 @@
 import { generateDummyPassword } from './db/utils';
-import type { DataTypes, MarketplaceItem } from './types';
+import type { DataTypes, HomeMarketplaceItem, MarketplaceItem } from './types';
 
 export const isProductionEnvironment = process.env.NODE_ENV === 'production';
 export const isDevelopmentEnvironment = process.env.NODE_ENV === 'development';
@@ -420,3 +420,83 @@ export const siteTemplates: DataTypes[] = [
     date: '2025-04-08',
   },
 ];
+
+export const homeMarketplaceItems: HomeMarketplaceItem[] = [
+  {
+    id: 'education-search',
+    title: 'Education Search AI',
+    description: 'Search for educational resources, courses, and learning materials with AI-powered insights.',
+    category: 'Education',
+    icon: '🎓',
+    gradient: 'from-blue-500 to-blue-700',
+    date: '2025-05-01',
+    type: 'assistant',
+    creator: 'Portdex'
+  },
+  {
+    id: 'education-realtime',
+    title: 'Education Realtime Chat',
+    description: 'Chat with AI about your education needs in real-time.',
+    category: 'Education',
+    icon: '🎓',
+    gradient: 'from-blue-500 to-blue-700',
+    date: '2025-05-01',
+    type: 'plugin',
+    creator: 'Portdex'
+  },
+  {
+    id: 'education-course-recommendation',
+    title: 'Education Course Recommendation',
+    description: 'Get personalized course recommendations based on your learning goals and interests.',
+    category: 'Education',
+    icon: '🎓',
+    gradient: 'from-blue-500 to-blue-700',
+    date: '2025-05-01',
+    type: 'plugin', 
+    creator: 'Portdex'
+  },
+  {
+    id: 'academic-research',
+    title: 'Academic Research',
+    description: 'Get personalized course recommendations based on your learning goals and interests.',
+    category: 'Education',
+    icon: '🎓',
+    gradient: 'from-blue-500 to-blue-700',
+    date: '2025-05-01',
+    type: 'plugin', 
+    creator: 'Portdex'
+  },
+  {
+    id: 'legal-search',
+    title: 'Legal Search',
+    description: 'Get personalized course recommendations based on your learning goals and interests.',
+    category: 'Education',
+    icon: '🎓',
+    gradient: 'from-blue-500 to-blue-700',
+    date: '2025-05-01',
+    type: 'assistant', 
+    creator: 'Portdex'
+  },
+  {
+    id: 'legal-realtime',
+    title: 'Legal Realtime Chat',
+    description: 'Chat with AI about your legal needs in real-time.',
+    category: 'Education',
+    icon: '🎓',
+    gradient: 'from-blue-500 to-blue-700',
+    date: '2025-05-01',
+    type: 'assistant', 
+    creator: 'Portdex'
+  },
+  {
+    id: 'find-legal-help',
+    title: 'Find Legal Help',
+    description: 'Find legal help for your needs.',
+    category: 'Education',
+    icon: '💰',
+    gradient: 'from-blue-500 to-blue-700',
+    date: '2025-05-01',
+    type: 'plugin', 
+    creator: 'Portdex'
+  }
+]

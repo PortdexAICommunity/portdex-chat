@@ -36,3 +36,15 @@ export type Plugin = {
   creator: string;
   description: string;
 };
+
+export type HomeMarketplaceItem = {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  icon: string;
+  gradient: string;
+  date: string;
+  type: 'plugin' | 'assistant' | 'ai-model' | 'software' | 'template';
+  creator: string;
+}
