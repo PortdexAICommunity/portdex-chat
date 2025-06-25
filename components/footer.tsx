@@ -239,10 +239,10 @@ export const Footer = () => {
 
 						<div className="flex mt-3 -mx-2 sm:mt-0 gap-4">
 							<Link href={"mailto:info@portdex.ai"} target="_blank">
-								<MailIcon className="w-5 h-5 " />
+								<MailIcon className="size-5 " />
 							</Link>
 							<Link href={"https://x.com/Portdex"} target="_blank">
-								<TwitterIcon className="w-5 h-5" />
+								<TwitterIcon className="size-5" />
 							</Link>
 						</div>
 					</div>
