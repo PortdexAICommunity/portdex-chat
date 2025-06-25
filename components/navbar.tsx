@@ -107,7 +107,7 @@ export function Navbar() {
 						Roadmap
 					</div>
 					<div
-						onClick={() => router.push("/contact-us")}
+						onClick={() => router.push("/contact")}
 						className={cn(
 							"hover:text-foreground text-sm md:text-md transition-colors cursor-pointer hidden md:block",
 							pathname === "/contact-us" ? "text-purple-400" : ""
