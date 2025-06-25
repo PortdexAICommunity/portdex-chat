@@ -33,10 +33,12 @@ import {
 	cardVariants,
 } from "@/lib/animation-constant";
 import Link from "next/link";
+import { Navbar } from "@/components/navbar";
 
 export default function ContactUsPage() {
 	return (
 		<div className="min-h-screen w-full mx-auto">
+			<Navbar />
 			<HeroSection />
 			<ContactInfo />
 			{/* <ContactForm /> */}
@@ -48,11 +50,22 @@ export default function ContactUsPage() {
 const HeroSection = () => {
 	return (
 		<section className="relative overflow-hidden py-12 md:py-20 lg:py-28">
+			{/* Background gradient elements */}
+			<div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(120,119,198,0.15),transparent_50%)]" />
+			<div
+				className="absolute inset-0"
+				style={{
+					background:
+						"linear-gradient(to right, #80808012 1px, transparent 1px), linear-gradient(to bottom, #80808012 1px, transparent 1px)",
+					backgroundSize: "24px 24px",
+				}}
+			/>
+
 			<motion.div
 				variants={staggerContainer}
 				initial="hidden"
 				animate="visible"
-				className="ai-flow-container flex flex-col items-center justify-center px-4 text-center"
+				className="container mx-auto flex flex-col items-center justify-center px-4 text-center relative"
 			>
 				<motion.div
 					variants={fadeIn}
@@ -64,8 +77,8 @@ const HeroSection = () => {
 						custom={1}
 						className="w-full flex justify-center py-2"
 					>
-						<Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 text-lg px-4 py-2">
-							<MessageSquare className="w-4 h-4 mr-2" />
+						<Badge className="bg-purple-100 text-purple-700 border-purple-200 text-lg px-4 py-2">
+							<MessageSquare className="size-4 mr-2" />
 							Get in Touch
 						</Badge>
 					</motion.div>
@@ -75,7 +88,7 @@ const HeroSection = () => {
 						custom={2}
 						className="text-center font-bold tracking-tight text-4xl md:text-5xl lg:text-6xl"
 					>
-						<span className="bg-gradient-to-r from-emerald-500 via-teal-500 to-green-500 bg-clip-text text-transparent">
+						<span className="bg-gradient-to-r from-purple-500 via-teal-500 to-green-500 bg-clip-text text-transparent">
 							Contact Portdex
 						</span>
 					</motion.h1>
@@ -95,16 +108,16 @@ const HeroSection = () => {
 						custom={4}
 						className="flex flex-wrap justify-center gap-6 pt-6"
 					>
-						<div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 rounded-full px-4 py-2">
-							<Users className="w-4 h-4" />
+						<div className="flex items-center gap-2 text-purple-600 bg-purple-50 rounded-full px-4 py-2">
+							<Users className="size-4" />
 							<span className="font-medium">24/7 Support</span>
 						</div>
-						<div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 rounded-full px-4 py-2">
-							<CheckCircle2 className="w-4 h-4" />
+						<div className="flex items-center gap-2 text-purple-600 bg-purple-50 rounded-full px-4 py-2">
+							<CheckCircle2 className="size-4" />
 							<span className="font-medium">Expert Team</span>
 						</div>
-						<div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 rounded-full px-4 py-2">
-							<Building2 className="w-4 h-4" />
+						<div className="flex items-center gap-2 text-purple-600 bg-purple-50 rounded-full px-4 py-2">
+							<Building2 className="size-4" />
 							<span className="font-medium">Enterprise Ready</span>
 						</div>
 					</motion.div>
@@ -153,11 +166,11 @@ const ContactInfo = () => {
 				initial="hidden"
 				whileInView="visible"
 				viewport={{ once: true }}
-				className="ai-flow-container"
+				className="container mx-auto"
 			>
 				<motion.div variants={fadeIn} custom={1} className="text-center mb-12">
 					<h2 className="text-3xl md:text-4xl font-bold mb-4">
-						<span className="bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">
+						<span className="bg-gradient-to-r from-purple-500 to-teal-500 bg-clip-text text-transparent">
 							Contact Information
 						</span>
 					</h2>
@@ -175,10 +188,10 @@ const ContactInfo = () => {
 							whileHover="hover"
 							className="group"
 						>
-							<Card className="h-full bg-white/10 backdrop-blur-sm border border-border hover:shadow-xl transition-all duration-300 hover:border-emerald-200">
+							<Card className="h-full bg-white/10 backdrop-blur-sm border border-border hover:shadow-xl transition-all duration-300 hover:border-purple-200">
 								<CardHeader className="text-center">
-									<div className="mx-auto w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-emerald-200 transition-colors">
-										<detail.icon className="w-6 h-6 text-emerald-600" />
+									<div className="mx-auto size-12 bg-purple-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-purple-200 transition-colors">
+										<detail.icon className="size-6 text-purple-600" />
 									</div>
 									<CardTitle className="text-lg font-semibold">
 										{detail.title}
@@ -188,7 +201,7 @@ const ContactInfo = () => {
 									{detail.link ? (
 										<a
 											href={detail.link}
-											className="font-medium text-emerald-600 hover:text-emerald-700 transition-colors"
+											className="font-medium text-purple-600 hover:text-purple-700 transition-colors"
 											target={
 												detail.link.startsWith("http") ? "_blank" : undefined
 											}
@@ -201,7 +214,7 @@ const ContactInfo = () => {
 											{detail.content}
 										</a>
 									) : (
-										<p className="font-medium text-emerald-600">
+										<p className="font-medium text-purple-600">
 											{detail.content}
 										</p>
 									)}
@@ -267,11 +280,11 @@ const ContactForm = () => {
 				initial="hidden"
 				whileInView="visible"
 				viewport={{ once: true }}
-				className="ai-flow-container"
+				className="container mx-auto"
 			>
 				<motion.div variants={fadeIn} custom={1} className="text-center mb-12">
 					<h2 className="text-3xl md:text-4xl font-bold mb-4">
-						<span className="bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">
+						<span className="bg-gradient-to-r from-purple-500 to-teal-500 bg-clip-text text-transparent">
 							Send Us a Message
 						</span>
 					</h2>
@@ -303,10 +316,10 @@ const ContactForm = () => {
 									animate={{ opacity: 1, scale: 1 }}
 									className="text-center py-8"
 								>
-									<div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-										<CheckCircle2 className="w-8 h-8 text-emerald-600" />
+									<div className="size-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+										<CheckCircle2 className="size-8 text-purple-600" />
 									</div>
-									<h3 className="text-xl font-semibold text-emerald-600 mb-2">
+									<h3 className="text-xl font-semibold text-purple-600 mb-2">
 										Message Sent Successfully!
 									</h3>
 									<p className="text-muted-foreground">
@@ -325,7 +338,7 @@ const ContactForm = () => {
 												onChange={handleInputChange}
 												placeholder="John Doe"
 												required
-												className="border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"
+												className="border-gray-200 focus:border-purple-500 focus:ring-purple-500"
 											/>
 										</div>
 										<div className="space-y-2">
@@ -338,7 +351,7 @@ const ContactForm = () => {
 												onChange={handleInputChange}
 												placeholder="john@company.com"
 												required
-												className="border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"
+												className="border-gray-200 focus:border-purple-500 focus:ring-purple-500"
 											/>
 										</div>
 									</div>
@@ -352,7 +365,7 @@ const ContactForm = () => {
 												value={formData.company}
 												onChange={handleInputChange}
 												placeholder="Your Company"
-												className="border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"
+												className="border-gray-200 focus:border-purple-500 focus:ring-purple-500"
 											/>
 										</div>
 										<div className="space-y-2">
@@ -364,7 +377,7 @@ const ContactForm = () => {
 												onChange={handleInputChange}
 												placeholder="How can we help?"
 												required
-												className="border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"
+												className="border-gray-200 focus:border-purple-500 focus:ring-purple-500"
 											/>
 										</div>
 									</div>
@@ -379,25 +392,25 @@ const ContactForm = () => {
 											placeholder="Tell us about your project, requirements, or any questions you have..."
 											required
 											rows={6}
-											className="border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 resize-none"
+											className="border-gray-200 focus:border-purple-500 focus:ring-purple-500 resize-none"
 										/>
 									</div>
 
 									<Button
 										type="submit"
 										disabled={isSubmitting}
-										className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-medium py-3"
+										className="w-full bg-gradient-to-r from-purple-600 to-teal-600 hover:from-purple-700 hover:to-teal-700 text-white font-medium py-3"
 									>
 										{isSubmitting ? (
 											<div className="flex items-center gap-2">
-												<div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+												<div className="size-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
 												Sending Message...
 											</div>
 										) : (
 											<div className="flex items-center gap-2">
-												<Send className="w-4 h-4" />
+												<Send className="size-4" />
 												Send Message
-												<ArrowRight className="w-4 h-4" />
+												<ArrowRight className="size-4" />
 											</div>
 										)}
 									</Button>
@@ -419,11 +432,11 @@ const LocationSection = () => {
 				initial="hidden"
 				whileInView="visible"
 				viewport={{ once: true }}
-				className="ai-flow-container"
+				className="container mx-auto"
 			>
 				<motion.div variants={fadeIn} custom={1} className="text-center mb-12">
 					<h2 className="text-3xl md:text-4xl font-bold mb-4">
-						<span className="bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">
+						<span className="bg-gradient-to-r from-purple-500 to-teal-500 bg-clip-text text-transparent">
 							Our Location
 						</span>
 					</h2>
@@ -439,20 +452,20 @@ const LocationSection = () => {
 				>
 					<Card className="overflow-hidden border-0 shadow-xl bg-transparent">
 						<div className="grid grid-cols-1 lg:grid-cols-2">
-							<div className="p-8 lg:p-12 bg-gradient-to-br from-emerald-50 to-teal-50">
+							<div className="p-8 lg:p-12 bg-gradient-to-br from-purple-50 to-teal-50">
 								<div className="space-y-6">
 									<div>
-										<h3 className="text-2xl font-bold text-emerald-800 mb-2">
+										<h3 className="text-2xl font-bold text-purple-800 mb-2">
 											Portdex Limited
 										</h3>
-										<p className="text-emerald-600 font-medium">
+										<p className="text-purple-600 font-medium">
 											Registered in England and Wales
 										</p>
 									</div>
 
 									<div className="space-y-4">
 										<div className="flex items-start gap-3">
-											<MapPin className="w-5 h-5 text-emerald-600 mt-1 flex-shrink-0" />
+											<MapPin className="size-5 text-purple-600 mt-1 shrink-0" />
 											<div>
 												<p className="font-medium text-gray-900">
 													16 Mount Pleasant
@@ -464,10 +477,10 @@ const LocationSection = () => {
 										</div>
 
 										<div className="flex items-center gap-3">
-											<Mail className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+											<Mail className="size-5 text-purple-600 shrink-0" />
 											<Link
 												href="mailto:info@portdex.ai"
-												className="text-emerald-600 hover:text-emerald-700 font-medium transition-colors"
+												className="text-purple-600 hover:text-purple-700 font-medium transition-colors"
 											>
 												info@portdex.ai
 											</Link>
@@ -477,14 +490,14 @@ const LocationSection = () => {
 									<div className="pt-6">
 										<Button
 											asChild
-											className="bg-emerald-600 hover:bg-emerald-700 text-white"
+											className="bg-purple-600 hover:bg-purple-700 text-white"
 										>
 											<Link
 												href="https://maps.google.com/?q=16+Mount+Pleasant+Tunbridge+Wells+England+TN1+1QU"
 												target="_blank"
 												rel="noopener noreferrer"
 											>
-												<MapPin className="w-4 h-4 mr-2" />
+												<MapPin className="size-4 mr-2" />
 												View on Google Maps
 											</Link>
 										</Button>
@@ -494,7 +507,7 @@ const LocationSection = () => {
 
 							<div className="h-64 lg:h-auto bg-gray-100 flex items-center justify-center">
 								<div className="text-center p-8">
-									<MapPin className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
+									<MapPin className="size-12 text-purple-500 mx-auto mb-4" />
 									<p className="text-gray-600 font-medium">
 										Tunbridge Wells, England
 									</p>

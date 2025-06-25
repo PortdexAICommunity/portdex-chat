@@ -230,7 +230,7 @@ export function Chat({
 					</div>
 				)}
 
-				<Footer />
+				{messages.length === 0 && <Footer />}
 			</div>
 
 			<Artifact

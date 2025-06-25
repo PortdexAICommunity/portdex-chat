@@ -21,19 +21,19 @@ import { BotIcon, CompassIcon, MonitorIcon, PuzzleIcon } from "lucide-react";
 
 const navigationItems = [
 	{
-		title: "ActivePieces",
+		title: "Workflows",
 		href: "https://workflow.portdex.ai/",
 		icon: PuzzleIcon,
 		target: "_blank",
 	},
 	{
-		title: "Open UI",
+		title: "Digital Content",
 		href: "https://digitalcontent.portdex.ai/",
 		icon: MonitorIcon,
 		target: "_blank",
 	},
 	{
-		title: "AutoGen",
+		title: "Agentic AI",
 		href: "https://dev.portdex.ai/",
 		icon: BotIcon,
 		target: "_blank",
