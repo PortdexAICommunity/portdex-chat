@@ -4,10 +4,12 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { auth } from "../(auth)/auth";
 import Script from "next/script";
+import { Footer } from "@/components/footer";
+import { Navbar } from "@/components/navbar";
 
 export const experimental_ppr = true;
 
-export default async function Layout({
+export default async function BlockchainLayout({
 	children,
 }: {
 	children: React.ReactNode;
@@ -25,6 +27,7 @@ export default async function Layout({
 				<AppSidebar user={session?.user} />
 				<SidebarInset>{children}</SidebarInset>
 			</SidebarProvider>
+			<Footer />
 		</>
 	);
 }

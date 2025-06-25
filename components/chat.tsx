@@ -22,6 +22,7 @@ import { useAutoResume } from "@/hooks/use-auto-resume";
 import { ChatSDKError } from "@/lib/errors";
 import { useChatCache } from "@/hooks/use-chat-cache";
 import { HomeMarketplace } from "./marketplace/home-marketplace";
+import { Footer } from "./footer";
 
 export function Chat({
 	id,
@@ -172,7 +173,14 @@ export function Chat({
 	});
 	return (
 		<>
-			<div className={cn("flex flex-col bg-background min-h-screen", messages.length === 0 ? "[background:radial-gradient(125%_125%_at_50%_10%,#fff_40%,#63e_100%)] dark:[background:radial-gradient(125%_125%_at_50%_10%,#000_40%,#63e_100%)]" : "")}>
+			<div
+				className={cn(
+					"flex flex-col bg-background min-h-screen",
+					messages.length === 0
+						? "[background:radial-gradient(125%_125%_at_50%_10%,#fff_40%,#63e_100%)] dark:[background:radial-gradient(125%_125%_at_50%_10%,#000_40%,#63e_100%)]"
+						: ""
+				)}
+			>
 				<ChatHeader
 					chatId={id}
 					selectedModelId={initialChatModel}
@@ -192,22 +200,27 @@ export function Chat({
 					isArtifactVisible={isArtifactVisible}
 				/>
 
-				<form className={cn("flex mx-auto px-4 sm:px-6 bg-transparent pb-4 md:pb-6 gap-2 w-full max-w-none md:max-w-3xl", messages.length === 0 ? "my-[20dvh]" : "my-0")}>
+				<form
+					className={cn(
+						"flex mx-auto px-4 sm:px-6 bg-transparent pb-4 md:pb-6 gap-2 w-full max-w-none md:max-w-3xl",
+						messages.length === 0 ? "my-[20dvh]" : "my-0"
+					)}
+				>
 					{!isReadonly && (
 						<MultimodalInput
-						chatId={id}
-						input={input}
-						setInput={setInput}
-						handleSubmit={handleSubmit}
-						status={status}
-						stop={stop}
-						attachments={attachments}
-						setAttachments={setAttachments}
-						messages={messages}
-						setMessages={setMessages}
-						append={append}
-						selectedVisibilityType={visibilityType}
-					/>
+							chatId={id}
+							input={input}
+							setInput={setInput}
+							handleSubmit={handleSubmit}
+							status={status}
+							stop={stop}
+							attachments={attachments}
+							setAttachments={setAttachments}
+							messages={messages}
+							setMessages={setMessages}
+							append={append}
+							selectedVisibilityType={visibilityType}
+						/>
 					)}
 				</form>
 
@@ -216,6 +229,8 @@ export function Chat({
 						<HomeMarketplace />
 					</div>
 				)}
+
+				<Footer />
 			</div>
 
 			<Artifact
