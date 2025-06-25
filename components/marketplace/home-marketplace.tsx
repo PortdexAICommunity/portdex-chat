@@ -372,7 +372,7 @@ const MarketplaceItemCard = ({
 
 export const HomeMarketplace = () => {
 	const router = useRouter();
-	const [showCount, setShowCount] = useState(8);
+	const [showCount, setShowCount] = useState(6);
 	const [selectedItem, setSelectedItem] = useState<HomeMarketplaceItem | null>(
 		null
 	);
@@ -423,7 +423,7 @@ export const HomeMarketplace = () => {
 			</div>
 
 			{/* Grid */}
-			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
 				<AnimatePresence>
 					{visibleItems.map((item, index) => (
 						<MarketplaceItemCard
@@ -450,7 +450,7 @@ export const HomeMarketplace = () => {
 							size="lg"
 							className="w-full sm:w-auto min-w-[200px] border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20"
 						>
-							Show More ({marketplaceItems.length - showCount} remaining)
+							Show More ({homeMarketplaceItems.length - showCount} remaining)
 						</Button>
 					</motion.div>
 				)}
