@@ -25,6 +25,12 @@ export const Footer = () => {
 									About us
 								</Link>
 								<Link
+									href="/contact"
+									className="block mt-3 text-sm font-medium text-gray-500 duration-700 dark:text-gray-300 hover:text-gray-400 dark:hover:text-gray-200 hover:underline"
+								>
+									Contact us
+								</Link>
+								<Link
 									href="/blockchain"
 									className="block mt-3 text-sm font-medium text-gray-500 duration-700 dark:text-gray-300 hover:text-gray-400 dark:hover:text-gray-200 hover:underline"
 								>
@@ -36,18 +42,18 @@ export const Footer = () => {
 								>
 									Developers
 								</Link>
-								<Link
+								{/* <Link
 									href="/models"
 									className="block mt-3 text-sm font-medium text-gray-500 duration-700 dark:text-gray-300 hover:text-gray-400 dark:hover:text-gray-200 hover:underline"
 								>
 									Models
-								</Link>
-								<Link
+								</Link> */}
+								{/* <Link
 									href="/integration"
 									className="block mt-3 text-sm font-medium text-gray-500 duration-700 dark:text-gray-300 hover:text-gray-400 dark:hover:text-gray-200 hover:underline"
 								>
 									Integrations
-								</Link>
+								</Link> */}
 								<Link
 									href="/roadmap"
 									className="block mt-3 text-sm font-medium text-gray-500 duration-700 dark:text-gray-300 hover:text-gray-400 dark:hover:text-gray-200 hover:underline"
@@ -73,30 +79,30 @@ export const Footer = () => {
                 >
                   Automated Daily Tasks
                 </a> */}
-								<Link
+								{/* <Link
 									href="/web3-agent"
 									className="block mt-3 text-sm font-medium text-gray-500 duration-700 dark:text-gray-300 hover:text-gray-400 dark:hover:text-gray-200 hover:underline"
 								>
 									Web3.0 Agent AI
-								</Link>
-								<Link
+								</Link> */}
+								{/* <Link
 									href="/agentic-ai"
 									className="block mt-3 text-sm font-medium text-gray-500 duration-700 dark:text-gray-300 hover:text-gray-400 dark:hover:text-gray-200 hover:underline"
 								>
 									Agentic AI
-								</Link>
+								</Link> */}
 								{/* <a
                   href="/business-ai"
                   className="block mt-3 text-sm font-medium text-gray-500 duration-700 dark:text-gray-300 hover:text-gray-400 dark:hover:text-gray-200 hover:underline"
                 >
                   Bussiness Workflow Automation
                 </a> */}
-								<Link
+								{/* <Link
 									href="/create-digital-content"
 									className="block mt-3 text-sm font-medium text-gray-500 duration-700 dark:text-gray-300 hover:text-gray-400 dark:hover:text-gray-200 hover:underline"
 								>
 									Create Digital Content
-								</Link>
+								</Link> */}
 								<Link
 									href="/tokenised-ai-agent"
 									className="block mt-3 text-sm font-medium text-gray-500 duration-700 dark:text-gray-300 hover:text-gray-400 dark:hover:text-gray-200 hover:underline"

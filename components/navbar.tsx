@@ -35,6 +35,15 @@ export function Navbar() {
 						Home
 					</div>
 					<div
+						onClick={() => router.push("/about")}
+						className={cn(
+							"hover:text-foreground text-sm md:text-md transition-colors cursor-pointer hidden md:block",
+							pathname === "/" ? "text-purple-400" : ""
+						)}
+					>
+						About
+					</div>
+					<div
 						onClick={() => router.push("/marketplace")}
 						className={cn(
 							"hover:text-foreground text-sm md:text-md transition-colors cursor-pointer hidden md:block",
@@ -61,7 +70,7 @@ export function Navbar() {
 					>
 						Blockchain
 					</div>
-					<div
+					{/* <div
 						onClick={() => router.push("/models")}
 						className={cn(
 							"hover:text-foreground text-sm md:text-md transition-colors cursor-pointer hidden md:block",
@@ -69,8 +78,8 @@ export function Navbar() {
 						)}
 					>
 						Models
-					</div>
-					<div
+					</div> */}
+					{/* <div
 						onClick={() => router.push("/playground")}
 						className={cn(
 							"hover:text-foreground text-sm md:text-md transition-colors cursor-pointer hidden md:block",
@@ -78,8 +87,8 @@ export function Navbar() {
 						)}
 					>
 						Playground
-					</div>
-					<div
+					</div> */}
+					{/* <div
 						onClick={() => router.push("/integration")}
 						className={cn(
 							"hover:text-foreground text-sm md:text-md transition-colors cursor-pointer hidden md:block",
@@ -87,7 +96,7 @@ export function Navbar() {
 						)}
 					>
 						Integration
-					</div>
+					</div> */}
 					<div
 						onClick={() => router.push("/roadmap")}
 						className={cn(
@@ -104,7 +113,7 @@ export function Navbar() {
 							pathname === "/contact-us" ? "text-purple-400" : ""
 						)}
 					>
-						Contact Us
+						Contacts
 					</div>
 				</nav>
 			</div>
