@@ -3,7 +3,6 @@ import {
   extractReasoningMiddleware,
   wrapLanguageModel,
 } from 'ai';
-import { xai } from '@ai-sdk/xai';
 import { isTestEnvironment } from '../constants';
 import {
   artifactModel,
@@ -11,6 +10,8 @@ import {
   reasoningModel,
   titleModel,
 } from './models.test';
+import { qwen } from 'qwen-ai-provider';
+import { portdex } from './portdex';
 
 export const myProvider = isTestEnvironment
   ? customProvider({
@@ -23,15 +24,15 @@ export const myProvider = isTestEnvironment
     })
   : customProvider({
       languageModels: {
-        'chat-model': xai('grok-2-vision-1212'),
+        'chat-model': qwen('qwen-plus-latest'),
         'chat-model-reasoning': wrapLanguageModel({
-          model: xai('grok-3-mini-beta'),
+          model: portdex('thinker'),
           middleware: extractReasoningMiddleware({ tagName: 'think' }),
         }),
-        'title-model': xai('grok-2-1212'),
-        'artifact-model': xai('grok-2-1212'),
+        'title-model': portdex('maker'),
+        'artifact-model': portdex('maker'),
       },
-      imageModels: {
-        'small-model': xai.image('grok-2-image'),
-      },
+      // imageModels: {
+      //   'small-model': qwen.('qwen-vl-max'),
+      // },
     });
