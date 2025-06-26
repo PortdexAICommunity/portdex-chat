@@ -1,4 +1,3 @@
-import type { DataTypes } from '@/lib/types';
 import { type NextRequest, NextResponse } from 'next/server';
 
 const GITHUB_RAW_URL =
@@ -47,55 +46,38 @@ function extractLegendInfo(str: string) {
   return { official, languages, scope, operating_systems };
 }
 
-type ParsedInfo = {
-  name: string;
-  url: string;
-  description: string;
-  legendInfo: {
-    official: boolean;
-    languages: string[];
-    scope: string[];
-    operating_systems: string[];
-  };
-  category: string;
-};
-
 function parseServers(markdown: string) {
   const categoryRegex = /###\s+([^\n]+)\n\n([\s\S]*?)(?=\n###|$)/g;
   const serverLineRegex = /^- \[([^\]]+)\]\(([^)]+)\)\s*([^-\n]*)(.*)$/gm;
 
-  const servers = [];
+  const servers: any[] = [];
+
   let match: RegExpExecArray | null;
+
   while (categoryRegex.exec(markdown) !== null) {
     match = categoryRegex.exec(markdown);
+
     if (!match) {
       return;
     }
-
     const categoryRaw = match[1].trim();
 
+    // Remove HTML anchor tags and extract just the text content
+    // Pattern: <a name="something"></a>CategoryName or just CategoryName
     const anchorMatch = categoryRaw.match(/<a[^>]*><\/a>(.+)$/);
     const category = anchorMatch ? anchorMatch[1].trim() : categoryRaw;
 
     const block = match[2];
-    let serverMatch: RegExpExecArray | null;
-    while (serverLineRegex.exec(block) !== null) {
-      serverMatch = serverLineRegex.exec(block);
-
-      if (!serverMatch) {
-        return;
-      }
-
+    // biome-ignore lint/suspicious/noImplicitAnyLet: <explanation>
+    let serverMatch;
+    // biome-ignore lint/suspicious/noAssignInExpressions: <explanation>
+    while ((serverMatch = serverLineRegex.exec(block))) {
       const name = serverMatch[1];
       const url = serverMatch[2];
-
       const description = (serverMatch[3] + (serverMatch[4] || ''))
         .replace(/^\s*-\s*/, '')
         .trim();
       const legendInfo = extractLegendInfo(serverMatch[0]);
-
-      console.log({ name, url, description, legendInfo, category });
-
       servers.push({
         name,
         url,
@@ -113,40 +95,44 @@ export async function GET(req: NextRequest) {
   const page = Number(searchParams.get('page') || 1);
   const pageSize = Number(searchParams.get('pageSize') || 20);
   const category = searchParams.get('category');
+  const search = searchParams.get('search');
 
   try {
     const readme = await (await fetch(GITHUB_RAW_URL)).text();
     let servers = parseServers(readme);
 
+    // Apply search filter
+    if (search) {
+      const searchLower = search.toLowerCase();
+      servers = servers?.filter(
+        (srv) =>
+          srv.name.toLowerCase().includes(searchLower) ||
+          srv.description.toLowerCase().includes(searchLower) ||
+          srv.category.toLowerCase().includes(searchLower),
+      );
+    }
+
+    // Apply category filter
     if (category) {
       servers = servers?.filter(
         (srv) => srv.category.toLowerCase() === category.toLowerCase(),
       );
     }
 
-    const total = servers?.length ?? 0;
+    const total = servers?.length;
     const start = (page - 1) * pageSize;
     const end = start + pageSize;
     const paged = servers?.slice(start, end);
 
-    console.log({ paged });
-    const response: DataTypes[] | undefined = paged?.map((item) => ({
-      category: item.category,
-      creator: item.url,
-      description: item.description,
-      icon: '',
-      id: item.name,
-      name: item.name,
-    }));
-
-    return NextResponse.json({ response });
+    return NextResponse.json({
+      page,
+      pageSize,
+      total,
+      category: category || null,
+      search: search || null,
+      servers: paged,
+    });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
-
-type Agent = DataTypes & {
-  url?: string;
-  author?: string;
-  tags?: string[];
-};

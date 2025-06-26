@@ -47,4 +47,4 @@ export type HomeMarketplaceItem = {
   date: string;
   type: 'plugin' | 'assistant' | 'ai-model' | 'software' | 'template';
   creator: string;
-}
+};

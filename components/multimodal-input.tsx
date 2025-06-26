@@ -23,7 +23,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowDown } from 'lucide-react';
 import { ArrowUpIcon, PaperclipIcon, StopIcon } from './icons';
 import { PreviewAttachment } from './preview-attachment';
-import { SuggestedActions } from './suggested-actions';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
 import type { VisibilityType } from './visibility-selector';
@@ -216,7 +215,7 @@ function PureMultimodalInput({
             >
               <ArrowDown />
             </Button>
-          </motion.div> 
+          </motion.div>
         )}
       </AnimatePresence>
 
