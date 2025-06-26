@@ -14,10 +14,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
-  aiModels,
   plugins,
   siteTemplates,
-  softwareTools,
+  softwareTools
 } from "@/lib/constants";
 import type { DataTypes } from "@/lib/types";
 import { AnimatePresence, motion } from "framer-motion";
@@ -48,6 +47,10 @@ type TabType =
 // --- SWR fetcher ---
 const fetcher = (url: string) =>
   fetch(url).then((res) => res.json()) as Promise<{ agents: DataTypes[] }>;
+
+// AI Models fetcher
+const aiModelsFetcher = (url: string) =>
+  fetch(url).then((res) => res.json()) as Promise<{ models: DataTypes[]; total: number }>;
 
 // MCP Servers fetcher
 const mcpServersFetcher = (url: string) =>
@@ -135,12 +138,24 @@ export default function Marketplace() {
     }
   }, [activeTab]);
 
+  // Fetch assistants/agents
   const {
     data: aiAgentsData,
     isLoading,
     error,
   } = useSWR<{ agents: DataTypes[] }>("marketplace/api/agents", fetcher);
-  console.log({ data: aiAgentsData });
+
+  // Fetch AI models (including Anthropic)
+  const {
+    data: aiModelsData,
+    isLoading: aiModelsLoading,
+    error: aiModelsError,
+  } = useSWR<{ models: DataTypes[]; total: number }>(
+    `marketplace/api/ai-models${searchTerm && activeTab === "ai-models" ? `?search=${encodeURIComponent(searchTerm)}` : ""}`,
+    aiModelsFetcher
+  );
+
+  // Fetch MCP servers
   const {
     data: mcpData,
     isLoading: mcpIsLoading,
@@ -165,6 +180,7 @@ export default function Marketplace() {
   );
 
   const assistants = useMemo(() => aiAgentsData?.agents ?? [], [aiAgentsData]);
+  const aiModels = useMemo(() => aiModelsData?.models ?? [], [aiModelsData]);
   const mcpServers = useMemo(() => mcpData?.servers ?? [], [mcpData]);
   const mcpCategories = useMemo(
     () => categoriesData?.categories ?? [],
@@ -236,19 +252,8 @@ export default function Marketplace() {
     return filteredAssistants.slice(startIndex, endIndex);
   }, [filteredAssistants, currentPage]);
 
-  const filteredAIModels = useMemo(
-    () =>
-      aiModels.filter(
-        (aiModel) =>
-          aiModel.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          aiModel.description
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()) ||
-          aiModel.creator.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          aiModel.category.toLowerCase().includes(searchTerm.toLowerCase())
-      ),
-    [searchTerm]
-  );
+  // AI Models are now filtered server-side, so we use them directly
+  const filteredAIModels = useMemo(() => aiModels, [aiModels]);
 
   // Paginated AI Models
   const paginatedAIModels = useMemo(() => {
@@ -408,7 +413,7 @@ export default function Marketplace() {
 
             <div className="flex items-center justify-end space-x-2">
               <Badge variant="secondary" className="text-xs">
-                {assistants.length + mcpServers.length} items
+                {assistants.length + aiModels.length + mcpServers.length} items
               </Badge>
             </div>
           </div>
@@ -488,18 +493,18 @@ export default function Marketplace() {
       <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="max-w-7xl mx-auto">
           <AnimatePresence mode="wait">
-            {isLoading && (
+            {(isLoading || aiModelsLoading) && (
               <div className="py-16 text-center text-gray-500 dark:text-gray-400">
-                Loading assistants...
+                Loading...
               </div>
             )}
-            {error && (
+            {(error || aiModelsError) && (
               <div className="py-16 text-center text-red-500">
-                Failed to load assistants.
+                Failed to load marketplace data.
               </div>
             )}
 
-            {activeTab === "home" && !isLoading && (
+            {activeTab === "home" && !isLoading && !aiModelsLoading && (
               <motion.div
                 key="home"
                 initial={{ opacity: 0, y: 20 }}
@@ -542,7 +547,7 @@ export default function Marketplace() {
                   </div>
                 </section>
 
-                {/* Featured AI Models */}
+                {/* Featured AI Models (including Anthropic) */}
                 <section>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                     <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
@@ -659,7 +664,7 @@ export default function Marketplace() {
               />
             )}
 
-            {activeTab === "ai-models" && !isLoading && (
+            {activeTab === "ai-models" && !aiModelsLoading && (
               <MarketplaceSection
                 title="All AI Models"
                 filteredItems={filteredAIModels}
