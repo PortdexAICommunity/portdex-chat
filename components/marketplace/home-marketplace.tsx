@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { saveChatModelAsCookie } from "@/app/(chat)/actions";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -35,6 +36,18 @@ const MarketplaceItemDialog = ({
 	onClose,
 }: MarketplaceItemDialogProps) => {
 	if (!item) return null;
+
+	const handleUseAssistant = () => {
+		// Set the selected assistant in localStorage
+		localStorage.setItem("selected-assistant", JSON.stringify(item));
+
+		// Set the assistant model as active
+		const assistantModelId = `assistant-${item.id}`;
+		saveChatModelAsCookie(assistantModelId);
+
+		console.log(`Using ${item.title} assistant`);
+		onClose();
+	};
 
 	const getCategoryIcon = (category: string) => {
 		switch (category) {
@@ -138,10 +151,7 @@ const MarketplaceItemDialog = ({
 						<div className="flex flex-col sm:flex-row gap-3 pt-4">
 							<Button
 								className="flex-1 bg-purple-600 hover:bg-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
-								onClick={() => {
-									console.log(`Using ${item.title}`);
-									onClose();
-								}}
+								onClick={handleUseAssistant}
 							>
 								<Download className="size-4 mr-2" />
 								Use Assistant

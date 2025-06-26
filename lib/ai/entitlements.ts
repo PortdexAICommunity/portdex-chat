@@ -27,3 +27,21 @@ export const entitlementsByUserType: Record<UserType, Entitlements> = {
    * TODO: For users with an account and a paid membership
    */
 };
+
+// Dynamic entitlements that include assistant models
+export const getDynamicEntitlements = (
+  userType: UserType,
+  selectedAssistant?: { id: string; title: string } | null
+): Entitlements => {
+  const baseEntitlements = entitlementsByUserType[userType];
+  
+  if (selectedAssistant) {
+    const assistantModelId = `assistant-${selectedAssistant.id}`;
+    return {
+      ...baseEntitlements,
+      availableChatModelIds: [assistantModelId, ...baseEntitlements.availableChatModelIds],
+    };
+  }
+  
+  return baseEntitlements;
+};

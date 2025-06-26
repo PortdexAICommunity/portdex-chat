@@ -302,11 +302,11 @@ export default function Marketplace() {
 							</div>
 						</div>
 
-						<div className="flex items-center justify-end space-x-2">
+						{/* <div className="flex items-center justify-end space-x-2">
 							<Badge variant="secondary" className="text-xs">
 								{assistants.length} items
 							</Badge>
-						</div>
+						</div> */}
 					</div>
 				</div>
 			</motion.header>

@@ -1,13 +1,15 @@
 import { auth, type UserType } from '@/app/(auth)/auth';
-import { entitlementsByUserType } from '@/lib/ai/entitlements';
+import { getDynamicEntitlements } from '@/lib/ai/entitlements';
 import { systemPrompt, type RequestHints } from '@/lib/ai/prompts';
-import { myProvider } from '@/lib/ai/providers';
+import { myProvider, createDynamicProvider } from '@/lib/ai/providers';
+import { isAssistantModel, extractAssistantId } from '@/lib/ai/models';
 import { createDocument } from '@/lib/ai/tools/create-document';
 import { getWeather } from '@/lib/ai/tools/get-weather';
 import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
 import { searchProducts } from '@/lib/ai/tools/search-products';
 import { updateDocument } from '@/lib/ai/tools/update-document';
 import { isProductionEnvironment } from '@/lib/constants';
+import { homeMarketplaceItems } from '@/lib/constants';
 import {
   createStreamId,
   deleteChatById,
@@ -62,6 +64,22 @@ function getStreamContext() {
   return globalStreamContext;
 }
 
+// Helper function to extract assistant data from model ID
+function getAssistantFromModelId(selectedChatModel: string) {
+  if (!isAssistantModel(selectedChatModel)) {
+    return null;
+  }
+  
+  const assistantId = extractAssistantId(selectedChatModel);
+  if (!assistantId) {
+    return null;
+  }
+  
+  const assistant = homeMarketplaceItems.find(item => item.id === assistantId);
+  
+  return assistant || null;
+}
+
 export async function POST(request: Request) {
   let requestBody: PostRequestBody;
 
@@ -84,13 +102,25 @@ export async function POST(request: Request) {
 
     const userType: UserType = session.user.type;
 
+    // Get selected assistant (if any) for dynamic entitlements and prompts
+    const selectedAssistant = getAssistantFromModelId(selectedChatModel);
+    
+    // Use dynamic entitlements that include assistant models
+    const assistantForEntitlements = selectedAssistant ? { id: selectedAssistant.id, title: selectedAssistant.title } : null;
+    const { maxMessagesPerDay, availableChatModelIds } = getDynamicEntitlements(userType, assistantForEntitlements);
+
     const messageCount = await getMessageCountByUserId({
       id: session.user.id,
       differenceInHours: 24,
     });
 
-    if (messageCount > entitlementsByUserType[userType].maxMessagesPerDay) {
+    if (messageCount > maxMessagesPerDay) {
       return new ChatSDKError('rate_limit:chat').toResponse();
+    }
+
+    // Validate that the selected model is available to the user
+    if (!availableChatModelIds.includes(selectedChatModel)) {
+      return new ChatSDKError('forbidden:chat').toResponse();
     }
 
     const chat = await getChatById({ id });
@@ -145,11 +175,16 @@ export async function POST(request: Request) {
     const streamId = generateUUID();
     await createStreamId({ streamId, chatId: id });
 
+    // Create appropriate provider based on whether an assistant is selected
+    const provider = selectedAssistant 
+      ? createDynamicProvider(assistantForEntitlements)
+      : myProvider;
+
     const stream = createDataStream({
       execute: (dataStream) => {
         const result = streamText({
-          model: myProvider.languageModel(selectedChatModel),
-          system: systemPrompt({ selectedChatModel, requestHints }),
+          model: provider.languageModel(selectedChatModel),
+          system: systemPrompt({ selectedChatModel, requestHints, selectedAssistant }),
           messages,
           maxSteps: 5,
           experimental_activeTools:
