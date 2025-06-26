@@ -65,36 +65,31 @@ function parseServers(markdown: string) {
   const serverLineRegex = /^- \[([^\]]+)\]\(([^)]+)\)\s*([^-\n]*)(.*)$/gm;
 
   const servers = [];
-  let match: RegExpExecArray | null;
-  while (categoryRegex.exec(markdown) !== null) {
-    match = categoryRegex.exec(markdown);
-    if (!match) {
-      return;
-    }
+  let categoryMatch: RegExpExecArray | null = null;
 
-    const categoryRaw = match[1].trim();
+  while (true) {
+    categoryMatch = categoryRegex.exec(markdown);
+    if (categoryMatch === null) break;
 
+    const categoryRaw = categoryMatch[1].trim();
     const anchorMatch = categoryRaw.match(/<a[^>]*><\/a>(.+)$/);
     const category = anchorMatch ? anchorMatch[1].trim() : categoryRaw;
 
-    const block = match[2];
-    let serverMatch: RegExpExecArray | null;
-    while (serverLineRegex.exec(block) !== null) {
-      serverMatch = serverLineRegex.exec(block);
+    const block = categoryMatch[2];
+    let serverMatch: RegExpExecArray | null = null;
 
-      if (!serverMatch) {
-        return;
-      }
+    serverLineRegex.lastIndex = 0;
+
+    while (true) {
+      serverMatch = serverLineRegex.exec(block);
+      if (serverMatch === null) break;
 
       const name = serverMatch[1];
       const url = serverMatch[2];
-
       const description = (serverMatch[3] + (serverMatch[4] || ''))
         .replace(/^\s*-\s*/, '')
         .trim();
       const legendInfo = extractLegendInfo(serverMatch[0]);
-
-      console.log({ name, url, description, legendInfo, category });
 
       servers.push({
         name,
@@ -105,6 +100,7 @@ function parseServers(markdown: string) {
       });
     }
   }
+
   return servers;
 }
 
@@ -118,19 +114,25 @@ export async function GET(req: NextRequest) {
     const readme = await (await fetch(GITHUB_RAW_URL)).text();
     let servers = parseServers(readme);
 
+    if (!servers || servers.length === 0) {
+      console.log('No servers parsed from markdown');
+      return NextResponse.json({ agents: [] });
+    }
+
     if (category) {
-      servers = servers?.filter(
+      servers = servers.filter(
         (srv) => srv.category.toLowerCase() === category.toLowerCase(),
       );
     }
 
-    const total = servers?.length ?? 0;
+    const total = servers.length;
     const start = (page - 1) * pageSize;
     const end = start + pageSize;
-    const paged = servers?.slice(start, end);
+    const paged = servers.slice(start, end);
 
-    console.log({ paged });
-    const response: DataTypes[] | undefined = paged?.map((item) => ({
+    console.log('Parsed servers:', { total, pagedCount: paged.length });
+
+    const agents: DataTypes[] = paged.map((item) => ({
       category: item.category,
       creator: item.url,
       description: item.description,
@@ -139,9 +141,10 @@ export async function GET(req: NextRequest) {
       name: item.name,
     }));
 
-    return NextResponse.json({ response });
+    return NextResponse.json({ agents });
   } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    console.error('Error in agents API:', e);
+    return NextResponse.json({ error: e.message, agents: [] }, { status: 500 });
   }
 }
 
