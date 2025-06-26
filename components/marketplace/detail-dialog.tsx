@@ -4,20 +4,20 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
 } from '@/components/ui/dialog';
-import type { Assistant, Plugin } from '@/lib/types';
+import type { Assistant, DataTypes, Plugin } from '@/lib/types';
 import { motion } from 'framer-motion';
-import { Calendar, Download, Sparkles, Star, User } from 'lucide-react';
+import { Calendar, Download, ExternalLink, Server, Sparkles, Star, User } from 'lucide-react';
 
 interface DetailDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  item: Assistant | Plugin | null;
-  type: 'assistant' | 'plugin';
+  item: Assistant | Plugin | DataTypes | null;
+  type: 'assistant' | 'plugin' | 'mcp-server';
 }
 
 export function DetailDialog({
@@ -29,8 +29,34 @@ export function DetailDialog({
   if (!item) return null;
 
   const isAssistant = type === 'assistant';
+  const isPlugin = type === 'plugin';
+  const isMcpServer = type === 'mcp-server';
+  
   const assistant = isAssistant ? (item as Assistant) : null;
-  const plugin = !isAssistant ? (item as Plugin) : null;
+  const plugin = isPlugin ? (item as Plugin) : null;
+  const mcpServer = isMcpServer ? (item as DataTypes) : null;
+
+  const handleUseAssistant = () => {
+    if (isMcpServer && mcpServer) {
+      // For MCP servers, open the GitHub URL in a new tab
+      window.open(`https://github.com/${mcpServer.creator}/${mcpServer.name}`, '_blank');
+    } else {
+      console.log(`Using ${item.name}`);
+    }
+    onClose();
+  };
+
+  const getButtonText = () => {
+    if (isAssistant) return 'Use Assistant';
+    if (isPlugin) return 'Install Plugin';
+    if (isMcpServer) return 'View on GitHub';
+    return 'Use';
+  };
+
+  const getButtonIcon = () => {
+    if (isMcpServer) return <ExternalLink className="size-4 mr-2" />;
+    return <Download className="size-4 mr-2" />;
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -51,16 +77,18 @@ export function DetailDialog({
                 className={`${
                   isAssistant
                     ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300'
-                    : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
+                    : isPlugin
+                    ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
+                    : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
                 } w-fit`}
               >
-                {item.category}
+                {isMcpServer ? 'MCP Server' : item.category}
               </Badge>
             </div>
           </DialogHeader>
 
           <div className="space-y-6">
-            {/* Visual Header */}
+            {/* Visual Header for Assistant */}
             {assistant && (
               <Card className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900/30 dark:to-gray-800/30 border-gray-200 dark:border-gray-800/50">
                 <CardContent className="p-6">
@@ -86,6 +114,7 @@ export function DetailDialog({
               </Card>
             )}
 
+            {/* Visual Header for Plugin */}
             {plugin && (
               <Card className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900/30 dark:to-gray-800/30 border-gray-200 dark:border-gray-800/50">
                 <CardContent className="p-6">
@@ -112,11 +141,38 @@ export function DetailDialog({
               </Card>
             )}
 
+            {/* Visual Header for MCP Server */}
+            {mcpServer && (
+              <Card className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900/30 dark:to-gray-800/30 border-gray-200 dark:border-gray-800/50">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-4">
+                    <div className="size-16 bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900/30 dark:to-green-800/30 rounded-2xl flex items-center justify-center text-3xl shadow-sm border border-green-200 dark:border-green-700/50">
+                      {mcpServer.icon}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-1">
+                        {mcpServer.name}
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">
+                        Created by @{mcpServer.creator}
+                      </p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <Server className="size-4 text-green-600 dark:text-green-400" />
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                          MCP Server • {mcpServer.category}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Description */}
             <div>
               <h4 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white flex items-center gap-2">
                 <Sparkles className="size-5 text-purple-600 dark:text-purple-400" />
-                Description
+                {isMcpServer ? 'About this MCP Server' : 'Description'}
               </h4>
               <Card className="bg-gray-50 dark:bg-gray-950/50 border-gray-200 dark:border-gray-800/50">
                 <CardContent className="p-4">
@@ -156,17 +212,57 @@ export function DetailDialog({
               </div>
             )}
 
+            {/* Installation/Usage Instructions for MCP Server */}
+            {mcpServer && (
+              <div>
+                <h4 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">
+                  How to Use
+                </h4>
+                <Card className="bg-gray-50 dark:bg-gray-950/50 border-gray-200 dark:border-gray-800/50">
+                  <CardContent className="p-4">
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-3">
+                        <div className="size-6 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center text-xs font-bold text-green-600 dark:text-green-400 mt-0.5">
+                          1
+                        </div>
+                        <p className="text-sm text-gray-700 dark:text-gray-300">
+                          Click "View on GitHub" to access the repository
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="size-6 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center text-xs font-bold text-green-600 dark:text-green-400 mt-0.5">
+                          2
+                        </div>
+                        <p className="text-sm text-gray-700 dark:text-gray-300">
+                          Follow the installation instructions in the README
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="size-6 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center text-xs font-bold text-green-600 dark:text-green-400 mt-0.5">
+                          3
+                        </div>
+                        <p className="text-sm text-gray-700 dark:text-gray-300">
+                          Configure the MCP server in your client application
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 pt-4">
               <Button
-                className="flex-1 bg-purple-600 hover:bg-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
-                onClick={() => {
-                  console.log(`Using ${item.name}`);
-                  onClose();
-                }}
+                className={`flex-1 ${
+                  isMcpServer
+                    ? 'bg-green-600 hover:bg-green-700'
+                    : 'bg-purple-600 hover:bg-purple-700'
+                } text-white shadow-lg hover:shadow-xl transition-all duration-200`}
+                onClick={handleUseAssistant}
               >
-                <Download className="size-4 mr-2" />
-                {isAssistant ? 'Use Assistant' : 'Install Plugin'}
+                {getButtonIcon()}
+                {getButtonText()}
               </Button>
               <Button
                 variant="outline"

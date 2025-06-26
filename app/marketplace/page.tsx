@@ -106,7 +106,7 @@ const FEATURED_OTHER_ITEMS = 4;
 export default function Marketplace() {
   const [activeTab, setActiveTab] = useState<TabType>("home");
   const [selectedItem, setSelectedItem] = useState<DataTypes | null>(null);
-  const [dialogType, setDialogType] = useState<"assistant" | "plugin">(
+  const [dialogType, setDialogType] = useState<"assistant" | "plugin" | "mcp-server">(
     "assistant"
   );
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -182,14 +182,14 @@ export default function Marketplace() {
         | "template"
         | "mcp-server"
     ) => {
-      if (type === "mcp-server") {
-        // For MCP servers, open the URL in a new tab
-        window.open(item.url, "_blank");
-        return;
-      }
+      // Set the selected item and dialog type for modal
       setSelectedItem(item);
       setDialogType(
-        type === "assistant" || type === "ai-model" ? "assistant" : "plugin"
+        type === "assistant" || type === "ai-model" 
+          ? "assistant" 
+          : type === "mcp-server"
+          ? "mcp-server"
+          : "plugin"
       );
       setIsDialogOpen(true);
     },
@@ -822,7 +822,7 @@ export default function Marketplace() {
         </div>
       </div>
 
-      {/* Detail Dialog */}
+      {/* Detail Dialog - Updated to handle MCP servers */}
       <DetailDialog
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
