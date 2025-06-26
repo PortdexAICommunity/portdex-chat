@@ -1,6 +1,9 @@
 'use client';
 
-import Image from 'next/image';
+import { AIModelsMarquee } from '@/components/ai-model-marquee';
+import { FAQSection } from '@/components/faq';
+import { Navbar } from '@/components/navbar';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -8,7 +11,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { motion } from 'framer-motion';
 import {
   cardVariants,
   fadeIn,
@@ -23,14 +25,12 @@ import {
   helpItems,
   TOOLS,
 } from '@/lib/constant';
-import { FAQSection } from '@/components/faq';
-import { AIModelsMarquee } from '@/components/ai-model-marquee';
-import HowWeHelp from '../blockchain/how-we-help';
-import { ArrowRight } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Navbar } from '@/components/navbar';
+import { motion } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import HowWeHelp from '../blockchain/how-we-help';
 
 interface FeatureAboutUs {
   title: string;
@@ -167,7 +167,7 @@ const HeroSection = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-4 max-w-6xl mx-auto px-4">
               {featuresAboutUs.map((item: FeatureAboutUs, index: number) => (
                 <motion.div
-                  key={index}
+                  key={item.title}
                   className={cn(
                     'flex flex-col justify-between gap-2 lg:gap-4 lg:min-h-64 w-full px-6 py-4 cursor-pointer bg-white/10 border border-border rounded-2xl relative group',
                     'hover:backdrop-blur-sm transition-all duration-200',
@@ -353,7 +353,7 @@ function Features() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {blockchainHelpItems.map((item: HelpItem, index: number) => (
               <motion.div
-                key={index}
+                key={item.title}
                 className="bg-background/60 backdrop-blur-sm border border-purple-600/50 hover:border-purple-400 hover:border-2 hover:border-dashed rounded-lg p-6 transition-all duration-300"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -434,7 +434,7 @@ function Tools() {
         >
           {TOOLS.map((tool: Tool, index: number) => (
             <motion.div
-              key={index}
+              key={tool.title}
               variants={cardVariants}
               custom={index}
               whileHover="hover"

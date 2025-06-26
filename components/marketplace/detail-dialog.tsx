@@ -4,14 +4,22 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog';
 import type { Assistant, DataTypes, Plugin } from '@/lib/types';
 import { motion } from 'framer-motion';
-import { Calendar, Download, ExternalLink, Server, Sparkles, Star, User } from 'lucide-react';
+import {
+  Calendar,
+  Download,
+  ExternalLink,
+  Server,
+  Sparkles,
+  Star,
+  User,
+} from 'lucide-react';
 
 interface DetailDialogProps {
   isOpen: boolean;
@@ -31,7 +39,7 @@ export function DetailDialog({
   const isAssistant = type === 'assistant';
   const isPlugin = type === 'plugin';
   const isMcpServer = type === 'mcp-server';
-  
+
   const assistant = isAssistant ? (item as Assistant) : null;
   const plugin = isPlugin ? (item as Plugin) : null;
   const mcpServer = isMcpServer ? (item as DataTypes) : null;
@@ -39,7 +47,10 @@ export function DetailDialog({
   const handleUseAssistant = () => {
     if (isMcpServer && mcpServer) {
       // For MCP servers, open the GitHub URL in a new tab
-      window.open(`https://github.com/${mcpServer.creator}/${mcpServer.name}`, '_blank');
+      window.open(
+        `https://github.com/${mcpServer.creator}/${mcpServer.name}`,
+        '_blank',
+      );
     } else {
       console.log(`Using ${item.name}`);
     }
@@ -78,8 +89,8 @@ export function DetailDialog({
                   isAssistant
                     ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300'
                     : isPlugin
-                    ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
-                    : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
+                      : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
                 } w-fit`}
               >
                 {isMcpServer ? 'MCP Server' : item.category}
@@ -226,7 +237,8 @@ export function DetailDialog({
                           1
                         </div>
                         <p className="text-sm text-gray-700 dark:text-gray-300">
-                          Click "View on GitHub" to access the repository
+                          Click &quot;View on GitHub&quot; to access the
+                          repository
                         </p>
                       </div>
                       <div className="flex items-start gap-3">

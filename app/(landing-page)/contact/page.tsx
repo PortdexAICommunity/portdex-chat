@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { Navbar } from '@/components/navbar';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -13,25 +13,25 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
 import {
-  Mail,
-  MapPin,
-  Clock,
-  Send,
-  MessageSquare,
-  Users,
-  Building2,
-  ArrowRight,
-  CheckCircle2,
-} from 'lucide-react';
-import {
+  cardVariants,
   fadeIn,
   staggerContainer,
-  cardVariants,
 } from '@/lib/animation-constant';
+import { motion } from 'framer-motion';
+import {
+  ArrowRight,
+  Building2,
+  CheckCircle2,
+  Clock,
+  Mail,
+  MapPin,
+  MessageSquare,
+  Send,
+  Users,
+} from 'lucide-react';
 import Link from 'next/link';
-import { Navbar } from '@/components/navbar';
+import { useState } from 'react';
 
 export default function ContactUsPage() {
   return (
@@ -180,7 +180,7 @@ const ContactInfo = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
           {contactDetails.map((detail, index) => (
             <motion.div
-              key={index}
+              key={detail.title}
               variants={cardVariants}
               custom={index}
               whileHover="hover"

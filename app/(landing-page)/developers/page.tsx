@@ -1,34 +1,33 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import Image from 'next/image';
+import { Navbar } from '@/components/navbar';
 import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from '@/components/ui/card';
 import {
-  fadeIn,
-  staggerContainer,
-  imageReveal,
-  fadeInUp,
   cardVariants,
+  fadeIn,
+  fadeInUp,
+  imageReveal,
+  staggerContainer,
 } from '@/lib/animation-constant';
-import { Navbar } from '@/components/navbar';
+import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 import {
   ArrowRight,
   Code,
-  Users,
-  Globe,
   DollarSign,
-  Zap,
   Gift,
+  Globe,
+  Users,
+  Zap,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 const DevelopersPage = () => {
   return (
@@ -300,7 +299,7 @@ const WhyJoinSection = () => {
             const IconComponent = benefit.icon;
             return (
               <motion.div
-                key={index}
+                key={benefit.title}
                 variants={cardVariants}
                 custom={index}
                 whileHover="hover"
@@ -410,7 +409,7 @@ const ContributeSection = () => {
             const IconComponent = item.icon;
             return (
               <motion.div
-                key={index}
+                key={item.title}
                 variants={fadeInUp}
                 custom={index}
                 className="h-full"

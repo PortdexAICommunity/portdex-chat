@@ -1,5 +1,6 @@
 'use client';
 
+import { Navbar } from '@/components/navbar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
@@ -8,15 +9,14 @@ import {
   BrainCircuit,
   CheckCircle,
   Code,
-  Coins,
   Cog,
+  Coins,
   Gamepad2,
   Link as LinkIcon,
   Network,
   Puzzle,
   Upload,
 } from 'lucide-react';
-import { Navbar } from '@/components/navbar';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 60 },
@@ -296,7 +296,7 @@ const UseCasesSection = () => (
             text: 'Legal or medical expert AIs as NFT assets',
           },
         ].map((useCase, index) => (
-          <motion.div variants={fadeInUp} key={index}>
+          <motion.div variants={fadeInUp} key={useCase.text}>
             <Card className="h-full text-center p-6 hover:shadow-md transition-shadow duration-300 bg-white/20">
               <useCase.icon className="size-10 text-purple-600 mx-auto mb-4" />
               <p className="font-medium">{useCase.text}</p>

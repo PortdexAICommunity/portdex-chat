@@ -1,9 +1,9 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import Products from './product';
 import { TextRotate } from '@/components/animation/text-rotate';
 import { Navbar } from '@/components/navbar';
+import { motion } from 'framer-motion';
+import Products from './product';
 
 const BlockchainPage = () => {
   return (
@@ -71,10 +71,16 @@ const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <button className="px-8 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity">
+            <button
+              type="button"
+              className="px-8 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity"
+            >
               Get Started
             </button>
-            <button className="px-8 py-3 border border-border rounded-lg font-medium hover:bg-muted transition-colors">
+            <button
+              type="button"
+              className="px-8 py-3 border border-border rounded-lg font-medium hover:bg-muted transition-colors"
+            >
               Learn More
             </button>
           </motion.div>

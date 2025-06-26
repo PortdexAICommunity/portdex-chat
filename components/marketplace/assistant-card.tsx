@@ -16,11 +16,12 @@ export function AssistantCard({ assistant, onClick }: AssistantCardProps) {
   const [imageError, setImageError] = useState(false);
 
   // Check if icon is an emoji (not a URL)
-  const isEmojiIcon = assistant.icon && 
-                      typeof assistant.icon === 'string' && 
-                      !assistant.icon.startsWith('http') && 
-                      !assistant.icon.includes('.') &&
-                      assistant.icon.length <= 4; // Most emojis are 1-4 characters
+  const isEmojiIcon =
+    assistant.icon &&
+    typeof assistant.icon === 'string' &&
+    !assistant.icon.startsWith('http') &&
+    !assistant.icon.includes('.') &&
+    assistant.icon.length <= 4; // Most emojis are 1-4 characters
 
   return (
     <motion.div
@@ -45,7 +46,11 @@ export function AssistantCard({ assistant, onClick }: AssistantCardProps) {
                 ) : (
                   // Fallback to avatar with error handling
                   <Image
-                    src={imageError ? '/logo.webp' : `https://avatar.vercel.sh/${assistant.creator}`}
+                    src={
+                      imageError
+                        ? '/logo.webp'
+                        : `https://avatar.vercel.sh/${assistant.creator}`
+                    }
                     alt={assistant.creator ?? 'MCP Server'}
                     width={48}
                     height={48}

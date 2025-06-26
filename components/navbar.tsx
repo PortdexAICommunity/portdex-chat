@@ -1,9 +1,9 @@
 'use client';
 
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { cn } from '@/lib/utils';
 
 export function Navbar() {
   const router = useRouter();
@@ -26,6 +26,7 @@ export function Navbar() {
         {/* Navigation - hidden on mobile */}
         <nav className="ml-auto hidden items-center gap-4 md:flex">
           <div
+            role="link"
             onClick={() => router.push('/')}
             className={cn(
               'hover:text-foreground text-sm md:text-md transition-colors cursor-pointer hidden md:block',
@@ -35,6 +36,7 @@ export function Navbar() {
             Home
           </div>
           <div
+            role="link"
             onClick={() => router.push('/about')}
             className={cn(
               'hover:text-foreground text-sm md:text-md transition-colors cursor-pointer hidden md:block',
@@ -44,6 +46,7 @@ export function Navbar() {
             About
           </div>
           <div
+            role="link"
             onClick={() => router.push('/marketplace')}
             className={cn(
               'hover:text-foreground text-sm md:text-md transition-colors cursor-pointer hidden md:block',
@@ -53,6 +56,7 @@ export function Navbar() {
             Marketplace
           </div>
           <div
+            role="link"
             onClick={() => router.push('/developers')}
             className={cn(
               'hover:text-foreground text-sm md:text-md transition-colors cursor-pointer hidden md:block',
@@ -62,6 +66,7 @@ export function Navbar() {
             Developers
           </div>
           <div
+            role="link"
             onClick={() => router.push('/blockchain')}
             className={cn(
               'hover:text-foreground text-sm md:text-md transition-colors cursor-pointer hidden md:block',
@@ -98,6 +103,7 @@ export function Navbar() {
 						Integration
 					</div> */}
           <div
+            role="link"
             onClick={() => router.push('/roadmap')}
             className={cn(
               'hover:text-foreground text-sm md:text-md transition-colors cursor-pointer hidden md:block',
@@ -107,6 +113,7 @@ export function Navbar() {
             Roadmap
           </div>
           <div
+            role="link"
             onClick={() => router.push('/contact')}
             className={cn(
               'hover:text-foreground text-sm md:text-md transition-colors cursor-pointer hidden md:block',

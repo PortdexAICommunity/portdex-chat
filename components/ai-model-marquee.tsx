@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import { useTheme } from 'next-themes';
+import Image from 'next/image';
+import React from 'react';
 
 export const AIModelsMarquee: React.FC = () => {
   const { theme } = useTheme();
@@ -49,7 +49,7 @@ export const AIModelsMarquee: React.FC = () => {
         {/* Render duplicated slides */}
         {duplicatedSlides.map((slide, index) => (
           <div
-            key={index}
+            key={slide.alt}
             className="shrink-0"
             style={{ width: `${100 / slides.length}%` }}
           >
@@ -79,7 +79,7 @@ export const AIModelsMarquee: React.FC = () => {
         {/* Render duplicated slides */}
         {duplicatedSlides.map((slide, index) => (
           <div
-            key={index}
+            key={slide.alt}
             className="shrink-0"
             style={{ width: `${100 / slides.length}%` }}
           >
