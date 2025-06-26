@@ -32,7 +32,7 @@ export const createDynamicProvider = (selectedAssistant?: { id: string; title: s
     const assistantModelId = `assistant-${selectedAssistant.id}`;
     baseLanguageModels[assistantModelId] = isTestEnvironment 
       ? chatModel 
-      : portdex('maker');
+      : qwen('qwen-plus-latest');
   }
 
   return customProvider({
