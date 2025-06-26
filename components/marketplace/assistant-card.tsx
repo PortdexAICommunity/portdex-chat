@@ -1,11 +1,11 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import type { DataTypes } from '@/lib/types';
-import { useState } from 'react';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
+import { useState } from 'react';
 
 interface AssistantCardProps {
   assistant: DataTypes;
@@ -14,7 +14,13 @@ interface AssistantCardProps {
 
 export function AssistantCard({ assistant, onClick }: AssistantCardProps) {
   const [imageError, setImageError] = useState(false);
-  console.log(assistant);
+
+  // Check if icon is an emoji (not a URL)
+  const isEmojiIcon = assistant.icon && 
+                      typeof assistant.icon === 'string' && 
+                      !assistant.icon.startsWith('http') && 
+                      !assistant.icon.includes('.') &&
+                      assistant.icon.length <= 4; // Most emojis are 1-4 characters
 
   return (
     <motion.div
@@ -31,13 +37,23 @@ export function AssistantCard({ assistant, onClick }: AssistantCardProps) {
             {/* Avatar Section */}
             <div className="shrink-0">
               <div className="relative">
-                <Image
-                  src={`https://avatar.vercel.sh/${assistant.creator}`}
-                  alt={assistant.creator ?? 'User Avatar'}
-                  width={48}
-                  height={48}
-                  className="rounded-full size-12 object-cover bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700"
-                />
+                {isEmojiIcon ? (
+                  // Display emoji icon with nice background
+                  <div className="size-12 rounded-full bg-gradient-to-br from-blue-100 to-purple-200 dark:from-blue-900/30 dark:to-purple-800/30 flex items-center justify-center text-2xl shadow-sm border-2 border-blue-200 dark:border-blue-700/50">
+                    {assistant.icon}
+                  </div>
+                ) : (
+                  // Fallback to avatar with error handling
+                  <Image
+                    src={imageError ? '/logo.webp' : `https://avatar.vercel.sh/${assistant.creator}`}
+                    alt={assistant.creator ?? 'MCP Server'}
+                    width={48}
+                    height={48}
+                    className="rounded-full size-12 object-cover bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700"
+                    onError={() => setImageError(true)}
+                    unoptimized={imageError} // Use unoptimized for fallback
+                  />
+                )}
               </div>
             </div>
 
@@ -49,7 +65,7 @@ export function AssistantCard({ assistant, onClick }: AssistantCardProps) {
                   {assistant.name}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400 text-sm font-medium line-clamp-1">
-                  {assistant.creator}
+                  @{assistant.creator}
                 </p>
                 {assistant.date && (
                   <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">
