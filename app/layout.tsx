@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 
 import "./globals.css";
 import { SessionProvider } from "next-auth/react";
+import UseCaseTooltip from "@/components/use-case-tooltip";
 
 export const metadata: Metadata = {
 	metadataBase: new URL("https://chat.vercel.ai"),
@@ -77,6 +78,7 @@ export default async function RootLayout({
 					disableTransitionOnChange
 				>
 					<Toaster position="top-center" />
+					<UseCaseTooltip />
 					<SessionProvider>{children}</SessionProvider>
 				</ThemeProvider>
 			</body>
