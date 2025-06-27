@@ -39,8 +39,8 @@ export const maxDuration = 60;
 
 // Cloudflare Workers timeout utilities
 const WORKER_TIMEOUT = 50000; // 50 seconds (10s buffer before maxDuration)
-const DB_OPERATION_TIMEOUT = 8000; // 8 seconds for database operations
-const AUTH_TIMEOUT = 5000; // 5 seconds for auth operations
+const DB_OPERATION_TIMEOUT = 25000; // 25 seconds for database operations (temporary increase for diagnosis)
+const AUTH_TIMEOUT = 8000; // 8 seconds for auth operations
 
 const withTimeout = <T>(promise: Promise<T>, timeoutMs: number, operation: string): Promise<T> => {
   return Promise.race([
@@ -174,8 +174,19 @@ export async function POST(request: Request) {
       );
     } catch (error) {
       clearTimeout(timeoutId);
+      console.error('Database validation timeout details:', {
+        error: (error as Error).message,
+        userId: session.user.id,
+        chatId: id,
+        timestamp: new Date().toISOString(),
+        timeElapsed: Date.now() - requestStartTime
+      });
       return new Response(
-        JSON.stringify({ error: 'Database timeout during validation' }),
+        JSON.stringify({ 
+          error: 'Database timeout during validation',
+          details: 'Database operations took longer than 15 seconds',
+          suggestion: 'Check database connection and performance'
+        }),
         { 
           status: 500,
           headers: { 'Content-Type': 'application/json' }

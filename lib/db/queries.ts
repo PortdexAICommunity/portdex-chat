@@ -38,8 +38,13 @@ import { ChatSDKError } from '../errors';
 // use the Drizzle adapter for Auth.js / NextAuth
 // https://authjs.dev/reference/adapter/drizzle
 
-// biome-ignore lint: Forbidden non-null assertion.
-const client = postgres(process.env.POSTGRES_URL!);
+// Optimized postgres configuration for Cloudflare Workers
+const client = postgres(process.env.POSTGRES_URL!, {
+  max: 1, // Maximum one connection per Worker instance
+  idle_timeout: 20, // Close idle connections after 20 seconds
+  connect_timeout: 10, // Connection timeout of 10 seconds
+  prepare: false, // Disable prepared statements for better compatibility
+});
 const db = drizzle(client);
 
 export async function getUser(email: string): Promise<Array<User>> {
