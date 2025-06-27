@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portdex
+  namespace: portdex-chat
+  labels:
+    app: portdex
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: portdex
+  template:
+    metadata:
+      labels:
+        app: portdex
+    spec:
+      containers:
+        - name: portdex
+          image: portdex.azurecr.io/portdex-chat:production
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: portdex-config
+            - secretRef:
+                name: portdex-secrets
