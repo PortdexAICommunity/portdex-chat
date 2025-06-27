@@ -7,7 +7,9 @@ import Script from "next/script";
 import { Footer } from "@/components/footer";
 import { Navbar } from "@/components/navbar";
 
-export const experimental_ppr = true;
+// Remove PPR since we're using dynamic functions
+// export const experimental_ppr = true;
+export const dynamic = "force-dynamic";
 
 export default async function HomeLayout({
 	children,

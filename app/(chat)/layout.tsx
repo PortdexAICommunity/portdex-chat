@@ -5,7 +5,9 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { auth } from "../(auth)/auth";
 import Script from "next/script";
 
-export const experimental_ppr = true;
+// Remove PPR since we're using dynamic functions
+// export const experimental_ppr = true;
+export const dynamic = "force-dynamic";
 
 export default async function Layout({
 	children,
