@@ -6,45 +6,43 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
+RUN rm -rf .next node_modules
+
 COPY package.json pnpm-lock.yaml* ./
 RUN corepack enable pnpm && pnpm install --frozen-lockfile
 
-# Build the app
+# Build the app with standalone output
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Build the application (includes database migration from package.json build script)
+# Enable standalone output in next.config.js:
+# module.exports = { output: 'standalone' }
+
 RUN corepack enable pnpm && pnpm build
 
 # Production image
-FROM base AS runner
+FROM node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
-ENV AUTH_URL="https://chat.portdex.ai"
+# ENV AUTH_URL="https://chat.scotsai.com"
 
 # Create non-root user for security
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
-# Copy package.json and install only production dependencies
-COPY package.json pnpm-lock.yaml* ./
-RUN corepack enable pnpm && pnpm install --frozen-lockfile --prod
-
-# Copy built application
-COPY --from=builder /app/.next ./.next
+# Copy only the standalone output
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
-
-# Change ownership to nextjs user
-RUN chown -R nextjs:nodejs /app
 
 USER nextjs
 
 EXPOSE 3000
 
-# Use Next.js start command
-CMD ["pnpm", "start"]
+# Use the Next.js built-in production server
+CMD ["node", "server.js"]
