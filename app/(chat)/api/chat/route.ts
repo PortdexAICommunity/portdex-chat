@@ -1,13 +1,15 @@
 import { auth, type UserType } from '@/app/(auth)/auth';
-import { entitlementsByUserType } from '@/lib/ai/entitlements';
+import { getDynamicEntitlements } from '@/lib/ai/entitlements';
 import { systemPrompt, type RequestHints } from '@/lib/ai/prompts';
-import { myProvider } from '@/lib/ai/providers';
+import { myProvider, createDynamicProvider } from '@/lib/ai/providers';
+import { isAssistantModel, extractAssistantId } from '@/lib/ai/models';
 import { createDocument } from '@/lib/ai/tools/create-document';
 import { getWeather } from '@/lib/ai/tools/get-weather';
 import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
 import { searchProducts } from '@/lib/ai/tools/search-products';
 import { updateDocument } from '@/lib/ai/tools/update-document';
 import { isProductionEnvironment } from '@/lib/constants';
+import { homeMarketplaceItems } from '@/lib/constants';
 import {
   createStreamId,
   deleteChatById,
@@ -30,230 +32,298 @@ import {
   streamText,
 } from 'ai';
 import { differenceInSeconds } from 'date-fns';
-import { after } from 'next/server';
-import {
-  createResumableStreamContext,
-  type ResumableStreamContext,
-} from 'resumable-stream';
 import { generateTitleFromUserMessage } from '../../actions';
 import { postRequestBodySchema, type PostRequestBody } from './schema';
 
 export const maxDuration = 60;
 
-let globalStreamContext: ResumableStreamContext | null = null;
-
-function getStreamContext() {
-  if (!globalStreamContext) {
-    try {
-      globalStreamContext = createResumableStreamContext({
-        waitUntil: after,
-      });
-    } catch (error: any) {
-      if (error.message.includes('REDIS_URL')) {
-        console.log(
-          ' > Resumable streams are disabled due to missing REDIS_URL',
-        );
-      } else {
-        console.error(error);
-      }
-    }
+// Helper function to extract assistant data from model ID
+function getAssistantFromModelId(selectedChatModel: string) {
+  if (!isAssistantModel(selectedChatModel)) {
+    return null;
   }
-
-  return globalStreamContext;
+  
+  const assistantId = extractAssistantId(selectedChatModel);
+  if (!assistantId) {
+    return null;
+  }
+  
+  const assistant = homeMarketplaceItems.find(item => item.id === assistantId);
+  
+  return assistant || null;
 }
 
 export async function POST(request: Request) {
-  let requestBody: PostRequestBody;
+  const { readable, writable } = new TransformStream();
+  const writer = writable.getWriter();
 
-  try {
-    const json = await request.json();
-    requestBody = postRequestBodySchema.parse(json);
-  } catch (_) {
-    return new ChatSDKError('bad_request:api').toResponse();
-  }
+  const response = new Response(readable, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache, no-transform',
+      Connection: 'keep-alive',
+      'X-Accel-Buffering': 'no',
+    },
+  });
 
-  try {
-    const { id, message, selectedChatModel, selectedVisibilityType } =
-      requestBody;
+  // Run everything in background to prevent Worker timeouts
+  (async () => {
+    const startTime = Date.now();
 
-    const session = await auth();
+    try {
+      // Quick validation upfront
+      let requestBody: PostRequestBody;
+      try {
+        const json = await request.json();
+        requestBody = postRequestBodySchema.parse(json);
+      } catch (_) {
+        writer.write(
+          `data: ${JSON.stringify({ error: 'Invalid request' })}\n\n`
+        );
+        await writer.close();
+        return;
+      }
 
-    if (!session?.user) {
-      return new ChatSDKError('unauthorized:chat').toResponse();
-    }
+      const session = await auth();
+      if (!session?.user) {
+        writer.write(
+          `data: ${JSON.stringify({ error: 'Unauthorized' })}\n\n`
+        );
+        await writer.close();
+        return;
+      }
 
-    const userType: UserType = session.user.type;
+      const { id, message, selectedChatModel, selectedVisibilityType } = requestBody;
+      const userType: UserType = session.user.type;
 
-    const messageCount = await getMessageCountByUserId({
-      id: session.user.id,
-      differenceInHours: 24,
-    });
+      // Get selected assistant (if any) for dynamic entitlements and prompts
+      const selectedAssistant = getAssistantFromModelId(selectedChatModel);
+      
+      // Use dynamic entitlements that include assistant models
+      const assistantForEntitlements = selectedAssistant 
+        ? { id: selectedAssistant.id, title: selectedAssistant.title } 
+        : null;
+      const { maxMessagesPerDay, availableChatModelIds } = getDynamicEntitlements(
+        userType, 
+        assistantForEntitlements
+      );
 
-    if (messageCount > entitlementsByUserType[userType].maxMessagesPerDay) {
-      return new ChatSDKError('rate_limit:chat').toResponse();
-    }
+      // Validate that the selected model is available to the user
+      if (!availableChatModelIds.includes(selectedChatModel)) {
+        writer.write(
+          `data: ${JSON.stringify({ error: 'Forbidden: Model not available' })}\n\n`
+        );
+        await writer.close();
+        return;
+      }
 
-    const chat = await getChatById({ id });
+      // Run critical checks in parallel
+      const [messageCount, chat] = await Promise.all([
+        getMessageCountByUserId({
+          id: session.user.id,
+          differenceInHours: 24,
+        }).catch((error) => {
+          console.error('Failed to get message count:', error);
+          return 0;
+        }),
+        getChatById({ id }).catch((error) => {
+          console.error('Failed to get chat:', error);
+          return null;
+        }),
+      ]);
 
-    if (!chat) {
-      const title = await generateTitleFromUserMessage({
+      if (messageCount > maxMessagesPerDay) {
+        writer.write(
+          `data: ${JSON.stringify({ error: 'Rate limit exceeded' })}\n\n`
+        );
+        await writer.close();
+        return;
+      }
+
+      if (chat?.userId && chat.userId !== session.user.id) {
+        writer.write(
+          `data: ${JSON.stringify({ error: 'Forbidden' })}\n\n`
+        );
+        await writer.close();
+        return;
+      }
+
+      // Get geolocation hints
+      const { longitude, latitude, city, country } = geolocation(request);
+      const requestHints: RequestHints = {
+        longitude,
+        latitude,
+        city,
+        country,
+      };
+
+      // Get previous messages for context
+      const previousMessages = await getMessagesByChatId({ id }).catch(() => []);
+      const messages = appendClientMessage({
+        // @ts-expect-error: todo add type conversion from DBMessage[] to UIMessage[]
+        messages: previousMessages,
         message,
       });
 
-      await saveChat({
-        id,
-        userId: session.user.id,
-        title,
-        visibility: selectedVisibilityType,
-      });
-    } else {
-      if (chat.userId !== session.user.id) {
-        return new ChatSDKError('forbidden:chat').toResponse();
-      }
-    }
+      // Create appropriate provider based on whether an assistant is selected
+      const provider = selectedAssistant 
+        ? createDynamicProvider(assistantForEntitlements)
+        : myProvider;
 
-    const previousMessages = await getMessagesByChatId({ id });
+      // Start database operations in background - don't wait for them
+      const saveOperationsPromise = (async () => {
+        try {
+          if (!chat) {
+            const title = await generateTitleFromUserMessage({ message });
+            await saveChat({
+              id,
+              userId: session.user.id,
+              title,
+              visibility: selectedVisibilityType,
+            });
+          }
 
-    const messages = appendClientMessage({
-      // @ts-expect-error: todo add type conversion from DBMessage[] to UIMessage[]
-      messages: previousMessages,
-      message,
-    });
+          // Save user message
+          await saveMessages({
+            messages: [
+              {
+                chatId: id,
+                id: message.id,
+                role: 'user',
+                parts: message.parts,
+                attachments: message.experimental_attachments ?? [],
+                createdAt: new Date(),
+              },
+            ],
+          });
 
-    const { longitude, latitude, city, country } = geolocation(request);
+          // Create stream ID
+          const streamId = generateUUID();
+          await createStreamId({ streamId, chatId: id });
 
-    const requestHints: RequestHints = {
-      longitude,
-      latitude,
-      city,
-      country,
-    };
+          return streamId;
+        } catch (error) {
+          console.error('Background database operations failed:', error);
+          return generateUUID(); // Fallback stream ID
+        }
+      })();
 
-    await saveMessages({
-      messages: [
-        {
-          chatId: id,
-          id: message.id,
-          role: 'user',
-          parts: message.parts,
-          attachments: message.experimental_attachments ?? [],
-          createdAt: new Date(),
+      // Create a proper dataStream writer for tools
+      let toolDataStream: any = null;
+      const toolDataStreamInstance = createDataStream({
+        execute: (dataStream) => {
+          toolDataStream = dataStream;
         },
-      ],
-    });
+      });
 
-    const streamId = generateUUID();
-    await createStreamId({ streamId, chatId: id });
+      // Start AI response streaming immediately - don't wait for database operations
+      const result = streamText({
+        model: provider.languageModel(selectedChatModel),
+        system: systemPrompt({ selectedChatModel, requestHints, selectedAssistant }),
+        messages,
+        maxSteps: 5,
+        experimental_activeTools:
+          selectedChatModel === 'chat-model-reasoning'
+            ? []
+            : [
+                'getWeather',
+                'createDocument',
+                'updateDocument',
+                'requestSuggestions',
+                'searchProducts',
+              ],
+        experimental_transform: smoothStream({ chunking: 'word' }),
+        experimental_generateMessageId: generateUUID,
+        tools: {
+          getWeather,
+          createDocument: createDocument({ session, dataStream: toolDataStream }),
+          updateDocument: updateDocument({ session, dataStream: toolDataStream }),
+          requestSuggestions: requestSuggestions({
+            session,
+            dataStream: toolDataStream,
+          }),
+          searchProducts: searchProducts({
+            session,
+            dataStream: toolDataStream,
+          }),
+        },
+        onFinish: async ({ response }) => {
+          if (!session?.user?.id) return;
 
-    const stream = createDataStream({
-      execute: (dataStream) => {
-        const result = streamText({
-          model: myProvider.languageModel(selectedChatModel),
-          system: systemPrompt({ selectedChatModel, requestHints }),
-          messages,
-          maxSteps: 5,
-          experimental_activeTools:
-            selectedChatModel === 'chat-model-reasoning'
-              ? []
-              : [
-                  'getWeather',
-                  'createDocument',
-                  'updateDocument',
-                  'requestSuggestions',
-                  'searchProducts',
+          const assistantMessages = response.messages.filter(
+            (msg) => msg.role === 'assistant'
+          );
+          const assistantId = getTrailingMessageId({
+            messages: assistantMessages,
+          });
+
+          if (!assistantId) return;
+
+          const [, assistantMessage] = appendResponseMessages({
+            messages: [message],
+            responseMessages: response.messages,
+          });
+
+          // Wait for background operations to complete before saving assistant message
+          saveOperationsPromise.then(async () => {
+            try {
+              await saveMessages({
+                messages: [
+                  {
+                    id: assistantId,
+                    chatId: id,
+                    role: assistantMessage.role,
+                    parts: assistantMessage.parts,
+                    attachments: assistantMessage.experimental_attachments ?? [],
+                    createdAt: new Date(),
+                  },
                 ],
-          experimental_transform: smoothStream({ chunking: 'word' }),
-          experimental_generateMessageId: generateUUID,
-          tools: {
-            getWeather,
-            createDocument: createDocument({ session, dataStream }),
-            updateDocument: updateDocument({ session, dataStream }),
-            requestSuggestions: requestSuggestions({
-              session,
-              dataStream,
-            }),
-            searchProducts: searchProducts({
-              session,
-              dataStream,
-            }),
-          },
-          onFinish: async ({ response }) => {
-            if (session.user?.id) {
-              try {
-                const assistantId = getTrailingMessageId({
-                  messages: response.messages.filter(
-                    (message) => message.role === 'assistant',
-                  ),
-                });
-
-                if (!assistantId) {
-                  throw new Error('No assistant message found!');
-                }
-
-                const [, assistantMessage] = appendResponseMessages({
-                  messages: [message],
-                  responseMessages: response.messages,
-                });
-
-                await saveMessages({
-                  messages: [
-                    {
-                      id: assistantId,
-                      chatId: id,
-                      role: assistantMessage.role,
-                      parts: assistantMessage.parts,
-                      attachments:
-                        assistantMessage.experimental_attachments ?? [],
-                      createdAt: new Date(),
-                    },
-                  ],
-                });
-              } catch (_) {
-                console.error('Failed to save chat');
-              }
+              });
+            } catch (error) {
+              console.error('Failed to save assistant message:', error);
             }
-          },
-          experimental_telemetry: {
-            isEnabled: isProductionEnvironment,
-            functionId: 'stream-text',
-          },
-        });
+          });
+        },
+        experimental_telemetry: {
+          isEnabled: isProductionEnvironment,
+          functionId: 'stream-text',
+        },
+      });
 
-        result.consumeStream();
+      // Process the stream with error handling
+      try {
+        const reader = result.toDataStream().getReader();
 
-        result.mergeIntoDataStream(dataStream, {
-          sendReasoning: true,
-        });
-      },
-      onError: () => {
-        return 'Oops, an error occurred!';
-      },
-    });
-
-    const streamContext = getStreamContext();
-
-    if (streamContext) {
-      return new Response(
-        await streamContext.resumableStream(streamId, () => stream),
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          await writer.write(value);
+        }
+        console.log(`Request processed in ${Date.now() - startTime}ms`);
+      } catch (streamError) {
+        console.error('Stream error:', streamError);
+        writer.write(
+          `data: ${JSON.stringify({ error: 'Stream processing error' })}\n\n`
+        );
+      }
+    } catch (err) {
+      const error = err as Error;
+      console.error('Fatal error:', error);
+      writer.write(
+        `data: ${JSON.stringify({
+          error: 'Internal server error',
+          details: error?.message || 'Unknown error',
+        })}\n\n`
       );
-    } else {
-      return new Response(stream);
+    } finally {
+      await writer.close();
     }
-  } catch (error) {
-    if (error instanceof ChatSDKError) {
-      return error.toResponse();
-    }
-  }
+  })();
+
+  return response;
 }
 
 export async function GET(request: Request) {
-  const streamContext = getStreamContext();
-  const resumeRequestedAt = new Date();
-
-  if (!streamContext) {
-    return new Response(null, { status: 204 });
-  }
-
   const { searchParams } = new URL(request.url);
   const chatId = searchParams.get('chatId');
 
@@ -295,50 +365,33 @@ export async function GET(request: Request) {
     return new ChatSDKError('not_found:stream').toResponse();
   }
 
-  const emptyDataStream = createDataStream({
-    execute: () => {},
-  });
+  // For GET requests, we'll return a simple response since resumable streams are complex
+  const messages = await getMessagesByChatId({ id: chatId });
+  const mostRecentMessage = messages.at(-1);
 
-  const stream = await streamContext.resumableStream(
-    recentStreamId,
-    () => emptyDataStream,
-  );
-
-  /*
-   * For when the generation is streaming during SSR
-   * but the resumable stream has concluded at this point.
-   */
-  if (!stream) {
-    const messages = await getMessagesByChatId({ id: chatId });
-    const mostRecentMessage = messages.at(-1);
-
-    if (!mostRecentMessage) {
-      return new Response(emptyDataStream, { status: 200 });
-    }
-
-    if (mostRecentMessage.role !== 'assistant') {
-      return new Response(emptyDataStream, { status: 200 });
-    }
-
-    const messageCreatedAt = new Date(mostRecentMessage.createdAt);
-
-    if (differenceInSeconds(resumeRequestedAt, messageCreatedAt) > 15) {
-      return new Response(emptyDataStream, { status: 200 });
-    }
-
-    const restoredStream = createDataStream({
-      execute: (buffer) => {
-        buffer.writeData({
-          type: 'append-message',
-          message: JSON.stringify(mostRecentMessage),
-        });
-      },
-    });
-
-    return new Response(restoredStream, { status: 200 });
+  if (!mostRecentMessage) {
+    return new Response(JSON.stringify({ messages: [] }), { status: 200 });
   }
 
-  return new Response(stream, { status: 200 });
+  if (mostRecentMessage.role !== 'assistant') {
+    return new Response(JSON.stringify({ messages: [] }), { status: 200 });
+  }
+
+  const resumeRequestedAt = new Date();
+  const messageCreatedAt = new Date(mostRecentMessage.createdAt);
+
+  if (differenceInSeconds(resumeRequestedAt, messageCreatedAt) > 15) {
+    return new Response(JSON.stringify({ messages: [] }), { status: 200 });
+  }
+
+  return new Response(JSON.stringify({ 
+    messages: [mostRecentMessage] 
+  }), { 
+    status: 200,
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  });
 }
 
 export async function DELETE(request: Request) {

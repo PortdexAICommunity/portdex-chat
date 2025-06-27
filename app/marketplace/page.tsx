@@ -108,7 +108,9 @@ const FEATURED_OTHER_ITEMS = 4;
 
 export default function Marketplace() {
   const [activeTab, setActiveTab] = useState<TabType>("home");
-  const [selectedItem, setSelectedItem] = useState<DataTypes | MCPDataTypes | MCPServerType | null>(null);
+  const [selectedItem, setSelectedItem] = useState<
+    DataTypes | MCPDataTypes | MCPServerType | null
+  >(null);
   const [dialogType, setDialogType] = useState<
     "assistant" | "plugin" | "mcp-server" | "ai-model"
   >("assistant");
@@ -328,7 +330,6 @@ export default function Marketplace() {
     const endIndex = currentPage * ITEMS_PER_PAGE;
     return filteredTemplates.slice(startIndex, endIndex);
   }, [filteredTemplates, currentPage]);
-
 
   const paginatedMcpServers = useMemo(() => mcpServers, [mcpServers]);
 
@@ -643,7 +644,7 @@ export default function Marketplace() {
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.1 }}
                         >
-                          <MemoizedMCPServerCard  
+                          <MemoizedMCPServerCard
                             server={server}
                             onClick={() =>
                               handleItemClick(server, "mcp-server")
