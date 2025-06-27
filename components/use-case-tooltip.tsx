@@ -66,7 +66,7 @@ export default function UseCaseTooltip() {
 
 	return (
 		<div>
-			<div className="fixed top-4 right-4 z-50">
+			<div className="fixed bottom-4 right-4 z-50">
 				<div
 					className="relative"
 					onMouseEnter={() => setIsHovered(true)}
@@ -88,8 +88,8 @@ export default function UseCaseTooltip() {
 								animate={{ opacity: 1, scale: 1, y: 0 }}
 								exit={{ opacity: 0, scale: 0.95, y: 10 }}
 								transition={{ duration: 0.2, ease: "easeOut" }}
-								className="absolute top-12 right-0 w-[90vw] max-w-4xl bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-6 md:p-8"
-								style={{ transformOrigin: "top right" }}
+								className="absolute bottom-12 right-0 w-[90vw] max-w-4xl bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-6 md:p-8"
+								style={{ transformOrigin: "bottom right" }}
 							>
 								{/* Header */}
 								<div className="mb-6">
