@@ -20,12 +20,13 @@ import {
   Star,
   User,
 } from 'lucide-react';
+import Image from 'next/image';
 
 interface DetailDialogProps {
   isOpen: boolean;
   onClose: () => void;
   item: Assistant | Plugin | DataTypes | null;
-  type: 'assistant' | 'plugin' | 'mcp-server';
+  type: 'assistant' | 'plugin' | 'mcp-server' | 'ai-model';
 }
 
 export function DetailDialog({
@@ -39,10 +40,12 @@ export function DetailDialog({
   const isAssistant = type === 'assistant';
   const isPlugin = type === 'plugin';
   const isMcpServer = type === 'mcp-server';
+  const isAIModel = type === 'ai-model';
 
   const assistant = isAssistant ? (item as Assistant) : null;
   const plugin = isPlugin ? (item as Plugin) : null;
   const mcpServer = isMcpServer ? (item as DataTypes) : null;
+  const aiModel = isAIModel ? (item as DataTypes) : null;
 
   const handleUseAssistant = () => {
     if (isMcpServer && mcpServer) {
@@ -61,6 +64,7 @@ export function DetailDialog({
     if (isAssistant) return 'Use Assistant';
     if (isPlugin) return 'Install Plugin';
     if (isMcpServer) return 'View on GitHub';
+    if (isAIModel) return 'Use AI Model';
     return 'Use';
   };
 
@@ -90,7 +94,9 @@ export function DetailDialog({
                     ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300'
                     : isPlugin
                       ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
-                      : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+                      : isAIModel
+                        ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300'
+                        : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
                 } w-fit`}
               >
                 {isMcpServer ? 'MCP Server' : item.category}
@@ -119,6 +125,44 @@ export function DetailDialog({
                     <div className="flex items-center gap-1">
                       <Calendar className="size-4" />
                       <span>{assistant.date}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Visual Header for AI Model */}
+            {aiModel && (
+              <Card className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900/30 dark:to-gray-800/30 border-gray-200 dark:border-gray-800/50">
+                <CardContent className="p-6">
+                  <div
+                    className={`h-24 w-full bg-gradient-to-r ${aiModel.gradient} rounded-xl relative overflow-hidden mb-4`}
+                  >
+                    <div className="absolute inset-0 bg-black/10" />
+                    <div className="absolute -bottom-3 -right-3 size-16 bg-white dark:bg-gray-900 rounded-2xl flex items-center justify-center shadow-lg border-4 border-white dark:border-gray-700/50 p-2">
+                      {typeof aiModel.icon === 'string' && aiModel.icon.startsWith('http') ? (
+                        <Image
+                          src={aiModel.icon}
+                          alt={aiModel.name}
+                          width={48}
+                          height={48}
+                          className="rounded-lg object-contain"
+                        />
+                      ) : (
+                        <div className="text-2xl">
+                          {typeof aiModel.icon === 'string' ? aiModel.icon : aiModel.name.charAt(0)}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center gap-1">
+                      <User className="size-4" />
+                      <span>{aiModel.creator}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Calendar className="size-4" />
+                      <span>{aiModel.date}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -183,7 +227,7 @@ export function DetailDialog({
             <div>
               <h4 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white flex items-center gap-2">
                 <Sparkles className="size-5 text-purple-600 dark:text-purple-400" />
-                {isMcpServer ? 'About this MCP Server' : 'Description'}
+                {isMcpServer ? 'About this MCP Server' : isAIModel ? 'About this AI Model' : 'Description'}
               </h4>
               <Card className="bg-gray-50 dark:bg-gray-950/50 border-gray-200 dark:border-gray-800/50">
                 <CardContent className="p-4">
@@ -220,6 +264,35 @@ export function DetailDialog({
                     </motion.div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* AI Model Information */}
+            {aiModel && (
+              <div>
+                <h4 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">
+                  Model Information
+                </h4>
+                <Card className="bg-gray-50 dark:bg-gray-950/50 border-gray-200 dark:border-gray-800/50">
+                  <CardContent className="p-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Category</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{aiModel.category}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Creator</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{aiModel.creator}</p>
+                      </div>
+                      {aiModel.date && (
+                        <div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Release Date</p>
+                          <p className="text-sm font-medium text-gray-900 dark:text-white">{aiModel.date}</p>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             )}
 
@@ -269,7 +342,9 @@ export function DetailDialog({
                 className={`flex-1 ${
                   isMcpServer
                     ? 'bg-green-600 hover:bg-green-700'
-                    : 'bg-purple-600 hover:bg-purple-700'
+                    : isAIModel
+                      ? 'bg-orange-600 hover:bg-orange-700'
+                      : 'bg-purple-600 hover:bg-purple-700'
                 } text-white shadow-lg hover:shadow-xl transition-all duration-200`}
                 onClick={handleUseAssistant}
               >

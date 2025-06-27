@@ -109,7 +109,7 @@ export default function Marketplace() {
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [selectedItem, setSelectedItem] = useState<DataTypes | null>(null);
   const [dialogType, setDialogType] = useState<
-    'assistant' | 'plugin' | 'mcp-server'
+    'assistant' | 'plugin' | 'mcp-server' | 'ai-model'
   >('assistant');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -200,11 +200,13 @@ export default function Marketplace() {
       // Set the selected item and dialog type for modal
       setSelectedItem(item);
       setDialogType(
-        type === 'assistant' || type === 'ai-model'
+        type === 'assistant'
           ? 'assistant'
-          : type === 'mcp-server'
-            ? 'mcp-server'
-            : 'plugin',
+          : type === 'ai-model'
+            ? 'ai-model'
+            : type === 'mcp-server'
+              ? 'mcp-server'
+              : 'plugin',
       );
       setIsDialogOpen(true);
     },
