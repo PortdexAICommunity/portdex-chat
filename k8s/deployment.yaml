@@ -6,7 +6,7 @@ metadata:
   labels:
     app: portdex
 spec:
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       app: portdex
@@ -15,9 +15,11 @@ spec:
       labels:
         app: portdex
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: aks-userpool1-25082268-vmss000000
       containers:
         - name: portdex
-          image: portdex.azurecr.io/portdex-chat:production
+          image: portdex.azurecr.io/portdex-chat:7c909e2ec07a9c189fc8fd57a8cd3bbb47ea57f9
           ports:
             - containerPort: 3000
           envFrom:
