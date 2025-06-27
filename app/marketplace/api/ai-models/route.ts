@@ -1,16 +1,23 @@
 import { aiModels } from '@/lib/constants';
 import { type NextRequest, NextResponse } from 'next/server';
 import { fetchAnthropicModels } from './anthropic';
+import { fetchDeepSeekModels } from './deepSeek';
 import { fetchQwenAIModels } from './qwen';
 
 export async function GET(req: NextRequest) {
   try {
-    const [anthropicModels, qwenModels] = await Promise.all([
+    const [anthropicModels, qwenModels, deepSeekModels] = await Promise.all([
       fetchAnthropicModels(),
       fetchQwenAIModels(),
+      fetchDeepSeekModels(),
     ]);
 
-    const allModels = [...aiModels, ...anthropicModels, ...qwenModels];
+    const allModels = [
+      ...aiModels,
+      ...anthropicModels,
+      ...qwenModels,
+      ...deepSeekModels,
+    ];
 
     const { searchParams } = req.nextUrl;
     const search = searchParams.get('search');

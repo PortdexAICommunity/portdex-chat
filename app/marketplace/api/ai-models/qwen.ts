@@ -277,7 +277,7 @@ export async function fetchQwenAIModels(): Promise<DataTypes[]> {
         creator: 'Alibaba Cloud',
         description: description,
         category: model.category,
-        icon: 'https://img.icons8.com/?size=100&id=IhjVlIwcAgzS&format=png&color=000000',
+        icon: 'https://img.icons8.com/?size=100&id=59023&format=png&color=000000',
         gradient: 'linear-gradient(135deg, #FF6900 0%, #FFA500 100%)',
         date: new Date().toLocaleDateString('en-US', {
           year: 'numeric',

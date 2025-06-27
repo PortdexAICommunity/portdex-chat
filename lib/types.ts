@@ -17,7 +17,27 @@ export interface DataTypes {
   icon: string;
   gradient?: string;
   date?: string;
+  url?: string;
 }
+
+export type MCPDataTypes = DataTypes & {
+  url: string;
+  official: boolean;
+  languages: string[];
+  scope: string[];
+  operating_systems: string[];
+};
+
+export type MCPServerType = {
+  name: string;
+  url: string;
+  description: string;
+  category: string;
+  official: boolean;
+  languages: string[];
+  scope: string[];
+  operating_systems: string[];
+};
 
 export type Assistant = {
   name: string;
