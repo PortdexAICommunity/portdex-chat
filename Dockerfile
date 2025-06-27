@@ -25,7 +25,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
-ENV AUTH_URL="https://chat.portdex.ai"
+# ENV AUTH_URL="https://chat.portdex.ai"
 
 # Create non-root user for security
 RUN addgroup --system --gid 1001 nodejs && \
