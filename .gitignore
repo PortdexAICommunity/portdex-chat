@@ -49,3 +49,5 @@ yarn-error.log*
 # open-next
 cloudflare-env.d.ts
 .open-next
+
+.wrangler

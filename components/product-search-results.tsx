@@ -1,6 +1,7 @@
 'use client';
 
 import { ExternalLink, Package, Star } from 'lucide-react';
+import Image from 'next/image';
 import { memo } from 'react';
 import { Button } from './ui/button';
 
@@ -132,7 +133,7 @@ const PureProductSearchResults = ({
 
                 {/* Product Image */}
                 <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden mb-3">
-                  <img
+                  <Image
                     src={
                       product.image || '/placeholder.svg?height=120&width=200'
                     }

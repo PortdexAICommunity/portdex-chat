@@ -7,14 +7,14 @@ import { AIModelCard } from './ai-model-card';
 import { AssistantCard } from './assistant-card';
 
 // Memoized Assistant Card Component
-import React from 'react';
-const MemoizedAssistantCard = React.memo(
+import { memo } from 'react';
+const MemoizedAssistantCard = memo(
   ({ assistant, onClick }: { assistant: DataTypes; onClick: () => void }) => (
     <AssistantCard assistant={assistant} onClick={onClick} />
   ),
 );
 
-const MemoizedAIModelCard = React.memo(
+const MemoizedAIModelCard = memo(
   ({ aiModel, onClick }: { aiModel: DataTypes; onClick: () => void }) => (
     <AIModelCard aiModel={aiModel} onClick={onClick} />
   ),
