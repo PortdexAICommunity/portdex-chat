@@ -13,7 +13,7 @@ export const Greeting = () => {
 				transition={{ delay: 0.5 }}
 				className="text-2xl font-semibold"
 			>
-				Welcome to Portdex AI
+				Welcome to Portdex Chat
 			</motion.div>
 		</div>
 	);
