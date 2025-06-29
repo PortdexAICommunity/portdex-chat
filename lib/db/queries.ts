@@ -38,32 +38,9 @@ import { ChatSDKError } from "../errors";
 // use the Drizzle adapter for Auth.js / NextAuth
 // https://authjs.dev/reference/adapter/drizzle
 
-// Optimized for Cloudflare Workers and serverless environments
 // biome-ignore lint: Forbidden non-null assertion.
-const client = postgres(process.env.POSTGRES_URL!, {
-	// Connection configuration optimized for serverless
-	max: 1, // Single connection for serverless
-	idle_timeout: 20, // Close idle connections after 20 seconds
-	connect_timeout: 10, // Connection timeout of 10 seconds
-	prepare: false, // Disable prepared statements for better compatibility
-	// Disable connection pooling transform for Workers
-	transform: {
-		undefined: null,
-	},
-});
+const client = postgres(process.env.POSTGRES_URL!);
 const db = drizzle(client);
-
-// Helper function to ensure connections are cleaned up
-const withTimeout = async <T>(
-	promise: Promise<T>,
-	timeoutMs = 25000
-): Promise<T> => {
-	const timeoutPromise = new Promise<never>((_, reject) => {
-		setTimeout(() => reject(new Error("Database query timeout")), timeoutMs);
-	});
-
-	return Promise.race([promise, timeoutPromise]);
-};
 
 export async function getUser(email: string): Promise<Array<User>> {
 	try {
@@ -160,68 +137,61 @@ export async function getChatsByUserId({
 	try {
 		const extendedLimit = limit + 1;
 
-		// Optimized query to avoid multiple sequential database calls
-		if (startingAfter || endingBefore) {
-			const referenceId = (startingAfter || endingBefore) as string;
-			const operator = startingAfter ? gt : lt;
+		const query = (whereCondition?: SQL<any>) =>
+			db
+				.select()
+				.from(chat)
+				.where(
+					whereCondition
+						? and(whereCondition, eq(chat.userId, id))
+						: eq(chat.userId, id)
+				)
+				.orderBy(desc(chat.createdAt))
+				.limit(extendedLimit);
 
-			// Single optimized query using subquery to avoid multiple round trips
-			const filteredChats = await withTimeout(
-				db
-					.select({
-						id: chat.id,
-						createdAt: chat.createdAt,
-						title: chat.title,
-						userId: chat.userId,
-						visibility: chat.visibility,
-					})
-					.from(chat)
-					.where(
-						and(
-							eq(chat.userId, id),
-							operator(
-								chat.createdAt,
-								db
-									.select({ createdAt: chat.createdAt })
-									.from(chat)
-									.where(eq(chat.id, referenceId))
-									.limit(1)
-							)
-						)
-					)
-					.orderBy(desc(chat.createdAt))
-					.limit(extendedLimit)
-			);
+		let filteredChats: Array<Chat> = [];
 
-			const hasMore = filteredChats.length > limit;
-			return {
-				chats: hasMore ? filteredChats.slice(0, limit) : filteredChats,
-				hasMore,
-			};
+		if (startingAfter) {
+			const [selectedChat] = await db
+				.select()
+				.from(chat)
+				.where(eq(chat.id, startingAfter))
+				.limit(1);
+
+			if (!selectedChat) {
+				throw new ChatSDKError(
+					"not_found:database",
+					`Chat with id ${startingAfter} not found`
+				);
+			}
+
+			filteredChats = await query(gt(chat.createdAt, selectedChat.createdAt));
+		} else if (endingBefore) {
+			const [selectedChat] = await db
+				.select()
+				.from(chat)
+				.where(eq(chat.id, endingBefore))
+				.limit(1);
+
+			if (!selectedChat) {
+				throw new ChatSDKError(
+					"not_found:database",
+					`Chat with id ${endingBefore} not found`
+				);
+			}
+
+			filteredChats = await query(lt(chat.createdAt, selectedChat.createdAt));
 		} else {
-			// Simple case - no pagination
-			const filteredChats = await withTimeout(
-				db
-					.select()
-					.from(chat)
-					.where(eq(chat.userId, id))
-					.orderBy(desc(chat.createdAt))
-					.limit(extendedLimit)
-			);
+			filteredChats = await query();
+		}
 
-			const hasMore = filteredChats.length > limit;
-			return {
-				chats: hasMore ? filteredChats.slice(0, limit) : filteredChats,
-				hasMore,
-			};
-		}
+		const hasMore = filteredChats.length > limit;
+
+		return {
+			chats: hasMore ? filteredChats.slice(0, limit) : filteredChats,
+			hasMore,
+		};
 	} catch (error) {
-		if (error instanceof Error && error.message === "Database query timeout") {
-			throw new ChatSDKError(
-				"offline:database",
-				"Database query timed out - request canceled to prevent hanging"
-			);
-		}
 		throw new ChatSDKError(
 			"bad_request:database",
 			"Failed to get chats by user id"
@@ -231,17 +201,9 @@ export async function getChatsByUserId({
 
 export async function getChatById({ id }: { id: string }) {
 	try {
-		const [selectedChat] = await withTimeout(
-			db.select().from(chat).where(eq(chat.id, id))
-		);
+		const [selectedChat] = await db.select().from(chat).where(eq(chat.id, id));
 		return selectedChat;
 	} catch (error) {
-		if (error instanceof Error && error.message === "Database query timeout") {
-			throw new ChatSDKError(
-				"offline:database",
-				"Database query timed out - request canceled to prevent hanging"
-			);
-		}
 		throw new ChatSDKError("bad_request:database", "Failed to get chat by id");
 	}
 }
@@ -283,49 +245,31 @@ export async function voteMessage({
 	type: "up" | "down";
 }) {
 	try {
-		const [existingVote] = await withTimeout(
-			db
-				.select()
-				.from(vote)
-				.where(and(eq(vote.messageId, messageId)))
-		);
+		const [existingVote] = await db
+			.select()
+			.from(vote)
+			.where(and(eq(vote.messageId, messageId)));
 
 		if (existingVote) {
-			return await withTimeout(
-				db
-					.update(vote)
-					.set({ isUpvoted: type === "up" })
-					.where(and(eq(vote.messageId, messageId), eq(vote.chatId, chatId)))
-			);
+			return await db
+				.update(vote)
+				.set({ isUpvoted: type === "up" })
+				.where(and(eq(vote.messageId, messageId), eq(vote.chatId, chatId)));
 		}
-		return await withTimeout(
-			db.insert(vote).values({
-				chatId,
-				messageId,
-				isUpvoted: type === "up",
-			})
-		);
+		return await db.insert(vote).values({
+			chatId,
+			messageId,
+			isUpvoted: type === "up",
+		});
 	} catch (error) {
-		if (error instanceof Error && error.message === "Database query timeout") {
-			throw new ChatSDKError(
-				"offline:database",
-				"Database query timed out - request canceled to prevent hanging"
-			);
-		}
 		throw new ChatSDKError("bad_request:database", "Failed to vote message");
 	}
 }
 
 export async function getVotesByChatId({ id }: { id: string }) {
 	try {
-		return await withTimeout(db.select().from(vote).where(eq(vote.chatId, id)));
+		return await db.select().from(vote).where(eq(vote.chatId, id));
 	} catch (error) {
-		if (error instanceof Error && error.message === "Database query timeout") {
-			throw new ChatSDKError(
-				"offline:database",
-				"Database query timed out - request canceled to prevent hanging"
-			);
-		}
 		throw new ChatSDKError(
 			"bad_request:database",
 			"Failed to get votes by chat id"
