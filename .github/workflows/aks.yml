@@ -46,8 +46,8 @@ env:
   AKS_RESOURCE_GROUP: ${{ vars.AKS_RESOURCE_GROUP }}
   CLUSTER_NAME: ${{ vars.CLUSTER_NAME }}
   DEPLOYMENT_MANIFEST_PATH: ${{ vars.DEPLOYMENT_MANIFEST_PATH }}
-  # NAMESPACE: ${{ github.event.repository.name }}
-  NAMESPACE: maava
+  NAMESPACE: ${{ github.event.repository.name }}
+  # NAMESPACE: maava
 
 jobs:
   buildImage:
