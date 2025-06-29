@@ -1,20 +1,18 @@
 {
-	"main": ".open-next/worker.js",
-	"name": "portdex-chat",
-	"compatibility_date": "2025-03-25",
-	"compatibility_flags": [
-		"nodejs_compat"
-	],
-	"assets": {
-		"directory": ".open-next/assets",
-		"binding": "ASSETS"
-	},
-	"observability": {
-		"enabled": true,
-		"head_sampling_rate": 0.1
-	},
-	"vars": {
-		"AUTH_URL": "https://chat.portdex.ai",
-		"AUTH_TRUST_HOST": "true"
-	}
+  "main": ".open-next/worker.js",
+  "name": "portdex-chat",
+  "compatibility_date": "2025-03-25",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 0.1
+  },
+  "vars": {
+    "AUTH_URL": "https://chat.portdex.ai",
+    "AUTH_TRUST_HOST": "true"
+  }
 }
