@@ -44,7 +44,7 @@ function PureMessages({
 			ref={messagesContainerRef}
 			className="flex flex-col min-w-0 gap-6 flex-1 overflow-y-scroll pt-4 relative no-scrollbar"
 		>
-			{/* {messages.length === 0 && <Greeting />} */}
+			{messages.length === 0 && <Greeting />}
 
 			{messages.map((message, index) => (
 				<PreviewMessage
