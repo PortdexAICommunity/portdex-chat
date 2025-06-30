@@ -98,7 +98,7 @@ export function AssistantCard({ assistant, onClick }: AssistantCardProps) {
 													variant="secondary"
 													className="bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors text-xs"
 												>
-													#{tag}
+													{tag}
 												</Badge>
 											))}
 											{assistant.tags.length > 3 && (
