@@ -15,7 +15,6 @@ interface AssistantCardProps {
 
 export function AssistantCard({ assistant, onClick }: AssistantCardProps) {
 	const [imageError, setImageError] = useState(false);
-	console.log(assistant);
 
 	return (
 		<motion.div
@@ -66,8 +65,57 @@ export function AssistantCard({ assistant, onClick }: AssistantCardProps) {
 								</p>
 							</div>
 
+							{/* Tags and additional metadata */}
+							{(assistant.tags ||
+								assistant.subcategory ||
+								assistant.useCase) && (
+								<div className="mb-3 space-y-2">
+									{/* {assistant.subcategory && (
+										<div className="flex items-center gap-1">
+											<span className="text-xs text-gray-500 dark:text-gray-400">
+												Type:
+											</span>
+											<Badge variant="outline" className="text-xs">
+												{assistant.subcategory}
+											</Badge>
+										</div>
+									)}
+									{assistant.useCase && (
+										<div className="flex items-center gap-1">
+											<span className="text-xs text-gray-500 dark:text-gray-400">
+												Use Case:
+											</span>
+											<Badge variant="outline" className="text-xs">
+												{assistant.useCase}
+											</Badge>
+										</div>
+									)} */}
+									{assistant.tags && assistant.tags.length > 0 && (
+										<div className="flex flex-wrap gap-1">
+											{assistant.tags.slice(0, 3).map((tag) => (
+												<Badge
+													key={tag}
+													variant="secondary"
+													className="bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors text-xs"
+												>
+													#{tag}
+												</Badge>
+											))}
+											{assistant.tags.length > 3 && (
+												<Badge
+													variant="secondary"
+													className="bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors text-xs"
+												>
+													+{assistant.tags.length - 3}
+												</Badge>
+											)}
+										</div>
+									)}
+								</div>
+							)}
+
 							{/* Footer with category badge */}
-							<div className="flex items-center justify-between gap-2 mt-auto">
+							{/* <div className="flex items-center justify-between gap-2 mt-auto">
 								<Badge
 									variant="secondary"
 									className="bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors text-xs"
@@ -82,7 +130,7 @@ export function AssistantCard({ assistant, onClick }: AssistantCardProps) {
 								>
 									View →
 								</motion.div>
-							</div>
+							</div> */}
 						</div>
 					</div>
 				</CardContent>

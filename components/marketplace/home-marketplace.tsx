@@ -45,7 +45,6 @@ const MarketplaceItemDialog = ({
 		const assistantModelId = `assistant-${item.id}`;
 		saveChatModelAsCookie(assistantModelId);
 
-		console.log(`Using ${item.title} assistant`);
 		onClose();
 	};
 
