@@ -232,7 +232,7 @@ function parseServers(markdown: string) {
       const legendInfo = extractLegendInfo(serverMatch[0]);
 
       servers.push({
-        name,
+      name,
         url,
         description,
         ...legendInfo,
@@ -281,7 +281,7 @@ export async function GET(req: NextRequest) {
       name: item.name,
     }));
 
-    return NextResponse.json({ agents });
+  return NextResponse.json({ agents });
   } catch (e: any) {
     console.error('Error in agents API:', e);
     return NextResponse.json({ error: e.message, agents: [] }, { status: 500 });
