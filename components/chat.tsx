@@ -1,28 +1,28 @@
-'use client';
+"use client";
 
-import { ChatHeader } from '@/components/chat-header';
-import { useArtifactSelector } from '@/hooks/use-artifact';
-import { useAutoResume } from '@/hooks/use-auto-resume';
-import { useChatCache } from '@/hooks/use-chat-cache';
-import { useChatVisibility } from '@/hooks/use-chat-visibility';
-import type { Vote } from '@/lib/db/schema';
-import { ChatSDKError } from '@/lib/errors';
-import { cn, fetcher, fetchWithErrorHandlers, generateUUID } from '@/lib/utils';
-import { useChat } from '@ai-sdk/react';
-import type { Attachment, UIMessage } from 'ai';
-import type { Session } from 'next-auth';
-import { useSearchParams } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
-import { unstable_serialize } from 'swr/infinite';
-import { Artifact } from './artifact';
-import { Footer } from './footer';
-import { HomeMarketplace } from './marketplace/home-marketplace';
-import { Messages } from './messages';
-import { MultimodalInput } from './multimodal-input';
-import { getChatHistoryPaginationKey } from './sidebar-history';
-import { toast } from './toast';
-import type { VisibilityType } from './visibility-selector';
+import { ChatHeader } from "@/components/chat-header";
+import { useArtifactSelector } from "@/hooks/use-artifact";
+import { useAutoResume } from "@/hooks/use-auto-resume";
+import { useChatCache } from "@/hooks/use-chat-cache";
+import { useChatVisibility } from "@/hooks/use-chat-visibility";
+import type { Vote } from "@/lib/db/schema";
+import { ChatSDKError } from "@/lib/errors";
+import { cn, fetcher, fetchWithErrorHandlers, generateUUID } from "@/lib/utils";
+import { useChat } from "@ai-sdk/react";
+import type { Attachment, UIMessage } from "ai";
+import type { Session } from "next-auth";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import useSWR, { useSWRConfig } from "swr";
+import { unstable_serialize } from "swr/infinite";
+import { Artifact } from "./artifact";
+import { Footer } from "./footer";
+import { HomeMarketplace } from "./marketplace/home-marketplace";
+import { Messages } from "./messages";
+import { MultimodalInput } from "./multimodal-input";
+import { getChatHistoryPaginationKey } from "./sidebar-history";
+import { toast } from "./toast";
+import type { VisibilityType } from "./visibility-selector";
 
 export function Chat({
   id,
@@ -42,10 +42,13 @@ export function Chat({
   autoResume: boolean;
 }) {
   const { mutate } = useSWRConfig();
-  const [selectedTool, setSelectedTool] = useState<string>('none');
+  const [selectedTool, setSelectedTool] = useState<string>("none");
   const selectedToolRef = useRef(selectedTool);
   const { cacheChat, cacheMessage } = useChatCache();
 
+  useEffect(() => {
+    selectedToolRef.current = selectedTool;
+  }, [selectedTool]);
   useEffect(() => {
     selectedToolRef.current = selectedTool;
   }, [selectedTool]);
@@ -57,11 +60,11 @@ export function Chat({
       let title = `Chat ${id.slice(0, 8)}`;
       if (initialMessages.length > 0) {
         // Use the first user message as title
-        const firstUserMessage = initialMessages.find((m) => m.role === 'user');
+        const firstUserMessage = initialMessages.find((m) => m.role === "user");
         if (firstUserMessage?.content) {
           title =
             firstUserMessage.content.slice(0, 50) +
-            (firstUserMessage.content.length > 50 ? '...' : '');
+            (firstUserMessage.content.length > 50 ? "..." : "");
         }
       }
 
@@ -112,7 +115,7 @@ export function Chat({
     onError: (error) => {
       if (error instanceof ChatSDKError) {
         toast({
-          type: 'error',
+          type: "error",
           description: error.message,
         });
       }
@@ -125,7 +128,7 @@ export function Chat({
     messages.forEach((message) => {
       if (
         message.content &&
-        (message.role === 'user' || message.role === 'assistant')
+        (message.role === "user" || message.role === "assistant")
       ) {
         cacheMessage({
           id: message.id,
@@ -140,25 +143,25 @@ export function Chat({
   }, [messages, id, cacheMessage]);
 
   const searchParams = useSearchParams();
-  const query = searchParams.get('query');
+  const query = searchParams.get("query");
 
   const [hasAppendedQuery, setHasAppendedQuery] = useState(false);
 
   useEffect(() => {
     if (query && !hasAppendedQuery) {
       append({
-        role: 'user',
+        role: "user",
         content: query,
       });
 
       setHasAppendedQuery(true);
-      window.history.replaceState({}, '', `/chat/${id}`);
+      window.history.replaceState({}, "", `/chat/${id}`);
     }
   }, [query, append, hasAppendedQuery, id]);
 
   const { data: votes } = useSWR<Array<Vote>>(
     messages.length >= 2 ? `/api/vote?chatId=${id}` : null,
-    fetcher as any,
+    fetcher as any
   );
 
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
@@ -175,10 +178,10 @@ export function Chat({
     <>
       <div
         className={cn(
-          'flex flex-col bg-background min-h-screen',
+          "flex flex-col bg-background min-h-screen",
           messages.length === 0
-            ? '[background:radial-gradient(125%_125%_at_50%_10%,#fff_40%,#63e_100%)] dark:[background:radial-gradient(125%_125%_at_50%_10%,#000_40%,#63e_100%)]'
-            : '',
+            ? "[background:radial-gradient(125%_125%_at_50%_10%,#fff_40%,#63e_100%)] dark:[background:radial-gradient(125%_125%_at_50%_10%,#000_40%,#63e_100%)]"
+            : ""
         )}
       >
         <ChatHeader
@@ -199,11 +202,21 @@ export function Chat({
           isReadonly={isReadonly}
           isArtifactVisible={isArtifactVisible}
         />
+        <Messages
+          chatId={id}
+          status={status}
+          votes={votes}
+          messages={messages}
+          setMessages={setMessages}
+          reload={reload}
+          isReadonly={isReadonly}
+          isArtifactVisible={isArtifactVisible}
+        />
 
         <form
           className={cn(
-            'flex mx-auto px-4 sm:px-6 bg-transparent pb-4 md:pb-6 gap-2 w-full max-w-none md:max-w-3xl',
-            messages.length === 0 ? 'my-[20dvh]' : 'my-0',
+            "flex mx-auto px-4 sm:px-6 bg-transparent pb-4 md:pb-6 gap-2 w-full max-w-none md:max-w-3xl",
+            messages.length === 0 ? "my-[20dvh]" : "my-0"
           )}
         >
           {!isReadonly && (
@@ -224,6 +237,11 @@ export function Chat({
           )}
         </form>
 
+        {messages.length === 0 && (
+          <div className="max-w-7xl mx-auto bg-background/50 my-14 rounded-3xl p-10">
+            <HomeMarketplace />
+          </div>
+        )}
         {messages.length === 0 && (
           <div className="max-w-7xl mx-auto bg-background/50 my-14 rounded-3xl p-10">
             <HomeMarketplace />
