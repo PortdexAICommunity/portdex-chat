@@ -89,6 +89,7 @@ export const MarketplaceFilter = ({
 					<div className="space-y-1 pr-3 lg:pr-6 w-full">
 						{/* All Categories */}
 						<button
+							type="button"
 							onClick={() => onCategoryChange(null)}
 							className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
 								selectedCategory === null
@@ -111,6 +112,7 @@ export const MarketplaceFilter = ({
 						{categories.map((category) => (
 							<button
 								key={category.name}
+								type="button"
 								onClick={() => onCategoryChange(category.name)}
 								className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
 									selectedCategory === category.name
@@ -157,6 +159,7 @@ export const MarketplaceFilter = ({
 										Search: &ldquo;{searchTerm}&rdquo;
 									</span>
 									<button
+										type="button"
 										onClick={() => onSearchChange("")}
 										className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200"
 									>
@@ -170,6 +173,7 @@ export const MarketplaceFilter = ({
 										Category: {selectedCategory}
 									</span>
 									<button
+										type="button"
 										onClick={() => onCategoryChange(null)}
 										className="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-200"
 									>
