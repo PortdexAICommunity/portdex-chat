@@ -1,11 +1,12 @@
-import type { UIMessage } from 'ai';
-import { PreviewMessage, ThinkingMessage } from './message';
-import { memo } from 'react';
-import type { Vote } from '@/lib/db/schema';
-import equal from 'fast-deep-equal';
-import type { UseChatHelpers } from '@ai-sdk/react';
-import { motion } from 'framer-motion';
 import { useMessages } from '@/hooks/use-messages';
+import type { Vote } from '@/lib/db/schema';
+import type { UseChatHelpers } from '@ai-sdk/react';
+import type { UIMessage } from 'ai';
+import equal from 'fast-deep-equal';
+import { motion } from 'framer-motion';
+import { memo } from 'react';
+import { Greeting } from './greeting';
+import { PreviewMessage, ThinkingMessage } from './message';
 
 interface MessagesProps {
   chatId: string;
@@ -41,9 +42,9 @@ function PureMessages({
   return (
     <div
       ref={messagesContainerRef}
-      className="flex flex-col min-w-0 gap-6 flex-1 overflow-y-scroll pt-4 relative no-scrollbar"
+      className="flex flex-col min-w-0 gap-2 flex-1 overflow-y-scroll pt-4 relative no-scrollbar"
     >
-      {/* {messages.length === 0 && <Greeting />} */}
+      {messages.length === 0 && <Greeting />}
 
       {messages.map((message, index) => (
         <PreviewMessage

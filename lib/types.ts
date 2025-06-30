@@ -14,10 +14,13 @@ export interface DataTypes {
   creator: string;
   description: string;
   category: string;
+  subcategory?: string;
+  useCase?: string;
   icon: string;
   gradient?: string;
   date?: string;
   url?: string;
+  tags?: string[];
 }
 
 export type MCPDataTypes = DataTypes & {

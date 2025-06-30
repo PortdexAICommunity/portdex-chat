@@ -20,7 +20,10 @@ export const chatModels: Array<ChatModel> = [
 ];
 
 // Dynamic assistant model creation
-export const createAssistantModel = (assistantId: string, assistantTitle: string): ChatModel => {
+export const createAssistantModel = (
+  assistantId: string,
+  assistantTitle: string,
+): ChatModel => {
   return {
     id: `assistant-${assistantId}`,
     name: assistantTitle,
@@ -29,14 +32,19 @@ export const createAssistantModel = (assistantId: string, assistantTitle: string
 };
 
 // Get all available models including dynamic assistant model
-export const getAllChatModels = (selectedAssistant?: { id: string; title: string } | null): Array<ChatModel> => {
+export const getAllChatModels = (
+  selectedAssistant?: { id: string; title: string } | null,
+): Array<ChatModel> => {
   const baseModels = [...chatModels];
-  
+
   if (selectedAssistant) {
-    const assistantModel = createAssistantModel(selectedAssistant.id, selectedAssistant.title);
+    const assistantModel = createAssistantModel(
+      selectedAssistant.id,
+      selectedAssistant.title,
+    );
     return [assistantModel, ...baseModels];
   }
-  
+
   return baseModels;
 };
 
@@ -53,5 +61,5 @@ export const extractAssistantId = (modelId: string): string | null => {
 };
 
 export const isValidBaseModel = (modelId: string): boolean => {
-  return chatModels.some(model => model.id === modelId);
+  return chatModels.some((model) => model.id === modelId);
 };

@@ -1,22 +1,22 @@
 /* eslint-disable import/no-named-as-default-member */
 /* eslint-disable react/display-name */
-"use client";
+'use client';
 
-import { AIModelCard } from "@/components/marketplace/ai-model-card";
-import { AssistantCard } from "@/components/marketplace/assistant-card";
-import { DetailDialog } from "@/components/marketplace/detail-dialog";
-import { MarketplaceSection } from "@/components/marketplace/marketplace-section";
-import { MCPServerCard } from "@/components/marketplace/mcp-server-card";
-import { MCPServersSidebar } from "@/components/marketplace/mcp-servers-sidebar";
-import { Pagination } from "@/components/marketplace/pagination";
-import { PluginCard } from "@/components/marketplace/plugin-card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import { plugins, siteTemplates, softwareTools } from "@/lib/constants";
-import type { DataTypes, MCPDataTypes, MCPServerType } from "@/lib/types";
-import { AnimatePresence, motion } from "framer-motion";
+import { AIModelCard } from '@/components/marketplace/ai-model-card';
+import { AssistantCard } from '@/components/marketplace/assistant-card';
+import { DetailDialog } from '@/components/marketplace/detail-dialog';
+import { MarketplaceSection } from '@/components/marketplace/marketplace-section';
+import { MCPServerCard } from '@/components/marketplace/mcp-server-card';
+import { MCPServersSidebar } from '@/components/marketplace/mcp-servers-sidebar';
+import { Pagination } from '@/components/marketplace/pagination';
+import { PluginCard } from '@/components/marketplace/plugin-card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+import { plugins, siteTemplates, softwareTools } from '@/lib/constants';
+import type { DataTypes, MCPDataTypes, MCPServerType } from '@/lib/types';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   Brain,
   FileText,
@@ -26,20 +26,20 @@ import {
   Search,
   Server,
   Users,
-} from "lucide-react";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import useSWR from "swr";
+} from 'lucide-react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import useSWR from 'swr';
 
 // Infer agent type from API - using DataTypes for consistency
 
 type TabType =
-  | "home"
-  | "assistants"
-  | "plugins"
-  | "ai-models"
-  | "softwares"
-  | "templates"
-  | "mcp-servers";
+  | 'home'
+  | 'assistants'
+  | 'plugins'
+  | 'ai-models'
+  | 'softwares'
+  | 'templates'
+  | 'mcp-servers';
 
 // --- SWR fetcher ---
 const fetcher = (url: string) =>
@@ -75,47 +75,47 @@ const mcpServersFetcher = (url: string) =>
 const MemoizedAssistantCard = React.memo(
   ({ assistant, onClick }: { assistant: DataTypes; onClick: () => void }) => (
     <AssistantCard assistant={assistant} onClick={onClick} />
-  )
+  ),
 );
 
 const MemoizedAIModelCard = React.memo(
   ({ aiModel, onClick }: { aiModel: DataTypes; onClick: () => void }) => (
     <AIModelCard aiModel={aiModel} onClick={onClick} />
-  )
+  ),
 );
 
 const MemoizedPluginCard = React.memo(
   ({ plugin, onClick }: { plugin: DataTypes; onClick: () => void }) => (
     <PluginCard plugin={plugin} onClick={onClick} />
-  )
+  ),
 );
 
 const MemoizedMCPServerCard = React.memo(
   ({ server, onClick }: { server: any; onClick: () => void }) => (
     <MCPServerCard server={server} onClick={onClick} />
-  )
+  ),
 );
 
-MemoizedAssistantCard.displayName = "MemoizedAssistantCard";
-MemoizedAIModelCard.displayName = "MemoizedAIModelCard";
-MemoizedPluginCard.displayName = "MemoizedPluginCard";
-MemoizedMCPServerCard.displayName = "MemoizedMCPServerCard";
+MemoizedAssistantCard.displayName = 'MemoizedAssistantCard';
+MemoizedAIModelCard.displayName = 'MemoizedAIModelCard';
+MemoizedPluginCard.displayName = 'MemoizedPluginCard';
+MemoizedMCPServerCard.displayName = 'MemoizedMCPServerCard';
 
 // Pagination constants
 const ITEMS_PER_PAGE = 24; // Adjust based on your preference
-const FEATURED_ITEMS = 8; // For home page
+const FEATURED_ITEMS = 6; // For home page
 const FEATURED_OTHER_ITEMS = 4;
 
 export default function Marketplace() {
-  const [activeTab, setActiveTab] = useState<TabType>("home");
+  const [activeTab, setActiveTab] = useState<TabType>('home');
   const [selectedItem, setSelectedItem] = useState<
     DataTypes | MCPDataTypes | MCPServerType | null
   >(null);
   const [dialogType, setDialogType] = useState<
-    "assistant" | "plugin" | "mcp-server" | "ai-model"
-  >("assistant");
+    'assistant' | 'plugin' | 'mcp-server' | 'ai-model'
+  >('assistant');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [mounted, setMounted] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -135,7 +135,7 @@ export default function Marketplace() {
 
   // Reset category filter when switching away from MCP servers tab
   useEffect(() => {
-    if (activeTab !== "mcp-servers") {
+    if (activeTab !== 'mcp-servers') {
       setSelectedCategory(null);
     }
   }, [activeTab]);
@@ -145,7 +145,7 @@ export default function Marketplace() {
     data: aiAgentsData,
     isLoading,
     error,
-  } = useSWR<{ agents: DataTypes[] }>("marketplace/api/agents", fetcher);
+  } = useSWR<{ agents: DataTypes[] }>('marketplace/api/agents', fetcher);
 
   // Fetch AI models (including Anthropic)
   const {
@@ -154,11 +154,11 @@ export default function Marketplace() {
     error: aiModelsError,
   } = useSWR<{ models: DataTypes[]; total: number }>(
     `marketplace/api/ai-models${
-      searchTerm && activeTab === "ai-models"
+      searchTerm && activeTab === 'ai-models'
         ? `?search=${encodeURIComponent(searchTerm)}`
-        : ""
+        : ''
     }`,
-    aiModelsFetcher
+    aiModelsFetcher,
   );
 
   // Fetch MCP servers
@@ -170,19 +170,19 @@ export default function Marketplace() {
     `marketplace/api/mcp-servers?page=${mcpCurrentPage}&pageSize=${mcpPageSize}${
       selectedCategory
         ? `&category=${encodeURIComponent(selectedCategory)}`
-        : ""
+        : ''
     }${
-      searchTerm && activeTab === "mcp-servers"
+      searchTerm && activeTab === 'mcp-servers'
         ? `&search=${encodeURIComponent(searchTerm)}`
-        : ""
+        : ''
     }`,
-    mcpServersFetcher
+    mcpServersFetcher,
   );
 
   const { data: categoriesData } = useSWR(
-    "marketplace/api/mcp-servers/categories",
+    'marketplace/api/mcp-servers/categories',
     (url: string) =>
-      fetch(url).then((res) => res.json()) as Promise<{ categories: string[] }>
+      fetch(url).then((res) => res.json()) as Promise<{ categories: string[] }>,
   );
 
   const assistants = useMemo(() => aiAgentsData?.agents ?? [], [aiAgentsData]);
@@ -190,37 +190,37 @@ export default function Marketplace() {
   const mcpServers = useMemo(() => mcpData?.servers ?? [], [mcpData]);
   const mcpCategories = useMemo(
     () => categoriesData?.categories ?? [],
-    [categoriesData]
+    [categoriesData],
   );
 
   const handleItemClick = useCallback(
     (
       item: DataTypes | MCPDataTypes | MCPServerType,
       type:
-        | "assistant"
-        | "plugin"
-        | "ai-model"
-        | "software"
-        | "template"
-        | "mcp-server"
+        | 'assistant'
+        | 'plugin'
+        | 'ai-model'
+        | 'software'
+        | 'template'
+        | 'mcp-server',
     ) => {
       // Set the selected item and dialog type for modal
       setSelectedItem(item);
       setDialogType(
-        type === "assistant"
-          ? "assistant"
-          : type === "ai-model"
-          ? "ai-model"
-          : type === "mcp-server"
-          ? "mcp-server"
-          : "plugin"
+        type === 'assistant'
+          ? 'assistant'
+          : type === 'ai-model'
+            ? 'ai-model'
+            : type === 'mcp-server'
+              ? 'mcp-server'
+              : 'plugin',
       );
       setIsDialogOpen(true);
     },
-    []
+    [],
   );
 
-  const handleViewMore = useCallback((type: "assistants" | "plugins") => {
+  const handleViewMore = useCallback((type: 'assistants' | 'plugins') => {
     setActiveTab(type);
   }, []);
 
@@ -248,9 +248,9 @@ export default function Marketplace() {
             .toLowerCase()
             .includes(searchTerm.toLowerCase()) ||
           assistant.creator.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          assistant.category.toLowerCase().includes(searchTerm.toLowerCase())
+          assistant.category.toLowerCase().includes(searchTerm.toLowerCase()),
       ),
-    [assistants, searchTerm]
+    [assistants, searchTerm],
   );
 
   // Paginated assistants for the assistants tab
@@ -278,9 +278,9 @@ export default function Marketplace() {
           plugin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           plugin.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
           plugin.creator.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          plugin.category.toLowerCase().includes(searchTerm.toLowerCase())
+          plugin.category.toLowerCase().includes(searchTerm.toLowerCase()),
       ),
-    [searchTerm]
+    [searchTerm],
   );
 
   const paginatedPlugins = useMemo(() => {
@@ -299,9 +299,9 @@ export default function Marketplace() {
             .toLowerCase()
             .includes(searchTerm.toLowerCase()) ||
           software.creator.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          software.category.toLowerCase().includes(searchTerm.toLowerCase())
+          software.category.toLowerCase().includes(searchTerm.toLowerCase()),
       ),
-    [searchTerm]
+    [searchTerm],
   );
 
   const paginatedSoftware = useMemo(() => {
@@ -320,9 +320,9 @@ export default function Marketplace() {
             .toLowerCase()
             .includes(searchTerm.toLowerCase()) ||
           template.creator.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          template.category.toLowerCase().includes(searchTerm.toLowerCase())
+          template.category.toLowerCase().includes(searchTerm.toLowerCase()),
       ),
-    [searchTerm]
+    [searchTerm],
   );
 
   const paginatedTemplates = useMemo(() => {
@@ -346,19 +346,19 @@ export default function Marketplace() {
     if (isLoadingMore) return;
 
     const hasMore =
-      activeTab === "assistants"
+      activeTab === 'assistants'
         ? hasMoreItems
-        : activeTab === "ai-models"
-        ? hasMoreAIModels
-        : activeTab === "plugins"
-        ? hasMorePlugins
-        : activeTab === "softwares"
-        ? hasMoreSoftware
-        : activeTab === "templates"
-        ? hasMoreTemplates
-        : activeTab === "mcp-servers"
-        ? hasMoreMcpServers
-        : false;
+        : activeTab === 'ai-models'
+          ? hasMoreAIModels
+          : activeTab === 'plugins'
+            ? hasMorePlugins
+            : activeTab === 'softwares'
+              ? hasMoreSoftware
+              : activeTab === 'templates'
+                ? hasMoreTemplates
+                : activeTab === 'mcp-servers'
+                  ? hasMoreMcpServers
+                  : false;
 
     if (!hasMore) return;
 
@@ -366,7 +366,7 @@ export default function Marketplace() {
     // Simulate loading delay (remove in production)
     await new Promise((resolve) => setTimeout(resolve, 300));
 
-    if (activeTab === "mcp-servers") {
+    if (activeTab === 'mcp-servers') {
       setMcpCurrentPage((prev) => prev + 1);
     } else {
       setCurrentPage((prev) => prev + 1);
@@ -449,21 +449,21 @@ export default function Marketplace() {
         <div className="w-full xl:max-w-7xl mx-auto px-4 lg:px-0">
           <div className="flex overflow-x-auto scrollbar-hide">
             {[
-              { id: "home", label: "Home", icon: Home },
-              { id: "assistants", label: "AI Agents", icon: Users },
-              { id: "ai-models", label: "AI Models", icon: Brain },
-              { id: "plugins", label: "Plugins", icon: Puzzle },
-              { id: "softwares", label: "Softwares", icon: PackageOpen },
-              { id: "templates", label: "Templates", icon: FileText },
-              { id: "mcp-servers", label: "MCP Servers", icon: Server },
+              { id: 'home', label: 'Home', icon: Home },
+              { id: 'assistants', label: 'AI Agents', icon: Users },
+              { id: 'ai-models', label: 'AI Models', icon: Brain },
+              { id: 'plugins', label: 'Plugins', icon: Puzzle },
+              { id: 'softwares', label: 'Softwares', icon: PackageOpen },
+              { id: 'templates', label: 'Templates', icon: FileText },
+              { id: 'mcp-servers', label: 'MCP Servers', icon: Server },
             ].map((tab) => (
               <motion.button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as TabType)}
                 className={`flex items-center gap-2 p-4 sm:px-6 text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap ${
                   activeTab === tab.id
-                    ? "border-purple-500 text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20"
-                    : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800"
+                    ? 'border-purple-500 text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20'
+                    : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800'
                 }`}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -471,19 +471,19 @@ export default function Marketplace() {
                 <tab.icon className="size-4" />
                 <span className="hidden sm:inline">{tab.label}</span>
                 <span className="sm:hidden">
-                  {tab.id === "home"
-                    ? "Home"
-                    : tab.id === "assistants"
-                    ? "Assistants"
-                    : tab.id === "ai-models"
-                    ? "AI Models"
-                    : tab.id === "plugins"
-                    ? "Plugins"
-                    : tab.id === "softwares"
-                    ? "Softwares"
-                    : tab.id === "templates"
-                    ? "Templates"
-                    : "MCP Servers"}
+                  {tab.id === 'home'
+                    ? 'Home'
+                    : tab.id === 'assistants'
+                      ? 'Assistants'
+                      : tab.id === 'ai-models'
+                        ? 'AI Models'
+                        : tab.id === 'plugins'
+                          ? 'Plugins'
+                          : tab.id === 'softwares'
+                            ? 'Softwares'
+                            : tab.id === 'templates'
+                              ? 'Templates'
+                              : 'MCP Servers'}
                 </span>
                 {/* {tab.id === 'assistants' && (
                   <Badge variant="secondary" className="ml-1 text-xs">
@@ -511,7 +511,7 @@ export default function Marketplace() {
               </div>
             )}
 
-            {activeTab === "home" && !isLoading && !aiModelsLoading && (
+            {activeTab === 'home' && !isLoading && !aiModelsLoading && (
               <motion.div
                 key="home"
                 initial={{ opacity: 0, y: 20 }}
@@ -527,7 +527,7 @@ export default function Marketplace() {
                     </h2>
                     <Button
                       variant="ghost"
-                      onClick={() => handleViewMore("assistants")}
+                      onClick={() => handleViewMore('assistants')}
                       className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 self-start sm:self-auto"
                     >
                       Discover More →
@@ -546,7 +546,7 @@ export default function Marketplace() {
                           <MemoizedAssistantCard
                             assistant={assistant}
                             onClick={() =>
-                              handleItemClick(assistant, "assistant")
+                              handleItemClick(assistant, 'assistant')
                             }
                           />
                         </motion.div>
@@ -562,7 +562,7 @@ export default function Marketplace() {
                     </h2>
                     <Button
                       variant="ghost"
-                      onClick={() => setActiveTab("ai-models")}
+                      onClick={() => setActiveTab('ai-models')}
                       className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 self-start sm:self-auto"
                     >
                       Discover More →
@@ -580,7 +580,7 @@ export default function Marketplace() {
                         >
                           <MemoizedAIModelCard
                             aiModel={aiModel}
-                            onClick={() => handleItemClick(aiModel, "ai-model")}
+                            onClick={() => handleItemClick(aiModel, 'ai-model')}
                           />
                         </motion.div>
                       ))}
@@ -595,7 +595,7 @@ export default function Marketplace() {
                     </h2>
                     <Button
                       variant="ghost"
-                      onClick={() => setActiveTab("plugins")}
+                      onClick={() => setActiveTab('plugins')}
                       className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 self-start sm:self-auto"
                     >
                       Discover More →
@@ -613,7 +613,7 @@ export default function Marketplace() {
                         >
                           <MemoizedPluginCard
                             plugin={plugin}
-                            onClick={() => handleItemClick(plugin, "plugin")}
+                            onClick={() => handleItemClick(plugin, 'plugin')}
                           />
                         </motion.div>
                       ))}
@@ -628,7 +628,7 @@ export default function Marketplace() {
                     </h2>
                     <Button
                       variant="ghost"
-                      onClick={() => setActiveTab("mcp-servers")}
+                      onClick={() => setActiveTab('mcp-servers')}
                       className="text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 self-start sm:self-auto"
                     >
                       Discover More →
@@ -647,7 +647,7 @@ export default function Marketplace() {
                           <MemoizedMCPServerCard
                             server={server}
                             onClick={() =>
-                              handleItemClick(server, "mcp-server")
+                              handleItemClick(server, 'mcp-server')
                             }
                           />
                         </motion.div>
@@ -657,7 +657,7 @@ export default function Marketplace() {
               </motion.div>
             )}
 
-            {activeTab === "assistants" && !isLoading && (
+            {activeTab === 'assistants' && !isLoading && (
               <MarketplaceSection
                 title="All Assistants"
                 filteredItems={filteredAssistants}
@@ -671,7 +671,7 @@ export default function Marketplace() {
               />
             )}
 
-            {activeTab === "ai-models" && !aiModelsLoading && (
+            {activeTab === 'ai-models' && !aiModelsLoading && (
               <MarketplaceSection
                 title="All AI Models"
                 filteredItems={filteredAIModels}
@@ -685,7 +685,7 @@ export default function Marketplace() {
               />
             )}
 
-            {activeTab === "plugins" && !isLoading && (
+            {activeTab === 'plugins' && !isLoading && (
               <MarketplaceSection
                 title="All Plugins"
                 filteredItems={filteredPlugins}
@@ -699,7 +699,7 @@ export default function Marketplace() {
               />
             )}
 
-            {activeTab === "softwares" && !isLoading && (
+            {activeTab === 'softwares' && !isLoading && (
               <MarketplaceSection
                 title="All Software"
                 filteredItems={filteredSoftware}
@@ -713,7 +713,7 @@ export default function Marketplace() {
               />
             )}
 
-            {activeTab === "templates" && !isLoading && (
+            {activeTab === 'templates' && !isLoading && (
               <MarketplaceSection
                 title="All Templates"
                 filteredItems={filteredTemplates}
@@ -727,7 +727,7 @@ export default function Marketplace() {
               />
             )}
 
-            {activeTab === "mcp-servers" && (
+            {activeTab === 'mcp-servers' && (
               <motion.div
                 key="mcp-servers"
                 initial={{ opacity: 0, y: 20 }}
@@ -800,7 +800,7 @@ export default function Marketplace() {
                               <MemoizedMCPServerCard
                                 server={server}
                                 onClick={() =>
-                                  handleItemClick(server, "mcp-server")
+                                  handleItemClick(server, 'mcp-server')
                                 }
                               />
                             </motion.div>
@@ -813,7 +813,7 @@ export default function Marketplace() {
                             <Pagination
                               currentPage={mcpCurrentPage}
                               totalPages={Math.ceil(
-                                mcpData.total / mcpPageSize
+                                mcpData.total / mcpPageSize,
                               )}
                               pageSize={mcpPageSize}
                               totalItems={mcpData.total}

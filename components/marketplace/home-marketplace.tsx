@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { homeMarketplaceItems, marketplaceItems } from "@/lib/constants";
-import type { HomeMarketplaceItem } from "@/lib/types";
-import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Calendar, Download, Sparkles, User } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+} from '@/components/ui/dialog';
+import { homeMarketplaceItems, marketplaceItems } from '@/lib/constants';
+import type { HomeMarketplaceItem } from '@/lib/types';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowRight, Calendar, Download, Sparkles, User } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 interface MarketplaceItemCardProps {
   item: HomeMarketplaceItem;
@@ -38,39 +38,39 @@ const MarketplaceItemDialog = ({
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
-      case "courses":
-        return "📚";
-      case "tutors":
-        return "👨‍🏫";
-      case "resources":
-        return "📖";
-      case "ai-models":
-        return "🤖";
-      case "software":
-        return "💻";
-      case "templates":
-        return "🎨";
+      case 'courses':
+        return '📚';
+      case 'tutors':
+        return '👨‍🏫';
+      case 'resources':
+        return '📖';
+      case 'ai-models':
+        return '🤖';
+      case 'software':
+        return '💻';
+      case 'templates':
+        return '🎨';
       default:
-        return "📄";
+        return '📄';
     }
   };
 
   const getCategoryColor = (category: string) => {
     switch (category) {
-      case "courses":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
-      case "tutors":
-        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
-      case "resources":
-        return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300";
-      case "ai-models":
-        return "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300";
-      case "software":
-        return "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300";
-      case "templates":
-        return "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300";
+      case 'courses':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
+      case 'tutors':
+        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
+      case 'resources':
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300';
+      case 'ai-models':
+        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300';
+      case 'software':
+        return 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300';
+      case 'templates':
+        return 'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300';
       default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300";
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300';
     }
   };
 
@@ -168,39 +168,39 @@ const MarketplaceItemCard = ({
 }: MarketplaceItemCardProps) => {
   const getCategoryColor = (category: string) => {
     switch (category.toLowerCase()) {
-      case "education":
-        return "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-800/30";
-      case "courses":
-        return "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-800/30";
-      case "tutors":
-        return "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800/30";
-      case "resources":
-        return "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/30 dark:text-purple-300 dark:border-purple-800/30";
-      case "ai-models":
-        return "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/30 dark:text-orange-300 dark:border-orange-800/30";
-      case "software":
-        return "bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-950/30 dark:text-cyan-300 dark:border-cyan-800/30";
-      case "templates":
-        return "bg-pink-50 text-pink-700 border-pink-200 dark:bg-pink-950/30 dark:text-pink-300 dark:border-pink-800/30";
+      case 'education':
+        return 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-800/30';
+      case 'courses':
+        return 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-800/30';
+      case 'tutors':
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800/30';
+      case 'resources':
+        return 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/30 dark:text-purple-300 dark:border-purple-800/30';
+      case 'ai-models':
+        return 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/30 dark:text-orange-300 dark:border-orange-800/30';
+      case 'software':
+        return 'bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-950/30 dark:text-cyan-300 dark:border-cyan-800/30';
+      case 'templates':
+        return 'bg-pink-50 text-pink-700 border-pink-200 dark:bg-pink-950/30 dark:text-pink-300 dark:border-pink-800/30';
       default:
-        return "bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-950/30 dark:text-gray-300 dark:border-gray-800/30";
+        return 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-950/30 dark:text-gray-300 dark:border-gray-800/30';
     }
   };
 
   const getTypeColor = (type: string) => {
     switch (type.toLowerCase()) {
-      case "assistant":
-        return "bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-purple-500/25";
-      case "plugin":
-        return "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-blue-500/25";
-      case "ai-model":
-        return "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-emerald-500/25";
-      case "software":
-        return "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-orange-500/25";
-      case "template":
-        return "bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-pink-500/25";
+      case 'assistant':
+        return 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-purple-500/25';
+      case 'plugin':
+        return 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-blue-500/25';
+      case 'ai-model':
+        return 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-emerald-500/25';
+      case 'software':
+        return 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-orange-500/25';
+      case 'template':
+        return 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-pink-500/25';
       default:
-        return "bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-gray-500/25";
+        return 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-gray-500/25';
     }
   };
 
@@ -209,10 +209,10 @@ const MarketplaceItemCard = ({
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
     });
   };
 
@@ -268,7 +268,7 @@ const MarketplaceItemCard = ({
           <div className="absolute top-2 sm:top-3 left-2 sm:left-3">
             <Badge
               className={`${getTypeColor(
-                item.type
+                item.type,
               )} text-xs font-semibold shadow-lg border-0 px-2 py-1`}
             >
               {item.type.charAt(0).toUpperCase() + item.type.slice(1)}
@@ -280,7 +280,7 @@ const MarketplaceItemCard = ({
             <Badge
               variant="outline"
               className={`${getCategoryColor(
-                item.category
+                item.category,
               )} text-xs font-medium shadow-sm backdrop-blur-sm`}
             >
               {item.category.charAt(0).toUpperCase() + item.category.slice(1)}
@@ -297,7 +297,7 @@ const MarketplaceItemCard = ({
             transition={{
               duration: 2,
               repeat: Number.POSITIVE_INFINITY,
-              ease: "linear",
+              ease: 'linear',
             }}
           >
             <Sparkles className="size-4 text-white/80" />
@@ -349,7 +349,7 @@ const MarketplaceItemCard = ({
                 transition={{
                   duration: 2,
                   repeat: Number.POSITIVE_INFINITY,
-                  ease: "easeInOut",
+                  ease: 'easeInOut',
                 }}
               />
               <span className="text-gray-500 dark:text-gray-400 text-xs font-medium">
@@ -374,7 +374,7 @@ export const HomeMarketplace = () => {
   const router = useRouter();
   const [showCount, setShowCount] = useState(6);
   const [selectedItem, setSelectedItem] = useState<HomeMarketplaceItem | null>(
-    null
+    null,
   );
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -384,7 +384,7 @@ export const HomeMarketplace = () => {
   };
 
   const handleGoToMarketplace = () => {
-    router.push("/marketplace");
+    router.push('/marketplace');
   };
 
   const handleCardClick = (item: HomeMarketplaceItem) => {
@@ -461,7 +461,7 @@ export const HomeMarketplace = () => {
           transition={{ delay: 0.3 }}
         >
           <Link
-            href={"/marketplace"}
+            href={'/marketplace'}
             className="w-full sm:w-auto min-w-[200px] bg-gradient-to-r from-purple-500 to-purple-800 text-transparent bg-clip-text font-semibold"
           >
             Take Me to Marketplace

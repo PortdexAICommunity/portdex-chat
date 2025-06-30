@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import type { Assistant, DataTypes, MCPServerType, Plugin } from "@/lib/types";
-import { motion } from "framer-motion";
+} from '@/components/ui/dialog';
+import type { Assistant, DataTypes, MCPServerType, Plugin } from '@/lib/types';
+import { motion } from 'framer-motion';
 import {
   Calendar,
   Download,
@@ -19,14 +19,14 @@ import {
   Sparkles,
   Star,
   User,
-} from "lucide-react";
-import Image from "next/image";
+} from 'lucide-react';
+import Image from 'next/image';
 
 interface DetailDialogProps {
   isOpen: boolean;
   onClose: () => void;
   item: Assistant | Plugin | DataTypes | MCPServerType | null;
-  type: "assistant" | "plugin" | "mcp-server" | "ai-model";
+  type: 'assistant' | 'plugin' | 'mcp-server' | 'ai-model';
 }
 
 export function DetailDialog({
@@ -37,10 +37,10 @@ export function DetailDialog({
 }: DetailDialogProps) {
   if (!item) return null;
 
-  const isAssistant = type === "assistant";
-  const isPlugin = type === "plugin";
-  const isMcpServer = type === "mcp-server";
-  const isAIModel = type === "ai-model";
+  const isAssistant = type === 'assistant';
+  const isPlugin = type === 'plugin';
+  const isMcpServer = type === 'mcp-server';
+  const isAIModel = type === 'ai-model';
 
   const assistant = isAssistant ? (item as Assistant) : null;
   const plugin = isPlugin ? (item as Plugin) : null;
@@ -50,7 +50,7 @@ export function DetailDialog({
   const handleUseAssistant = () => {
     if (isMcpServer && mcpServer) {
       // For MCP servers, open the GitHub URL in a new tab
-      window.open(mcpServer.url, "_blank");
+      window.open(mcpServer.url, '_blank');
     } else {
       console.log(`Using ${item.name}`);
     }
@@ -58,11 +58,11 @@ export function DetailDialog({
   };
 
   const getButtonText = () => {
-    if (isAssistant) return "Use Assistant";
-    if (isPlugin) return "Install Plugin";
-    if (isMcpServer) return "View on GitHub";
-    if (isAIModel) return "Use AI Model";
-    return "Use";
+    if (isAssistant) return 'Use Assistant';
+    if (isPlugin) return 'Install Plugin';
+    if (isMcpServer) return 'View on GitHub';
+    if (isAIModel) return 'Use AI Model';
+    return 'Use';
   };
 
   const getButtonIcon = () => {
@@ -88,15 +88,15 @@ export function DetailDialog({
                 variant="secondary"
                 className={`${
                   isAssistant
-                    ? "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300"
+                    ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300'
                     : isPlugin
-                    ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
-                    : isAIModel
-                    ? "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300"
-                    : "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
+                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
+                      : isAIModel
+                        ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300'
+                        : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
                 } w-fit`}
               >
-                {isMcpServer ? "MCP Server" : item.category}
+                {isMcpServer ? 'MCP Server' : item.category}
               </Badge>
             </div>
           </DialogHeader>
@@ -137,8 +137,8 @@ export function DetailDialog({
                   >
                     <div className="absolute inset-0 bg-black/10" />
                     <div className="absolute -bottom-3 -right-3 size-16 bg-white dark:bg-gray-900 rounded-2xl flex items-center justify-center shadow-lg border-4 border-white dark:border-gray-700/50 p-2">
-                      {typeof aiModel.icon === "string" &&
-                      aiModel.icon.startsWith("http") ? (
+                      {typeof aiModel.icon === 'string' &&
+                      aiModel.icon.startsWith('http') ? (
                         <Image
                           src={aiModel.icon}
                           alt={aiModel.name}
@@ -148,7 +148,7 @@ export function DetailDialog({
                         />
                       ) : (
                         <div className="text-2xl">
-                          {typeof aiModel.icon === "string"
+                          {typeof aiModel.icon === 'string'
                             ? aiModel.icon
                             : aiModel.name.charAt(0)}
                         </div>
@@ -228,10 +228,10 @@ export function DetailDialog({
               <h4 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white flex items-center gap-2">
                 <Sparkles className="size-5 text-purple-600 dark:text-purple-400" />
                 {isMcpServer
-                  ? "About this MCP Server"
+                  ? 'About this MCP Server'
                   : isAIModel
-                  ? "About this AI Model"
-                  : "Description"}
+                    ? 'About this AI Model'
+                    : 'Description'}
               </h4>
               <Card className="bg-gray-50 dark:bg-gray-950/50 border-gray-200 dark:border-gray-800/50">
                 <CardContent className="p-4">
@@ -250,10 +250,10 @@ export function DetailDialog({
                 </h4>
                 <div className="grid gap-2">
                   {[
-                    "🚀 Lightning fast performance",
-                    "🔧 Easy to configure",
-                    "📱 Mobile responsive",
-                    "🎨 Customizable themes",
+                    '🚀 Lightning fast performance',
+                    '🔧 Easy to configure',
+                    '📱 Mobile responsive',
+                    '🎨 Customizable themes',
                   ].map((feature, index) => (
                     <motion.div
                       key={feature}
@@ -357,10 +357,10 @@ export function DetailDialog({
               <Button
                 className={`flex-1 ${
                   isMcpServer
-                    ? "bg-green-600 hover:bg-green-700"
+                    ? 'bg-green-600 hover:bg-green-700'
                     : isAIModel
-                    ? "bg-orange-600 hover:bg-orange-700"
-                    : "bg-purple-600 hover:bg-purple-700"
+                      ? 'bg-orange-600 hover:bg-orange-700'
+                      : 'bg-purple-600 hover:bg-purple-700'
                 } text-white shadow-lg hover:shadow-xl transition-all duration-200`}
                 onClick={handleUseAssistant}
               >

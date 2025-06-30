@@ -31,17 +31,20 @@ export const entitlementsByUserType: Record<UserType, Entitlements> = {
 // Dynamic entitlements that include assistant models
 export const getDynamicEntitlements = (
   userType: UserType,
-  selectedAssistant?: { id: string; title: string } | null
+  selectedAssistant?: { id: string; title: string } | null,
 ): Entitlements => {
   const baseEntitlements = entitlementsByUserType[userType];
-  
+
   if (selectedAssistant) {
     const assistantModelId = `assistant-${selectedAssistant.id}`;
     return {
       ...baseEntitlements,
-      availableChatModelIds: [assistantModelId, ...baseEntitlements.availableChatModelIds],
+      availableChatModelIds: [
+        assistantModelId,
+        ...baseEntitlements.availableChatModelIds,
+      ],
     };
   }
-  
+
   return baseEntitlements;
 };

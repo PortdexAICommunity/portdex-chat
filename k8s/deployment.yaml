@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portdex
+  namespace: portdex-chat
+  labels:
+    app: portdex
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: portdex
+  template:
+    metadata:
+      labels:
+        app: portdex
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: aks-userpool1-25082268-vmss000000
+      containers:
+        - name: portdex
+          image: portdex.azurecr.io/portdex-chat:7c909e2ec07a9c189fc8fd57a8cd3bbb47ea57f9
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: portdex-config
+            - secretRef:
+                name: portdex-secrets
