@@ -31,7 +31,6 @@ export function useChatCache() {
 				`${CHAT_CACHE_KEY}_${chat.id}`,
 				JSON.stringify(cached)
 			);
-			console.log(`Cached chat: ${chat.id}`);
 		} catch (error) {
 			console.error("Failed to cache chat:", error);
 		}
