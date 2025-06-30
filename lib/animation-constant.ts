@@ -13,7 +13,7 @@ export const fadeIn = {
     opacity: 0,
     y: 20,
   },
-  visible: (custom: number = 0) => ({
+  visible: (custom = 0) => ({
     opacity: 1,
     y: 0,
     transition: {
@@ -29,7 +29,7 @@ export const fadeInUp = {
     opacity: 0,
     y: 40,
   },
-  visible: (custom: number = 0) => ({
+  visible: (custom = 0) => ({
     opacity: 1,
     y: 0,
     transition: {
@@ -60,7 +60,7 @@ export const cardVariants = {
     opacity: 0,
     y: 30,
   },
-  visible: (custom: number = 0) => ({
+  visible: (custom = 0) => ({
     opacity: 1,
     y: 0,
     transition: {
@@ -127,4 +127,4 @@ export const slideInRight = {
       ease: [0.25, 0.4, 0.25, 1],
     },
   },
-}; 
+};

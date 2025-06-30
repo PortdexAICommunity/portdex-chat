@@ -1,28 +1,28 @@
 "use client";
 
-import type { Attachment, UIMessage } from "ai";
-import { useChat } from "@ai-sdk/react";
-import { useEffect, useRef, useState } from "react";
-import useSWR, { useSWRConfig } from "swr";
 import { ChatHeader } from "@/components/chat-header";
-import type { Vote } from "@/lib/db/schema";
-import { cn, fetcher, fetchWithErrorHandlers, generateUUID } from "@/lib/utils";
-import { Artifact } from "./artifact";
-import { MultimodalInput } from "./multimodal-input";
-import { Messages } from "./messages";
-import type { VisibilityType } from "./visibility-selector";
 import { useArtifactSelector } from "@/hooks/use-artifact";
-import { unstable_serialize } from "swr/infinite";
-import { getChatHistoryPaginationKey } from "./sidebar-history";
-import { toast } from "./toast";
+import { useAutoResume } from "@/hooks/use-auto-resume";
+import { useChatCache } from "@/hooks/use-chat-cache";
+import { useChatVisibility } from "@/hooks/use-chat-visibility";
+import type { Vote } from "@/lib/db/schema";
+import { ChatSDKError } from "@/lib/errors";
+import { cn, fetcher, fetchWithErrorHandlers, generateUUID } from "@/lib/utils";
+import { useChat } from "@ai-sdk/react";
+import type { Attachment, UIMessage } from "ai";
 import type { Session } from "next-auth";
 import { useSearchParams } from "next/navigation";
-import { useChatVisibility } from "@/hooks/use-chat-visibility";
-import { useAutoResume } from "@/hooks/use-auto-resume";
-import { ChatSDKError } from "@/lib/errors";
-import { useChatCache } from "@/hooks/use-chat-cache";
-import { HomeMarketplace } from "./marketplace/home-marketplace";
+import { useEffect, useRef, useState } from "react";
+import useSWR, { useSWRConfig } from "swr";
+import { unstable_serialize } from "swr/infinite";
+import { Artifact } from "./artifact";
 import { Footer } from "./footer";
+import { HomeMarketplace } from "./marketplace/home-marketplace";
+import { Messages } from "./messages";
+import { MultimodalInput } from "./multimodal-input";
+import { getChatHistoryPaginationKey } from "./sidebar-history";
+import { toast } from "./toast";
+import type { VisibilityType } from "./visibility-selector";
 
 export function Chat({
 	id,
@@ -49,6 +49,9 @@ export function Chat({
 	useEffect(() => {
 		selectedToolRef.current = selectedTool;
 	}, [selectedTool]);
+	useEffect(() => {
+		selectedToolRef.current = selectedTool;
+	}, [selectedTool]);
 
 	// Cache the chat when component mounts or when messages change
 	useEffect(() => {
@@ -58,7 +61,7 @@ export function Chat({
 			if (initialMessages.length > 0) {
 				// Use the first user message as title
 				const firstUserMessage = initialMessages.find((m) => m.role === "user");
-				if (firstUserMessage && firstUserMessage.content) {
+				if (firstUserMessage?.content) {
 					title =
 						firstUserMessage.content.slice(0, 50) +
 						(firstUserMessage.content.length > 50 ? "..." : "");
@@ -158,7 +161,7 @@ export function Chat({
 
 	const { data: votes } = useSWR<Array<Vote>>(
 		messages.length >= 2 ? `/api/vote?chatId=${id}` : null,
-		fetcher
+		fetcher as any
 	);
 
 	const [attachments, setAttachments] = useState<Array<Attachment>>([]);
@@ -224,6 +227,11 @@ export function Chat({
 					)}
 				</form>
 
+				{messages.length === 0 && (
+					<div className="max-w-7xl mx-auto bg-background/50 my-14 rounded-3xl p-10">
+						<HomeMarketplace />
+					</div>
+				)}
 				{messages.length === 0 && (
 					<div className="max-w-7xl mx-auto bg-background/50 my-14 rounded-3xl p-10">
 						<HomeMarketplace />

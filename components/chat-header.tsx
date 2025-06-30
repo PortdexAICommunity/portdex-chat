@@ -11,7 +11,7 @@ import { memo } from 'react';
 import { PlusIcon } from './icons';
 import { useSidebar } from './ui/sidebar';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
-import { type VisibilityType, VisibilitySelector } from './visibility-selector';
+import type { VisibilityType } from './visibility-selector';
 
 function PureChatHeader({
   chatId,

@@ -7,14 +7,14 @@ import { AIModelCard } from "./ai-model-card";
 import { AssistantCard } from "./assistant-card";
 
 // Memoized Assistant Card Component
-import React from "react";
-const MemoizedAssistantCard = React.memo(
+import { memo } from "react";
+const MemoizedAssistantCard = memo(
 	({ assistant, onClick }: { assistant: DataTypes; onClick: () => void }) => (
 		<AssistantCard assistant={assistant} onClick={onClick} />
 	)
 );
 
-const MemoizedAIModelCard = React.memo(
+const MemoizedAIModelCard = memo(
 	({ aiModel, onClick }: { aiModel: DataTypes; onClick: () => void }) => (
 		<AIModelCard aiModel={aiModel} onClick={onClick} />
 	)
@@ -30,12 +30,13 @@ interface MarketplaceSectionProps {
 	hasMoreItems: boolean;
 	onItemClick: (
 		item: DataTypes,
-		type: "assistant" | "plugin" | "ai-model" | "software" | "template"
+		type: "assistant" | "ai-model" | "software" | "template"
 	) => void;
 	onLoadMore: () => void;
 	isLoadingMore: boolean;
-	itemType: "assistant" | "plugin" | "ai-model" | "software" | "template";
+	itemType: "assistant" | "ai-model" | "software" | "template";
 	shouldUseStaggeredAnimation: boolean;
+	hideTitle?: boolean;
 }
 
 export function MarketplaceSection({
@@ -48,6 +49,7 @@ export function MarketplaceSection({
 	isLoadingMore,
 	itemType,
 	shouldUseStaggeredAnimation,
+	hideTitle = false,
 }: MarketplaceSectionProps) {
 	return (
 		<motion.section
@@ -56,16 +58,18 @@ export function MarketplaceSection({
 			animate={{ opacity: 1, y: 0 }}
 			exit={{ opacity: 0, y: -20 }}
 		>
-			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-				<h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-					{title}
-				</h2>
-				<div className="flex items-center gap-2">
-					<Badge variant="secondary" className="self-start sm:self-auto">
-						Showing {paginatedItems.length} of {filteredItems.length}
-					</Badge>
+			{!hideTitle && (
+				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+					<h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+						{title}
+					</h2>
+					<div className="flex items-center gap-2">
+						<Badge variant="secondary" className="self-start sm:self-auto">
+							Showing {paginatedItems.length} of {filteredItems.length}
+						</Badge>
+					</div>
 				</div>
-			</div>
+			)}
 
 			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
 				{paginatedItems.map((item, index) => (

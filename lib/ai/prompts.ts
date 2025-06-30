@@ -46,15 +46,17 @@ export const regularPrompt = `You are a friendly assistant! Keep your responses 
   `;
 
 // Assistant-specific prompt generation
-export const createAssistantPrompt = (assistant: HomeMarketplaceItem): string => {
+export const createAssistantPrompt = (
+  assistant: HomeMarketplaceItem,
+): string => {
   const baseRole = `You are ${assistant.title}, a specialized AI assistant created by ${assistant.creator}.`;
-  
+
   const capabilities = `Your primary role: ${assistant.description}`;
-  
+
   const categoryGuidance = getCategoryGuidance(assistant.category);
-  
+
   const typeGuidance = getTypeGuidance(assistant.type);
-  
+
   return `${baseRole}
 
 ${capabilities}
@@ -77,7 +79,7 @@ const getCategoryGuidance = (category: string): string => {
 - Offer practical advice for financial decision-making
 - Always include appropriate disclaimers for investment advice
 - Stay current with market trends and regulatory changes`;
-      
+
     case 'education':
       return `**Educational Expertise Guidelines:**
 - Provide clear, structured learning guidance
@@ -85,7 +87,7 @@ const getCategoryGuidance = (category: string): string => {
 - Offer practical examples and real-world applications
 - Encourage critical thinking and further exploration
 - Adapt explanations to different learning styles`;
-      
+
     case 'technology':
       return `**Technology Expertise Guidelines:**
 - Provide technical accuracy with practical implementation guidance
@@ -93,7 +95,7 @@ const getCategoryGuidance = (category: string): string => {
 - Offer step-by-step solutions and troubleshooting help
 - Consider security, performance, and scalability implications
 - Bridge technical concepts with business value`;
-      
+
     case 'business':
       return `**Business Expertise Guidelines:**
 - Focus on practical business strategies and solutions
@@ -101,7 +103,7 @@ const getCategoryGuidance = (category: string): string => {
 - Provide actionable insights for business growth
 - Balance risk and opportunity in recommendations
 - Align suggestions with business objectives and constraints`;
-      
+
     default:
       return `**Specialized Expertise Guidelines:**
 - Leverage your deep knowledge in ${category}
@@ -121,7 +123,7 @@ const getTypeGuidance = (type: string): string => {
 - Offer step-by-step guidance and explanations
 - Adapt to user's knowledge level and needs
 - Maintain context throughout conversations`;
-      
+
     case 'plugin':
       return `**As a Specialized Plugin:**
 - Focus on specific, targeted functionality
@@ -129,7 +131,7 @@ const getTypeGuidance = (type: string): string => {
 - Offer quick solutions and direct answers
 - Integrate seamlessly with user workflows
 - Emphasize practical utility and results`;
-      
+
     case 'ai-model':
       return `**As an AI Model:**
 - Demonstrate advanced reasoning and analysis capabilities
@@ -137,7 +139,7 @@ const getTypeGuidance = (type: string): string => {
 - Handle complex data analysis and pattern recognition
 - Offer evidence-based conclusions and recommendations
 - Showcase specialized AI capabilities in your domain`;
-      
+
     default:
       return `**As a ${type}:**
 - Focus on delivering value through your specialized capabilities
@@ -180,7 +182,7 @@ export const systemPrompt = ({
   // If an assistant is selected, use assistant-specific prompt
   if (selectedAssistant) {
     const assistantPrompt = createAssistantPrompt(selectedAssistant);
-    
+
     if (selectedChatModel === 'chat-model-reasoning') {
       return `${assistantPrompt}\n\n${requestPrompt}`;
     } else {

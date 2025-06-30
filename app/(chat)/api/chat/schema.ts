@@ -23,15 +23,18 @@ export const postRequestBodySchema = z.object({
       )
       .optional(),
   }),
-  selectedChatModel: z.string().refine(
-    (model) => 
-      model === 'chat-model' || 
-      model === 'chat-model-reasoning' || 
-      model.startsWith('assistant-'),
-    {
-      message: 'Selected chat model must be a valid base model or assistant model (assistant-{id})',
-    }
-  ),
+  selectedChatModel: z
+    .string()
+    .refine(
+      (model) =>
+        model === 'chat-model' ||
+        model === 'chat-model-reasoning' ||
+        model.startsWith('assistant-'),
+      {
+        message:
+          'Selected chat model must be a valid base model or assistant model (assistant-{id})',
+      },
+    ),
   selectedVisibilityType: z.enum(['public', 'private']),
 });
 

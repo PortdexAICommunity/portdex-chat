@@ -1,4 +1,4 @@
-import type { DataTypes } from '@/lib/types';
+import type { MCPDataTypes } from '@/lib/types';
 import { type NextRequest, NextResponse } from 'next/server';
 
 const GITHUB_RAW_URL =
@@ -103,40 +103,48 @@ const CATEGORY_ICONS: Record<string, string> = {
   nlp: '🗣️',
   openai: '🤖',
   anthropic: '🤖',
-
-  // File & Storage
-  file: '📁',
-  storage: '💾',
-  backup: '💾',
-  sync: '🔄',
-
-  // Time & Scheduling
-  calendar: '📅',
-  time: '⏰',
-  schedule: '📅',
-  cron: '⏰',
-
-  // Weather & Location
-  weather: '🌤️',
-  location: '📍',
-  maps: '🗺️',
-
-  // Default fallbacks
-  server: '🖥️',
-  service: '⚙️',
-  app: '📱',
 };
 
-// Language-specific icons
-const LANGUAGE_ICONS: Record<string, string> = {
-  Python: '🐍',
-  'TypeScript/JavaScript': '📇',
-  Go: '🏎️',
-  Rust: '🦀',
-  'C#': '#️⃣',
-  Java: '☕',
-  'C/C++': '🌊',
-};
+function extractCreatorFromUrl(url: string): string {
+  try {
+    // Extract GitHub username from URL
+    const match = url.match(/github\.com\/([^\/]+)/);
+    return match ? match[1] : 'Unknown';
+  } catch {
+    return 'Unknown';
+  }
+}
+
+function getCategoryIcon(
+  category: string,
+  name: string,
+  description: string,
+): string {
+  const searchText = `${category} ${name} ${description}`.toLowerCase();
+
+  // Check for exact category matches first
+  const categoryKey = category.toLowerCase();
+  if (CATEGORY_ICONS[categoryKey]) {
+    return CATEGORY_ICONS[categoryKey];
+  }
+
+  // Check for keyword matches in the combined text
+  for (const [keyword, icon] of Object.entries(CATEGORY_ICONS)) {
+    if (searchText.includes(keyword)) {
+      return icon;
+    }
+  }
+
+  // Default icon
+  return '🔧';
+}
+
+function generateId(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
 
 function extractLegendInfo(str: string) {
   let official = false;
@@ -160,83 +168,57 @@ function extractLegendInfo(str: string) {
   return { official, languages, scope, operating_systems };
 }
 
-function getIconForServer(server: {
-  name: string;
-  description: string;
-  category: string;
-  languages: string[];
-  official: boolean;
-}) {
-  const { name, description, category, languages, official } = server;
-
-  // If it's official, use the official badge emoji
-  if (official) {
-    return '🎖️';
-  }
-
-  // Check for language-specific icons first (most specific)
-  if (languages.length > 0) {
-    const primaryLanguage = languages[0];
-    if (LANGUAGE_ICONS[primaryLanguage]) {
-      return LANGUAGE_ICONS[primaryLanguage];
-    }
-  }
-
-  // Create a searchable text combining name, description, and category
-  const searchText = `${name} ${description} ${category}`.toLowerCase();
-
-  // Check for category/keyword matches (order matters - more specific first)
-  const keywords = Object.keys(CATEGORY_ICONS).sort(
-    (a, b) => b.length - a.length,
-  );
-
-  for (const keyword of keywords) {
-    if (searchText.includes(keyword.toLowerCase())) {
-      return CATEGORY_ICONS[keyword];
-    }
-  }
-
-  // Fallback to a default server icon
-  return '🖥️';
-}
-
-function parseServers(markdown: string) {
+function parseServers(markdown: string): MCPDataTypes[] {
   const categoryRegex = /###\s+([^\n]+)\n\n([\s\S]*?)(?=\n###|$)/g;
   const serverLineRegex = /^- \[([^\]]+)\]\(([^)]+)\)\s*([^-\n]*)(.*)$/gm;
 
-  const servers = [];
-  let categoryMatch: RegExpExecArray | null = null;
+  const servers: MCPDataTypes[] = [];
 
-  while (true) {
-    categoryMatch = categoryRegex.exec(markdown);
-    if (categoryMatch === null) break;
+  let match: RegExpExecArray | null;
+  categoryRegex.lastIndex = 0; // Reset regex state
 
-    const categoryRaw = categoryMatch[1].trim();
+  while (categoryRegex.exec(markdown) !== null) {
+    match = categoryRegex.exec(markdown);
+    if (!match) {
+      return servers;
+    }
+
+    const categoryRaw = match[1].trim();
+
+    // Remove HTML anchor tags and extract just the text content
     const anchorMatch = categoryRaw.match(/<a[^>]*><\/a>(.+)$/);
     const category = anchorMatch ? anchorMatch[1].trim() : categoryRaw;
 
-    const block = categoryMatch[2];
-    let serverMatch: RegExpExecArray | null = null;
+    const block = match[2];
+    let serverMatch: RegExpExecArray | null;
+    serverLineRegex.lastIndex = 0; // Reset regex state
 
-    serverLineRegex.lastIndex = 0;
-
-    while (true) {
+    while (serverLineRegex.exec(block) !== null) {
       serverMatch = serverLineRegex.exec(block);
-      if (serverMatch === null) break;
+      if (!serverMatch) {
+        return servers;
+      }
 
       const name = serverMatch[1];
       const url = serverMatch[2];
       const description = (serverMatch[3] + (serverMatch[4] || ''))
         .replace(/^\s*-\s*/, '')
         .trim();
+
       const legendInfo = extractLegendInfo(serverMatch[0]);
+      const creator = extractCreatorFromUrl(url);
+      const icon = getCategoryIcon(category, name, description);
+      const id = generateId(name);
 
       servers.push({
-      name,
-        url,
+        id,
+        name,
+        creator,
         description,
-        ...legendInfo,
         category,
+        icon,
+        url,
+        ...legendInfo,
       });
     }
   }
@@ -249,16 +231,24 @@ export async function GET(req: NextRequest) {
   const page = Number(searchParams.get('page') || 1);
   const pageSize = Number(searchParams.get('pageSize') || 20);
   const category = searchParams.get('category');
+  const search = searchParams.get('search');
 
   try {
     const readme = await (await fetch(GITHUB_RAW_URL)).text();
     let servers = parseServers(readme);
 
-    if (!servers || servers.length === 0) {
-      console.log('No servers parsed from markdown');
-      return NextResponse.json({ agents: [] });
+    // Apply search filter
+    if (search) {
+      const searchLower = search.toLowerCase();
+      servers = servers.filter(
+        (srv) =>
+          srv.name.toLowerCase().includes(searchLower) ||
+          srv.description.toLowerCase().includes(searchLower) ||
+          srv.category.toLowerCase().includes(searchLower),
+      );
     }
 
+    // Apply category filter
     if (category) {
       servers = servers.filter(
         (srv) => srv.category.toLowerCase() === category.toLowerCase(),
@@ -270,26 +260,15 @@ export async function GET(req: NextRequest) {
     const end = start + pageSize;
     const paged = servers.slice(start, end);
 
-    console.log('Parsed servers:', { total, pagedCount: paged.length });
-
-    const agents: DataTypes[] = paged.map((item) => ({
-      category: item.category,
-      creator: item.url,
-      description: item.description,
-      icon: getIconForServer(item), // Use the intelligent icon assignment
-      id: item.name,
-      name: item.name,
-    }));
-
-  return NextResponse.json({ agents });
+    return NextResponse.json({
+      page,
+      pageSize,
+      total,
+      category: category || null,
+      search: search || null,
+      servers: paged,
+    });
   } catch (e: any) {
-    console.error('Error in agents API:', e);
-    return NextResponse.json({ error: e.message, agents: [] }, { status: 500 });
+    return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
-
-type Agent = DataTypes & {
-  url?: string;
-  author?: string;
-  tags?: string[];
-};

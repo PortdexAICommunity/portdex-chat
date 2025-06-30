@@ -1,15 +1,14 @@
 import { auth, type UserType } from '@/app/(auth)/auth';
 import { getDynamicEntitlements } from '@/lib/ai/entitlements';
+import { extractAssistantId, isAssistantModel } from '@/lib/ai/models';
 import { systemPrompt, type RequestHints } from '@/lib/ai/prompts';
-import { myProvider, createDynamicProvider } from '@/lib/ai/providers';
-import { isAssistantModel, extractAssistantId } from '@/lib/ai/models';
+import { createDynamicProvider, myProvider } from '@/lib/ai/providers';
 import { createDocument } from '@/lib/ai/tools/create-document';
 import { getWeather } from '@/lib/ai/tools/get-weather';
 import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
 import { searchProducts } from '@/lib/ai/tools/search-products';
 import { updateDocument } from '@/lib/ai/tools/update-document';
-import { isProductionEnvironment } from '@/lib/constants';
-import { homeMarketplaceItems } from '@/lib/constants';
+import { homeMarketplaceItems, isProductionEnvironment } from '@/lib/constants';
 import {
   createStreamId,
   deleteChatById,
@@ -42,14 +41,16 @@ function getAssistantFromModelId(selectedChatModel: string) {
   if (!isAssistantModel(selectedChatModel)) {
     return null;
   }
-  
+
   const assistantId = extractAssistantId(selectedChatModel);
   if (!assistantId) {
     return null;
   }
-  
-  const assistant = homeMarketplaceItems.find(item => item.id === assistantId);
-  
+
+  const assistant = homeMarketplaceItems.find(
+    (item) => item.id === assistantId,
+  );
+
   return assistant || null;
 }
 
@@ -78,7 +79,7 @@ export async function POST(request: Request) {
         requestBody = postRequestBodySchema.parse(json);
       } catch (_) {
         writer.write(
-          `data: ${JSON.stringify({ error: 'Invalid request' })}\n\n`
+          `data: ${JSON.stringify({ error: 'Invalid request' })}\n\n`,
         );
         await writer.close();
         return;
@@ -86,32 +87,31 @@ export async function POST(request: Request) {
 
       const session = await auth();
       if (!session?.user) {
-        writer.write(
-          `data: ${JSON.stringify({ error: 'Unauthorized' })}\n\n`
-        );
+        writer.write(`data: ${JSON.stringify({ error: 'Unauthorized' })}\n\n`);
         await writer.close();
         return;
       }
 
-      const { id, message, selectedChatModel, selectedVisibilityType } = requestBody;
+      const { id, message, selectedChatModel, selectedVisibilityType } =
+        requestBody;
       const userType: UserType = session.user.type;
 
       // Get selected assistant (if any) for dynamic entitlements and prompts
       const selectedAssistant = getAssistantFromModelId(selectedChatModel);
-      
+
       // Use dynamic entitlements that include assistant models
-      const assistantForEntitlements = selectedAssistant 
-        ? { id: selectedAssistant.id, title: selectedAssistant.title } 
+      const assistantForEntitlements = selectedAssistant
+        ? { id: selectedAssistant.id, title: selectedAssistant.title }
         : null;
-      const { maxMessagesPerDay, availableChatModelIds } = getDynamicEntitlements(
-        userType, 
-        assistantForEntitlements
-      );
+      const { maxMessagesPerDay, availableChatModelIds } =
+        getDynamicEntitlements(userType, assistantForEntitlements);
 
       // Validate that the selected model is available to the user
       if (!availableChatModelIds.includes(selectedChatModel)) {
         writer.write(
-          `data: ${JSON.stringify({ error: 'Forbidden: Model not available' })}\n\n`
+          `data: ${JSON.stringify({
+            error: 'Forbidden: Model not available',
+          })}\n\n`,
         );
         await writer.close();
         return;
@@ -134,16 +134,14 @@ export async function POST(request: Request) {
 
       if (messageCount > maxMessagesPerDay) {
         writer.write(
-          `data: ${JSON.stringify({ error: 'Rate limit exceeded' })}\n\n`
+          `data: ${JSON.stringify({ error: 'Rate limit exceeded' })}\n\n`,
         );
         await writer.close();
         return;
       }
 
       if (chat?.userId && chat.userId !== session.user.id) {
-        writer.write(
-          `data: ${JSON.stringify({ error: 'Forbidden' })}\n\n`
-        );
+        writer.write(`data: ${JSON.stringify({ error: 'Forbidden' })}\n\n`);
         await writer.close();
         return;
       }
@@ -158,7 +156,9 @@ export async function POST(request: Request) {
       };
 
       // Get previous messages for context
-      const previousMessages = await getMessagesByChatId({ id }).catch(() => []);
+      const previousMessages = await getMessagesByChatId({ id }).catch(
+        () => [],
+      );
       const messages = appendClientMessage({
         // @ts-expect-error: todo add type conversion from DBMessage[] to UIMessage[]
         messages: previousMessages,
@@ -166,7 +166,7 @@ export async function POST(request: Request) {
       });
 
       // Create appropriate provider based on whether an assistant is selected
-      const provider = selectedAssistant 
+      const provider = selectedAssistant
         ? createDynamicProvider(assistantForEntitlements)
         : myProvider;
 
@@ -219,12 +219,16 @@ export async function POST(request: Request) {
       // Start AI response streaming immediately - don't wait for database operations
       const result = streamText({
         model: provider.languageModel(selectedChatModel),
-        system: systemPrompt({ selectedChatModel, requestHints, selectedAssistant }),
+        system: systemPrompt({
+          selectedChatModel,
+          requestHints,
+          selectedAssistant,
+        }),
         messages,
         maxSteps: 5,
         experimental_activeTools:
           selectedChatModel === 'chat-model-reasoning'
-            ? []
+            ? ['searchProducts']
             : [
                 'getWeather',
                 'createDocument',
@@ -236,8 +240,14 @@ export async function POST(request: Request) {
         experimental_generateMessageId: generateUUID,
         tools: {
           getWeather,
-          createDocument: createDocument({ session, dataStream: toolDataStream }),
-          updateDocument: updateDocument({ session, dataStream: toolDataStream }),
+          createDocument: createDocument({
+            session,
+            dataStream: toolDataStream,
+          }),
+          updateDocument: updateDocument({
+            session,
+            dataStream: toolDataStream,
+          }),
           requestSuggestions: requestSuggestions({
             session,
             dataStream: toolDataStream,
@@ -251,7 +261,7 @@ export async function POST(request: Request) {
           if (!session?.user?.id) return;
 
           const assistantMessages = response.messages.filter(
-            (msg) => msg.role === 'assistant'
+            (msg) => msg.role === 'assistant',
           );
           const assistantId = getTrailingMessageId({
             messages: assistantMessages,
@@ -274,7 +284,8 @@ export async function POST(request: Request) {
                     chatId: id,
                     role: assistantMessage.role,
                     parts: assistantMessage.parts,
-                    attachments: assistantMessage.experimental_attachments ?? [],
+                    attachments:
+                      assistantMessage.experimental_attachments ?? [],
                     createdAt: new Date(),
                   },
                 ],
@@ -303,7 +314,7 @@ export async function POST(request: Request) {
       } catch (streamError) {
         console.error('Stream error:', streamError);
         writer.write(
-          `data: ${JSON.stringify({ error: 'Stream processing error' })}\n\n`
+          `data: ${JSON.stringify({ error: 'Stream processing error' })}\n\n`,
         );
       }
     } catch (err) {
@@ -313,7 +324,7 @@ export async function POST(request: Request) {
         `data: ${JSON.stringify({
           error: 'Internal server error',
           details: error?.message || 'Unknown error',
-        })}\n\n`
+        })}\n\n`,
       );
     } finally {
       await writer.close();
@@ -384,14 +395,17 @@ export async function GET(request: Request) {
     return new Response(JSON.stringify({ messages: [] }), { status: 200 });
   }
 
-  return new Response(JSON.stringify({ 
-    messages: [mostRecentMessage] 
-  }), { 
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json',
-    }
-  });
+  return new Response(
+    JSON.stringify({
+      messages: [mostRecentMessage],
+    }),
+    {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  );
 }
 
 export async function DELETE(request: Request) {

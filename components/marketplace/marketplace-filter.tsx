@@ -1,289 +1,143 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuCheckboxItem,
-	DropdownMenuContent,
-	DropdownMenuLabel,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import type { DataTypes } from "@/lib/types";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { AnimatePresence, motion } from "framer-motion";
-import { Filter, Search, X } from "lucide-react";
-import { useMemo } from "react";
+import { Search, X } from "lucide-react";
+import React from "react";
 
 interface MarketplaceFilterProps {
-	items: DataTypes[];
-	selectedCategories: string[];
-	selectedSubcategories: string[];
-	selectedUseCases: string[];
-	selectedTags: string[];
+	categories: Array<{ name: string; count: number }>;
+	selectedCategory: string | null;
 	searchTerm: string;
-	onCategoryChange: (categories: string[]) => void;
-	onSubcategoryChange: (subcategories: string[]) => void;
-	onUseCaseChange: (useCases: string[]) => void;
-	onTagChange: (tags: string[]) => void;
+	totalItems: number;
+	onCategoryChange: (category: string | null) => void;
 	onSearchChange: (search: string) => void;
 	onClearFilters: () => void;
+	title: string;
 	placeholder?: string;
 }
 
 export const MarketplaceFilter = ({
-	items,
-	selectedCategories,
-	selectedSubcategories,
-	selectedUseCases,
-	selectedTags,
+	categories,
+	selectedCategory,
 	searchTerm,
+	totalItems,
 	onCategoryChange,
-	onSubcategoryChange,
-	onUseCaseChange,
-	onTagChange,
 	onSearchChange,
 	onClearFilters,
-	placeholder = "Search items...",
+	title,
+	placeholder = "Search...",
 }: MarketplaceFilterProps) => {
-	// Extract unique values for filters
-	const { categories, subcategories, useCases, tags } = useMemo(() => {
-		const categoriesSet = new Set<string>();
-		const subcategoriesSet = new Set<string>();
-		const useCasesSet = new Set<string>();
-		const tagsSet = new Set<string>();
-
-		items.forEach((item) => {
-			if (item.category) categoriesSet.add(item.category);
-			if (item.subcategory) subcategoriesSet.add(item.subcategory);
-			if (item.useCase) useCasesSet.add(item.useCase);
-			if (item.tags) item.tags.forEach((tag) => tagsSet.add(tag));
-		});
-
-		return {
-			categories: Array.from(categoriesSet).sort(),
-			subcategories: Array.from(subcategoriesSet).sort(),
-			useCases: Array.from(useCasesSet).sort(),
-			tags: Array.from(tagsSet).sort(),
-		};
-	}, [items]);
-
-	const handleCategoryToggle = (category: string) => {
-		const updated = selectedCategories.includes(category)
-			? selectedCategories.filter((c) => c !== category)
-			: [...selectedCategories, category];
-		onCategoryChange(updated);
-	};
-
-	const handleSubcategoryToggle = (subcategory: string) => {
-		const updated = selectedSubcategories.includes(subcategory)
-			? selectedSubcategories.filter((s) => s !== subcategory)
-			: [...selectedSubcategories, subcategory];
-		onSubcategoryChange(updated);
-	};
-
-	const handleUseCaseToggle = (useCase: string) => {
-		const updated = selectedUseCases.includes(useCase)
-			? selectedUseCases.filter((u) => u !== useCase)
-			: [...selectedUseCases, useCase];
-		onUseCaseChange(updated);
-	};
-
-	const handleTagToggle = (tag: string) => {
-		const updated = selectedTags.includes(tag)
-			? selectedTags.filter((t) => t !== tag)
-			: [...selectedTags, tag];
-		onTagChange(updated);
-	};
-
-	const activeFiltersCount =
-		selectedCategories.length +
-		selectedSubcategories.length +
-		selectedUseCases.length +
-		selectedTags.length;
-	const hasActiveFilters = activeFiltersCount > 0 || searchTerm.length > 0;
+	const hasActiveFilters = selectedCategory !== null || searchTerm.length > 0;
 
 	return (
-		<div className="space-y-4">
-			{/* Search and Filter Controls */}
-			<div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+		<div className="w-full lg:w-72 shrink-0 space-y-4 lg:space-y-6">
+			{/* Header */}
+			<div className="space-y-3 lg:space-y-4">
+				<div className="flex flex-col sm:flex-row lg:flex-col items-start sm:items-center lg:items-start justify-between gap-2">
+					<h2 className="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white">
+						{title}
+					</h2>
+					<Badge variant="secondary" className="text-xs">
+						{totalItems} items
+					</Badge>
+				</div>
+
 				{/* Search */}
-				<div className="relative flex-1 max-w-md">
-					<Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-muted size-4" />
+				<div className="relative">
+					<Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 size-4" />
 					<Input
 						placeholder={placeholder}
 						value={searchTerm}
 						onChange={(e) => onSearchChange(e.target.value)}
-						className="pl-10 bg-white dark:bg-sidebar border-gray-200 dark:border-gray-700"
+						className="pl-10 w-full bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600"
 					/>
 				</div>
 
-				{/* Filter Dropdowns */}
-				<div className="flex flex-wrap gap-2">
-					{/* Categories Filter */}
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button variant="outline" size="sm" className="h-9 border-dashed">
-								<Filter className="mr-2 size-4" />
-								Categories
-								{selectedCategories.length > 0 && (
-									<Badge className="ml-2 size-5 p-0 flex items-center justify-center">
-										{selectedCategories.length}
-									</Badge>
-								)}
-							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent
-							align="end"
-							className="w-64 max-h-80 overflow-y-auto"
-						>
-							<DropdownMenuLabel>Filter by Category</DropdownMenuLabel>
-							<DropdownMenuSeparator />
-							<div className="max-h-64 overflow-y-auto">
-								{categories.map((category) => (
-									<DropdownMenuCheckboxItem
-										key={category}
-										checked={selectedCategories.includes(category)}
-										onCheckedChange={() => handleCategoryToggle(category)}
-									>
-										{category}
-									</DropdownMenuCheckboxItem>
-								))}
-							</div>
-						</DropdownMenuContent>
-					</DropdownMenu>
-
-					{/* Subcategories Filter */}
-					{subcategories.length > 0 && (
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button
-									variant="outline"
-									size="sm"
-									className="h-9 border-dashed"
-								>
-									<Filter className="mr-2 size-4" />
-									Types
-									{selectedSubcategories.length > 0 && (
-										<Badge className="ml-2 size-5 p-0 flex items-center justify-center">
-											{selectedSubcategories.length}
-										</Badge>
-									)}
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent
-								align="end"
-								className="w-56 max-h-80 overflow-y-auto"
-							>
-								<DropdownMenuLabel>Filter by Type</DropdownMenuLabel>
-								<DropdownMenuSeparator />
-								<div className="max-h-64 overflow-y-auto">
-									{subcategories.map((subcategory) => (
-										<DropdownMenuCheckboxItem
-											key={subcategory}
-											checked={selectedSubcategories.includes(subcategory)}
-											onCheckedChange={() =>
-												handleSubcategoryToggle(subcategory)
-											}
-										>
-											{subcategory}
-										</DropdownMenuCheckboxItem>
-									))}
-								</div>
-							</DropdownMenuContent>
-						</DropdownMenu>
-					)}
-
-					{/* Use Cases Filter */}
-					{useCases.length > 0 && (
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button
-									variant="outline"
-									size="sm"
-									className="h-9 border-dashed"
-								>
-									<Filter className="mr-2 size-4" />
-									Use Cases
-									{selectedUseCases.length > 0 && (
-										<Badge className="ml-2 size-5 p-0 flex items-center justify-center">
-											{selectedUseCases.length}
-										</Badge>
-									)}
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent
-								align="end"
-								className="w-56 max-h-80 overflow-y-auto"
-							>
-								<DropdownMenuLabel>Filter by Use Case</DropdownMenuLabel>
-								<DropdownMenuSeparator />
-								<div className="max-h-64 overflow-y-auto">
-									{useCases.map((useCase) => (
-										<DropdownMenuCheckboxItem
-											key={useCase}
-											checked={selectedUseCases.includes(useCase)}
-											onCheckedChange={() => handleUseCaseToggle(useCase)}
-										>
-											{useCase}
-										</DropdownMenuCheckboxItem>
-									))}
-								</div>
-							</DropdownMenuContent>
-						</DropdownMenu>
-					)}
-
-					{/* Tags Filter */}
-					{tags.length > 0 && (
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button
-									variant="outline"
-									size="sm"
-									className="h-9 border-dashed"
-								>
-									<Filter className="mr-2 size-4" />
-									Tags
-									{selectedTags.length > 0 && (
-										<Badge className="ml-2 size-5 p-0 flex items-center justify-center">
-											{selectedTags.length}
-										</Badge>
-									)}
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent
-								align="end"
-								className="w-52 max-h-80 overflow-y-auto"
-							>
-								<DropdownMenuLabel>Filter by Tags</DropdownMenuLabel>
-								<DropdownMenuSeparator />
-								<div className="max-h-64 overflow-y-auto">
-									{tags.map((tag) => (
-										<DropdownMenuCheckboxItem
-											key={tag}
-											checked={selectedTags.includes(tag)}
-											onCheckedChange={() => handleTagToggle(tag)}
-										>
-											{tag}
-										</DropdownMenuCheckboxItem>
-									))}
-								</div>
-							</DropdownMenuContent>
-						</DropdownMenu>
-					)}
-
-					{/* Clear Filters */}
+				{/* Clear Filters */}
+				<AnimatePresence>
 					{hasActiveFilters && (
-						<Button
-							variant="ghost"
-							size="sm"
-							onClick={onClearFilters}
-							className="h-9 px-2 lg:px-3"
+						<motion.div
+							initial={{ opacity: 0, height: 0 }}
+							animate={{ opacity: 1, height: "auto" }}
+							exit={{ opacity: 0, height: 0 }}
 						>
-							Clear
-							<X className="ml-2 size-4" />
-						</Button>
+							<Button
+								variant="ghost"
+								size="sm"
+								onClick={onClearFilters}
+								className="w-full justify-start text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+							>
+								<X className="mr-2 size-4" />
+								Clear all filters
+							</Button>
+						</motion.div>
 					)}
-				</div>
+				</AnimatePresence>
+			</div>
+
+			{/* Categories */}
+			<div className="space-y-2 lg:space-y-3">
+				<h3 className="text-sm font-medium text-gray-900 dark:text-white uppercase tracking-wide">
+					Categories
+				</h3>
+
+				<ScrollArea className="h-[300px] lg:h-[400px] xl:h-[500px] w-full">
+					<div className="space-y-1 pr-3 lg:pr-6 w-full">
+						{/* All Categories */}
+						<button
+							type="button"
+							onClick={() => onCategoryChange(null)}
+							className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
+								selectedCategory === null
+									? "bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium"
+									: "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+							}`}
+						>
+							<div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
+								<div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center flex-shrink-0">
+									<div className="size-1.5 lg:size-2 bg-white rounded-full" />
+								</div>
+								<span className="font-medium truncate">All</span>
+							</div>
+							<Badge variant="secondary" className="text-xs flex-shrink-0 ml-2">
+								{categories.reduce((sum, cat) => sum + cat.count, 0)}
+							</Badge>
+						</button>
+
+						{/* Individual Categories */}
+						{categories.map((category) => (
+							<button
+								key={category.name}
+								type="button"
+								onClick={() => onCategoryChange(category.name)}
+								className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
+									selectedCategory === category.name
+										? "bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium"
+										: "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+								}`}
+							>
+								<div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
+									<div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center flex-shrink-0">
+										<span className="text-xs text-white font-medium">
+											{category.name.charAt(0).toUpperCase()}
+										</span>
+									</div>
+									<span className="text-left truncate">{category.name}</span>
+								</div>
+								<Badge
+									variant="secondary"
+									className="text-xs flex-shrink-0 ml-2"
+								>
+									{category.count}
+								</Badge>
+							</button>
+						))}
+					</div>
+				</ScrollArea>
 			</div>
 
 			{/* Active Filters Display */}
@@ -293,53 +147,41 @@ export const MarketplaceFilter = ({
 						initial={{ opacity: 0, height: 0 }}
 						animate={{ opacity: 1, height: "auto" }}
 						exit={{ opacity: 0, height: 0 }}
-						className="flex flex-wrap gap-2"
+						className="space-y-2"
 					>
-						{searchTerm && (
-							<Badge variant="secondary" className="gap-1">
-								Search: {searchTerm}
-								<X
-									className="size-3 cursor-pointer"
-									onClick={() => onSearchChange("")}
-								/>
-							</Badge>
-						)}
-						{selectedCategories.map((category) => (
-							<Badge key={category} variant="secondary" className="gap-1">
-								Category: {category}
-								<X
-									className="size-3 cursor-pointer"
-									onClick={() => handleCategoryToggle(category)}
-								/>
-							</Badge>
-						))}
-						{selectedSubcategories.map((subcategory) => (
-							<Badge key={subcategory} variant="secondary" className="gap-1">
-								Type: {subcategory}
-								<X
-									className="size-3 cursor-pointer"
-									onClick={() => handleSubcategoryToggle(subcategory)}
-								/>
-							</Badge>
-						))}
-						{selectedUseCases.map((useCase) => (
-							<Badge key={useCase} variant="secondary" className="gap-1">
-								Use Case: {useCase}
-								<X
-									className="size-3 cursor-pointer"
-									onClick={() => handleUseCaseToggle(useCase)}
-								/>
-							</Badge>
-						))}
-						{selectedTags.map((tag) => (
-							<Badge key={tag} variant="secondary" className="gap-1">
-								#{tag}
-								<X
-									className="size-3 cursor-pointer"
-									onClick={() => handleTagToggle(tag)}
-								/>
-							</Badge>
-						))}
+						<h3 className="text-sm font-medium text-gray-900 dark:text-white">
+							Active Filters
+						</h3>
+						<div className="space-y-2">
+							{searchTerm && (
+								<div className="flex items-center justify-between p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+									<span className="text-sm text-blue-900 dark:text-blue-100">
+										Search: &ldquo;{searchTerm}&rdquo;
+									</span>
+									<button
+										type="button"
+										onClick={() => onSearchChange("")}
+										className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200"
+									>
+										<X className="size-4" />
+									</button>
+								</div>
+							)}
+							{selectedCategory && (
+								<div className="flex items-center justify-between p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+									<span className="text-sm text-purple-900 dark:text-purple-100">
+										Category: {selectedCategory}
+									</span>
+									<button
+										type="button"
+										onClick={() => onCategoryChange(null)}
+										className="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-200"
+									>
+										<X className="size-4" />
+									</button>
+								</div>
+							)}
+						</div>
 					</motion.div>
 				)}
 			</AnimatePresence>
