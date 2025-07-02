@@ -96,7 +96,6 @@ LICENSE
 
 # Test files
 test
-tests
 __tests__
 *.test.*
 *.spec.*
@@ -107,7 +106,6 @@ test-results/
 
 # Build artifacts
 dist/
-artifacts/
 
 # Database
 *.db

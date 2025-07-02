@@ -5,7 +5,7 @@ FROM node:20-alpine AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
-RUN apk add --no-cache libc6-compat curl
+RUN apk add --no-cache libc6-compat curl postgresql-client
 
 # Stage 2: Install dependencies
 FROM base AS deps
@@ -63,6 +63,15 @@ COPY --from=builder --chown=nextjs:nodejs /app/lib/db ./lib/db
 COPY --from=builder --chown=nextjs:nodejs /app/drizzle.config.ts ./
 COPY --from=builder --chown=nextjs:nodejs /app/package.json ./
 
+# Copy startup script
+COPY --chown=nextjs:nodejs scripts/start.sh ./start.sh
+
+# Copy node_modules needed for migrations (tsx and postgres packages)
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
+
+# Make startup script executable
+RUN chmod +x ./start.sh
+
 # Switch to non-root user
 USER nextjs
 
@@ -77,5 +86,5 @@ ENV HOSTNAME "0.0.0.0"
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
   CMD curl -f http://localhost:3000/api/health || exit 1
 
-# Start the application
-CMD ["node", "server.js"] 
+# Start the application with migrations
+CMD ["./start.sh"] 

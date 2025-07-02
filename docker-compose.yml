@@ -28,9 +28,14 @@ services:
     environment:
       NODE_ENV: production
       POSTGRES_URL: postgresql://postgres:postgres@postgres:5432/portdex_chat
+      AUTH_TRUST_HOST: "true"
+      NEXTAUTH_URL: http://localhost:3000
+      AUTH_SECRET: h4huB+Yz/HedzqcnQhx6wkN68GHFbTfiGabL37JgqSI=
+      DASHSCOPE_API_KEY: sk-116b80f97f3147388ab31b40433d9848
+      PORTDEX_API_KEY: sk-ii040qeGVXlt95xXhTu7sw
+      REDIS_URL: redis://default:sH5EImlKc2MTMgeeuGYYJKrgphvpfEY5@redis-17973.c100.us-east-1-4.ec2.redns.redis-cloud.com:17973
       # Add other required environment variables here
       # AUTH_SECRET: your-auth-secret
-      # NEXTAUTH_URL: http://localhost:3000
       # Add AI API keys as needed
     depends_on:
       postgres:
