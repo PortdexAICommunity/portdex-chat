@@ -1,36 +1,125 @@
-import { Toaster } from 'sonner';
-import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
-import { ThemeProvider } from '@/components/theme-provider';
+import { Toaster } from "sonner";
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import { ThemeProvider } from "@/components/theme-provider";
 
-import './globals.css';
-import { SessionProvider } from 'next-auth/react';
-import UseCaseTooltip from '@/components/use-case-tooltip';
+import "./globals.css";
+import { SessionProvider } from "next-auth/react";
+import UseCaseTooltip from "@/components/use-case-tooltip";
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://chat.vercel.ai'),
-  title: 'Portdex Chat',
-  description: 'Portdex Chat is a chatbot that uses the AI SDK.',
+	metadataBase: new URL("https://chat.vercel.ai"),
+	title: {
+		default: "Portdex Chat - AI-Powered Blockchain Marketplace",
+		template: "%s | Portdex Chat",
+	},
+	description:
+		"Portdex Chat is a revolutionary AI-powered platform combining chatbot technology with blockchain marketplace features. Create, tokenize, and trade AI agents while experiencing cutting-edge conversational AI.",
+	keywords: [
+		"AI chatbot",
+		"blockchain marketplace",
+		"AI agents",
+		"tokenization",
+		"cryptocurrency",
+		"machine learning",
+		"artificial intelligence",
+		"decentralized",
+		"smart contracts",
+		"DeFi",
+		"NFT",
+		"digital assets",
+	],
+	authors: [{ name: "Portdex Team" }],
+	creator: "Portdex",
+	publisher: "Portdex",
+	robots: {
+		index: true,
+		follow: true,
+		googleBot: {
+			index: true,
+			follow: true,
+			"max-video-preview": -1,
+			"max-image-preview": "large",
+			"max-snippet": -1,
+		},
+	},
+	openGraph: {
+		type: "website",
+		locale: "en_US",
+		url: "https://chat.vercel.ai",
+		siteName: "Portdex Chat",
+		title: "Portdex Chat - AI-Powered Blockchain Marketplace",
+		description:
+			"Revolutionary AI-powered platform combining chatbot technology with blockchain marketplace features. Create, tokenize, and trade AI agents.",
+		images: [
+			{
+				url: "/hero.png",
+				width: 1200,
+				height: 630,
+				alt: "Portdex Chat - AI-Powered Blockchain Marketplace",
+			},
+			{
+				url: "/hero2.png",
+				width: 1200,
+				height: 630,
+				alt: "Portdex Chat Platform Interface",
+			},
+		],
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Portdex Chat - AI-Powered Blockchain Marketplace",
+		description:
+			"Revolutionary AI-powered platform combining chatbot technology with blockchain marketplace features.",
+		images: ["/hero.png"],
+		creator: "@portdex",
+		site: "@portdex",
+	},
+	verification: {
+		google: "your-google-verification-code", // Replace with actual verification code
+		yandex: "your-yandex-verification-code", // Replace with actual verification code
+		yahoo: "your-yahoo-verification-code", // Replace with actual verification code
+	},
+	alternates: {
+		canonical: "https://chat.vercel.ai",
+		languages: {
+			"en-US": "https://chat.vercel.ai",
+		},
+	},
+	category: "technology",
+	classification: "AI Technology",
+	referrer: "origin-when-cross-origin",
+	formatDetection: {
+		email: false,
+		address: false,
+		telephone: false,
+	},
+	manifest: "/manifest.json",
+	icons: {
+		icon: "/favicon.ico",
+		shortcut: "/favicon.ico",
+		apple: "/favicon.ico",
+	},
 };
 
 export const viewport = {
-  maximumScale: 1, // Disable auto-zoom on mobile Safari
+	maximumScale: 1, // Disable auto-zoom on mobile Safari
 };
 
 const geist = Geist({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-geist',
+	subsets: ["latin"],
+	display: "swap",
+	variable: "--font-geist",
 });
 
 const geistMono = Geist_Mono({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-geist-mono',
+	subsets: ["latin"],
+	display: "swap",
+	variable: "--font-geist-mono",
 });
 
-const LIGHT_THEME_COLOR = 'hsl(0 0% 100%)';
-const DARK_THEME_COLOR = 'hsl(240deg 10% 3.92%)';
+const LIGHT_THEME_COLOR = "hsl(0 0% 100%)";
+const DARK_THEME_COLOR = "hsl(240deg 10% 3.92%)";
 const THEME_COLOR_SCRIPT = `\
 (function() {
   var html = document.documentElement;
@@ -50,38 +139,38 @@ const THEME_COLOR_SCRIPT = `\
 })();`;
 
 export default async function RootLayout({
-  children,
+	children,
 }: Readonly<{
-  children: React.ReactNode;
+	children: React.ReactNode;
 }>) {
-  return (
-    <html
-      lang="en"
-      // `next-themes` injects an extra classname to the body element to avoid
-      // visual flicker before hydration. Hence the `suppressHydrationWarning`
-      // prop is necessary to avoid the React hydration mismatch warning.
-      // https://github.com/pacocoursey/next-themes?tab=readme-ov-file#with-app
-      className={`${geist.variable} ${geistMono.variable}`}
-    >
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: THEME_COLOR_SCRIPT,
-          }}
-        />
-      </head>
-      <body suppressHydrationWarning className="antialiased">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Toaster position="top-center" />
-          <UseCaseTooltip />
-          <SessionProvider>{children}</SessionProvider>
-        </ThemeProvider>
-      </body>
-    </html>
-  );
+	return (
+		<html
+			lang="en"
+			// `next-themes` injects an extra classname to the body element to avoid
+			// visual flicker before hydration. Hence the `suppressHydrationWarning`
+			// prop is necessary to avoid the React hydration mismatch warning.
+			// https://github.com/pacocoursey/next-themes?tab=readme-ov-file#with-app
+			className={`${geist.variable} ${geistMono.variable}`}
+		>
+			<head>
+				<script
+					dangerouslySetInnerHTML={{
+						__html: THEME_COLOR_SCRIPT,
+					}}
+				/>
+			</head>
+			<body suppressHydrationWarning className="antialiased">
+				<ThemeProvider
+					attribute="class"
+					defaultTheme="system"
+					enableSystem
+					disableTransitionOnChange
+				>
+					<Toaster position="top-center" />
+					<UseCaseTooltip />
+					<SessionProvider>{children}</SessionProvider>
+				</ThemeProvider>
+			</body>
+		</html>
+	);
 }

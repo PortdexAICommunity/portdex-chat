@@ -232,11 +232,6 @@ export function Chat({
 						<HomeMarketplace />
 					</div>
 				)}
-				{messages.length === 0 && (
-					<div className="max-w-7xl mx-auto bg-background/50 my-14 rounded-3xl p-10">
-						<HomeMarketplace />
-					</div>
-				)}
 
 				{messages.length === 0 && <Footer />}
 			</div>
