@@ -1,89 +1,48 @@
-# Multi-stage Dockerfile for Next.js application
-
-# Stage 1: Base image with pnpm
+# syntax=docker/dockerfile:1
 FROM node:20-alpine AS base
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
-RUN apk add --no-cache libc6-compat curl postgresql-client
 
-# Stage 2: Install dependencies
+# Install dependencies only when needed
 FROM base AS deps
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Copy package files
-COPY package.json pnpm-lock.yaml ./
+RUN rm -rf .next node_modules
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile
+COPY package.json pnpm-lock.yaml* ./
+RUN corepack enable pnpm && pnpm install --frozen-lockfile
 
-# Stage 3: Build the application
+# Build the app with standalone output
 FROM base AS builder
 WORKDIR /app
-
-# Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
-
-# Copy source code
 COPY . .
 
-# Set environment variable for build
-ENV NEXT_TELEMETRY_DISABLED 1
+# Enable standalone output in next.config.js:
+# module.exports = { output: 'standalone' }
 
-# Build the application (includes database migration)
-# Note: Database migration requires POSTGRES_URL environment variable
-RUN pnpm run build
+RUN corepack enable pnpm && pnpm build
 
-# Stage 4: Production image
-FROM base AS runner
+# Production image
+FROM node:20-alpine AS runner
 WORKDIR /app
+#####################################
+# ENV NODE_ENV=production
+# ENV PORT=3000
+# ENV HOSTNAME="0.0.0.0"
+# ENV AUTH_URL="https://chat.portdex.ai/"
+####################################
+# Create non-root user for security
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
 
-# Create non-root user
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
-# Set environment variables
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
-
-# Copy built application
+# Copy only the standalone output
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 
-# Set the correct permission for prerender cache
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
-
-# Copy built Next.js application with correct permissions
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-# Copy database migrations and scripts
-COPY --from=builder --chown=nextjs:nodejs /app/lib/db ./lib/db
-COPY --from=builder --chown=nextjs:nodejs /app/drizzle.config.ts ./
-COPY --from=builder --chown=nextjs:nodejs /app/package.json ./
-
-# Copy startup script
-COPY --chown=nextjs:nodejs scripts/start.sh ./start.sh
-
-# Copy node_modules needed for migrations (tsx and postgres packages)
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
-
-# Make startup script executable
-RUN chmod +x ./start.sh
-
-# Switch to non-root user
 USER nextjs
 
-# Expose port
 EXPOSE 3000
 
-# Set environment variables
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-  CMD curl -f http://localhost:3000/api/health || exit 1
-
-# Start the application with migrations
-CMD ["./start.sh"] 
+# Use the Next.js built-in production server
+CMD ["node", "server.js"]
