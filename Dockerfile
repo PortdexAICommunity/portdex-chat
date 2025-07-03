@@ -44,5 +44,6 @@ USER nextjs
 
 EXPOSE 3000
 
-# Use the Next.js built-in production server
+# Entrypoint script ensures env vars are loaded at runtime
+ENTRYPOINT ["/bin/sh", "/app/entrypoint.sh"]
 CMD ["node", "server.js"]
