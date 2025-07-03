@@ -25,12 +25,12 @@ RUN corepack enable pnpm && pnpm build
 # Production image
 FROM node:20-alpine AS runner
 WORKDIR /app
-#####################################
+
+# Set environment variables
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
-ENV AUTH_URL="https://chat.portdex.ai/"
-####################################
+
 # Create non-root user for security
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
@@ -39,6 +39,10 @@ RUN addgroup --system --gid 1001 nodejs && \
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
+
+# Copy entrypoint script and ensure it's executable
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
 USER nextjs
 
