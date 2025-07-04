@@ -42,22 +42,18 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
 	matcher: [
+		// Specific protected routes only
 		"/",
-		"/chat/:id",
-		"/api/((?!auth|health).*)", // Allow auth and health to pass through
+		"/chat/:path*",
 		"/login",
 		"/register",
 		"/marketplace/:path*",
-
-		/*
-		 * Match all request paths except:
-		 * - _next/static (static files)
-		 * - _next/image (image optimization files)
-		 * - favicon.ico, sitemap.xml, robots.txt (metadata files)
-		 * - manifest.webmanifest (PWA manifest)
-		 * - api/auth (auth endpoints)
-		 * - api/health (health checks)
-		 */
-		"/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|manifest.webmanifest|api/auth|api/health).*)",
+		// Protected API routes (excluding auth and health)
+		"/api/chat/:path*",
+		"/api/document/:path*",
+		"/api/files/:path*",
+		"/api/history/:path*",
+		"/api/suggestions/:path*",
+		"/api/vote/:path*",
 	],
 };
