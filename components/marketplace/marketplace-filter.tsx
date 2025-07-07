@@ -18,6 +18,7 @@ interface MarketplaceFilterProps {
 	onClearFilters: () => void;
 	title: string;
 	placeholder?: string;
+	isCreatorBased?: boolean;
 }
 
 export const MarketplaceFilter = ({
@@ -30,8 +31,10 @@ export const MarketplaceFilter = ({
 	onClearFilters,
 	title,
 	placeholder = "Search...",
+	isCreatorBased = false,
 }: MarketplaceFilterProps) => {
 	const hasActiveFilters = selectedCategory !== null || searchTerm.length > 0;
+	console.log("cate", categories);
 
 	return (
 		<div className="w-full lg:w-72 shrink-0 space-y-4 lg:space-y-6">
@@ -82,7 +85,7 @@ export const MarketplaceFilter = ({
 			{/* Categories */}
 			<div className="space-y-2 lg:space-y-3">
 				<h3 className="text-sm font-medium text-gray-900 dark:text-white uppercase tracking-wide">
-					Categories
+					{isCreatorBased ? "Creators" : "Categories"}
 				</h3>
 
 				<ScrollArea className="h-[300px] lg:h-[400px] xl:h-[500px] w-full">
@@ -98,12 +101,14 @@ export const MarketplaceFilter = ({
 							}`}
 						>
 							<div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
-								<div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center flex-shrink-0">
+								<div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center shrink-0">
 									<div className="size-1.5 lg:size-2 bg-white rounded-full" />
 								</div>
-								<span className="font-medium truncate">All</span>
+								<span className="font-medium truncate">
+									{isCreatorBased ? "All Creators" : "All"}
+								</span>
 							</div>
-							<Badge variant="secondary" className="text-xs flex-shrink-0 ml-2">
+							<Badge variant="secondary" className="text-xs shrink-0 ml-2">
 								{categories.reduce((sum, cat) => sum + cat.count, 0)}
 							</Badge>
 						</button>
@@ -121,17 +126,14 @@ export const MarketplaceFilter = ({
 								}`}
 							>
 								<div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
-									<div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center flex-shrink-0">
+									<div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center shrink-0">
 										<span className="text-xs text-white font-medium">
 											{category.name.charAt(0).toUpperCase()}
 										</span>
 									</div>
 									<span className="text-left truncate">{category.name}</span>
 								</div>
-								<Badge
-									variant="secondary"
-									className="text-xs flex-shrink-0 ml-2"
-								>
+								<Badge variant="secondary" className="text-xs shrink-0 ml-2">
 									{category.count}
 								</Badge>
 							</button>
@@ -170,7 +172,8 @@ export const MarketplaceFilter = ({
 							{selectedCategory && (
 								<div className="flex items-center justify-between p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
 									<span className="text-sm text-purple-900 dark:text-purple-100">
-										Category: {selectedCategory}
+										{isCreatorBased ? "Creator" : "Category"}:{" "}
+										{selectedCategory}
 									</span>
 									<button
 										type="button"
