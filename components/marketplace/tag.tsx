@@ -4,39 +4,7 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-
-const aiPlatforms = [
-	"Reasoning Model",
-	"Hybrid Reasoning Model",
-	"Code Programming",
-	"Fast Response",
-	"Long Text Processing",
-	"Web Search",
-	"Search Tool",
-	"Image and Video Recognition",
-	"Mathematical Logic",
-	"Financial Quantitative Analysis",
-	"Write a Tweet",
-	"Text Detection",
-	"Translation",
-	"Long-form Writing",
-	"Emotional Companionship",
-	"Chinese Friendly",
-	"European Multilingual",
-	"Middle East and Southeast Asia Multilingual",
-	"Text-to-Image",
-	"Image-to-Image",
-	"Image-to-Video",
-	"Text-to-Video",
-	"Continuous Editing",
-	"Text Recognition",
-	"Commercial Design",
-	"Anti-NSFW",
-	"Smooth Motion",
-	"All-in-One Assistant",
-	"Audio Generation",
-	"Text Proofreading",
-];
+import { AI_PLATFORMS } from "@/lib/constant/marketplace-constant";
 
 export default function Tags() {
 	const [activeTab, setActiveTab] = useState("all");
@@ -71,7 +39,7 @@ export default function Tags() {
 	return (
 		<div className="w-full max-w-7xl mx-auto p-4 space-y-6">
 			<div className="flex flex-wrap gap-2">
-				{aiPlatforms.map((platform) => (
+				{AI_PLATFORMS.map((platform) => (
 					<TagBadge key={platform} tag={platform} variant="outline" />
 				))}
 			</div>

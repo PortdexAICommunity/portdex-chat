@@ -8,6 +8,7 @@ import { AssistantCard } from "./assistant-card";
 
 // Memoized Assistant Card Component
 import { memo } from "react";
+import { cn } from "@/lib/utils";
 const MemoizedAssistantCard = memo(
 	({ assistant, onClick }: { assistant: DataTypes; onClick: () => void }) => (
 		<AssistantCard assistant={assistant} onClick={onClick} />
@@ -71,7 +72,11 @@ export function MarketplaceSection({
 				</div>
 			)}
 
-			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+			<div
+				className={cn(
+					"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
+				)}
+			>
 				{paginatedItems.map((item, index) => (
 					<motion.div
 						key={item.id}

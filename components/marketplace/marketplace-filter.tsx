@@ -56,7 +56,7 @@ export const MarketplaceFilter = ({
 						placeholder={placeholder}
 						value={searchTerm}
 						onChange={(e) => onSearchChange(e.target.value)}
-						className="pl-10 w-full bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600"
+						className="pl-10 w-full bg-white dark:bg-sidebar border-gray-200 dark:border-gray-600"
 					/>
 				</div>
 

@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { PREDEFINED_ASSISTANT_CATEGORIES } from "@/lib/constant/marketplace-constant";
 import { siteTemplates, softwareTools } from "@/lib/constants";
 import type { DataTypes, MCPDataTypes, MCPServerType } from "@/lib/types";
 import { AnimatePresence, motion } from "framer-motion";
@@ -210,6 +211,26 @@ export default function Marketplace() {
 			.sort((a, b) => a.name.localeCompare(b.name));
 	}, []);
 
+	// Helper function specifically for assistants with predefined categories
+	const getAssistantCategoriesWithCounts = useCallback((items: DataTypes[]) => {
+		const categoryMap = new Map<string, number>();
+
+		// Initialize all predefined categories with 0 count
+		PREDEFINED_ASSISTANT_CATEGORIES.forEach((category) => {
+			categoryMap.set(category, 0);
+		});
+
+		// Count actual items
+		items.forEach((item) => {
+			const category = item.category || "General";
+			categoryMap.set(category, (categoryMap.get(category) || 0) + 1);
+		});
+
+		return Array.from(categoryMap.entries())
+			.map(([name, count]) => ({ name, count }))
+			.sort((a, b) => a.name.localeCompare(b.name));
+	}, []);
+
 	// Helper function to get creators with counts
 	const getCreatorsWithCounts = useCallback((items: DataTypes[]) => {
 		const creatorMap = new Map<string, number>();
@@ -224,8 +245,8 @@ export default function Marketplace() {
 
 	// Category data for each tab
 	const assistantCategories = useMemo(
-		() => getCategoriesWithCounts(assistants),
-		[assistants, getCategoriesWithCounts]
+		() => getAssistantCategoriesWithCounts(assistants),
+		[assistants, getAssistantCategoriesWithCounts]
 	);
 	const aiModelCreators = useMemo(
 		() => getCreatorsWithCounts(aiModels),
@@ -537,7 +558,7 @@ export default function Marketplace() {
 
 			{/* Content */}
 			<div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-				<div className="max-w-7xl mx-auto">
+				<div className="">
 					<AnimatePresence mode="wait">
 						{(isLoading || aiModelsLoading) && (
 							<div className="py-16 text-center text-gray-500 dark:text-gray-400">
@@ -938,7 +959,7 @@ export default function Marketplace() {
 										</div>
 									) : (
 										<>
-											<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+											<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
 												{paginatedMcpServers.map((server, index) => (
 													<motion.div
 														key={`${server.name}-${index}`}

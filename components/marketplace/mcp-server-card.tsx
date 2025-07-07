@@ -3,13 +3,16 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { ExternalLink, Globe, Server } from "lucide-react";
+import { ExternalLink, GitBranch, Star, Users } from "lucide-react";
 
 interface MCPServer {
+	id: string;
 	name: string;
-	url: string;
+	creator: string;
 	description: string;
 	category: string;
+	icon: string;
+	url: string;
 	official: boolean;
 	languages: string[];
 	scope: string[];
@@ -21,240 +24,146 @@ interface MCPServerCardProps {
 	onClick: () => void;
 }
 
-// Legend mappings for beautiful display
-const LEGEND_ICONS = {
-	languages: {
-		Python: {
-			icon: "🐍",
-			color:
-				"bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-300 dark:border-yellow-700/50",
-		},
-		"TypeScript/JavaScript": {
-			icon: "📇",
-			color:
-				"bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-700/50",
-		},
-		Go: {
-			icon: "🏎️",
-			color:
-				"bg-cyan-100 text-cyan-800 border-cyan-200 dark:bg-cyan-900/20 dark:text-cyan-300 dark:border-cyan-700/50",
-		},
-		Rust: {
-			icon: "🦀",
-			color:
-				"bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/20 dark:text-orange-300 dark:border-orange-700/50",
-		},
-		"C#": {
-			icon: "#️⃣",
-			color:
-				"bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-700/50",
-		},
-		Java: {
-			icon: "☕",
-			color:
-				"bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-700/50",
-		},
-		"C/C++": {
-			icon: "🌊",
-			color:
-				"bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-300 dark:border-indigo-700/50",
-		},
-	},
-	scope: {
-		Cloud: {
-			icon: "☁️",
-			color:
-				"bg-sky-100 text-sky-800 border-sky-200 dark:bg-sky-900/20 dark:text-sky-300 dark:border-sky-700/50",
-		},
-		Local: {
-			icon: "🏠",
-			color:
-				"bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-700/50",
-		},
-		Embedded: {
-			icon: "📟",
-			color:
-				"bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/20 dark:text-gray-300 dark:border-gray-700/50",
-		},
-	},
-	operating_systems: {
-		macOS: {
-			icon: "🍎",
-			color:
-				"bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-900/20 dark:text-slate-300 dark:border-slate-700/50",
-		},
-		Windows: {
-			icon: "🪟",
-			color:
-				"bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-700/50",
-		},
-		Linux: {
-			icon: "🐧",
-			color:
-				"bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-300 dark:border-yellow-700/50",
-		},
-	},
+// Language color mappings
+const LANGUAGE_COLORS = {
+	"TypeScript/JavaScript":
+		"bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
+	Python:
+		"bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300",
+	Go: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300",
+	Rust: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300",
+	"C#": "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300",
+	Java: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
+	"C/C++":
+		"bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300",
+};
+
+// Scope color mappings
+const SCOPE_COLORS = {
+	Remote:
+		"bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
+	Local:
+		"bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300",
+	Cloud: "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300",
+	Embedded: "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300",
 };
 
 export function MCPServerCard({ server, onClick }: MCPServerCardProps) {
-	// Helper function to render legend badges
-	const renderLegendBadges = () => {
-		const badges: JSX.Element[] = [];
+	// Generate random-ish stats for demo purposes (in real app, these would come from API)
+	const starCount = Math.floor(Math.random() * 10000) + 100;
+	const forkCount = Math.floor(Math.random() * 1000) + 10;
 
-		// Add language badges
-		server.languages.forEach((lang) => {
-			const legendInfo =
-				LEGEND_ICONS.languages[lang as keyof typeof LEGEND_ICONS.languages];
-			if (legendInfo) {
-				badges.push(
-					<Badge
-						key={`lang-${lang}`}
-						variant="outline"
-						className={`text-xs border ${legendInfo.color} flex items-center gap-1`}
-					>
-						<span>{legendInfo.icon}</span>
-						<span className="hidden sm:inline">{lang}</span>
-					</Badge>
-				);
-			}
-		});
-
-		// Add scope badges
-		server.scope.forEach((scopeItem) => {
-			const legendInfo =
-				LEGEND_ICONS.scope[scopeItem as keyof typeof LEGEND_ICONS.scope];
-			if (legendInfo) {
-				badges.push(
-					<Badge
-						key={`scope-${scopeItem}`}
-						variant="outline"
-						className={`text-xs border ${legendInfo.color} flex items-center gap-1`}
-					>
-						<span>{legendInfo.icon}</span>
-						<span className="hidden sm:inline">{scopeItem}</span>
-					</Badge>
-				);
-			}
-		});
-
-		// Add OS badges
-		server.operating_systems.forEach((os) => {
-			const legendInfo =
-				LEGEND_ICONS.operating_systems[
-					os as keyof typeof LEGEND_ICONS.operating_systems
-				];
-			if (legendInfo) {
-				badges.push(
-					<Badge
-						key={`os-${os}`}
-						variant="outline"
-						className={`text-xs border ${legendInfo.color} flex items-center gap-1`}
-					>
-						<span>{legendInfo.icon}</span>
-						<span className="hidden sm:inline">{os}</span>
-					</Badge>
-				);
-			}
-		});
-
-		return badges.slice(0, 4); // Limit to 4 badges to prevent overflow
+	const handleExternalLinkClick = (e: React.MouseEvent) => {
+		e.stopPropagation();
+		window.open(server.url, "_blank", "noopener,noreferrer");
 	};
 
 	return (
 		<motion.div
-			whileHover={{ y: -5, scale: 1.02 }}
-			whileTap={{ scale: 0.98 }}
+			whileHover={{ y: -2, scale: 1.01 }}
+			whileTap={{ scale: 0.99 }}
 			className="cursor-pointer h-full"
 		>
 			<Card
-				className="h-full bg-white dark:bg-gray-950/50 border-gray-200 dark:border-gray-800/50 hover:shadow-lg dark:hover:shadow-2xl transition-all duration-300 hover:border-purple-300 dark:hover:border-purple-600/50 flex flex-col group"
+				className="h-full bg-white dark:bg-transparent border border-gray-200 dark:border-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600/50 hover:shadow-md dark:hover:shadow-lg transition-all duration-200 group"
 				onClick={onClick}
 			>
-				<CardContent className="p-4 flex-1 flex flex-col">
-					<div className="flex items-start gap-4 flex-1">
-						{/* Icon Section */}
-						<div className="shrink-0">
-							<div className="relative">
-								<div className="size-12 bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900/30 dark:to-purple-800/30 rounded-xl flex items-center justify-center text-xl shadow-sm border border-purple-200 dark:border-purple-700/50">
-									<Server className="size-6 text-purple-600 dark:text-purple-400" />
-								</div>
-								{server.official && (
-									<div className="absolute -top-1 -right-1 size-5 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full flex items-center justify-center shadow-sm border-2 border-white dark:border-gray-900">
-										<span className="text-xs">🎖️</span>
-									</div>
-								)}
+				<CardContent className="p-4">
+					<div className="flex items-start gap-3">
+						{/* Icon */}
+						<div className="shrink-0 relative">
+							<div className="size-10 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-lg">
+								{server.icon || "📦"}
 							</div>
+							{server.official && (
+								<div className="absolute -top-1 -right-1 size-4 bg-blue-500 rounded-full flex items-center justify-center">
+									<span className="text-[10px] text-white">✓</span>
+								</div>
+							)}
 						</div>
 
-						{/* Content Section */}
-						<div className="flex-1 min-w-0 flex flex-col">
-							{/* Title and URL */}
-							<div className="mb-3">
-								<div className="flex items-start justify-between gap-2">
-									<h3 className="text-gray-900 dark:text-white font-semibold text-base mb-1 line-clamp-1 flex-1">
+						{/* Content */}
+						<div className="flex-1 min-w-0">
+							{/* Header */}
+							<div className="flex items-start justify-between gap-2 mb-2">
+								<div className="min-w-0 flex-1">
+									<h3 className="font-semibold text-gray-900 dark:text-white text-sm mb-1 truncate">
 										{server.name}
 									</h3>
-									{server.official && (
-										<Badge
-											variant="secondary"
-											className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 text-xs px-2 py-0.5"
-										>
-											Official
-										</Badge>
-									)}
+									<p className="text-xs text-gray-600 dark:text-gray-400">
+										@{server.creator}
+									</p>
 								</div>
-								<div className="flex items-center gap-1 text-gray-600 dark:text-gray-400 text-sm">
-									<Globe className="size-3 shrink-0" />
-									<span className="line-clamp-1 text-xs truncate">
-										{server.url}
-									</span>
+
+								{/* Stats */}
+								<div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 shrink-0">
+									<div className="flex items-center gap-1">
+										<Star className="size-3" />
+										<span>{starCount.toLocaleString()}</span>
+									</div>
+									<div className="flex items-center gap-1">
+										<GitBranch className="size-3" />
+										<span>{forkCount}</span>
+									</div>
 								</div>
 							</div>
 
 							{/* Description */}
-							<div className="flex-1 mb-4">
-								<p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-3 leading-relaxed">
-									{server.description}
-								</p>
-							</div>
+							<p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mb-3 leading-relaxed">
+								{server.description}
+							</p>
 
-							{/* Legend badges */}
-							<div className="flex flex-wrap gap-1.5 mb-3 min-h-[24px]">
-								{renderLegendBadges()}
-								{server.languages.length +
-									server.scope.length +
-									server.operating_systems.length >
-									4 && (
+							{/* Footer */}
+							<div className="flex items-center justify-between gap-2">
+								{/* Tags */}
+								<div className="flex items-center gap-2 flex-1 min-w-0">
+									{/* Primary Language */}
+									{server.languages.length > 0 && (
+										<Badge
+											variant="secondary"
+											className={`text-xs px-2 py-0.5 ${
+												LANGUAGE_COLORS[
+													server.languages[0] as keyof typeof LANGUAGE_COLORS
+												] ||
+												"bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+											}`}
+										>
+											{server.languages[0]}
+										</Badge>
+									)}
+
+									{/* Scope */}
+									{server.scope.length > 0 && (
+										<Badge
+											variant="outline"
+											className={`text-xs px-2 py-0.5 border ${
+												SCOPE_COLORS[
+													server.scope[0] as keyof typeof SCOPE_COLORS
+												] ||
+												"bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+											}`}
+										>
+											{server.scope[0]}
+										</Badge>
+									)}
+
+									{/* Category */}
 									<Badge
 										variant="outline"
-										className="text-xs bg-gray-50 text-gray-500 border-gray-200 dark:bg-gray-900/20 dark:text-gray-400 dark:border-gray-700/50"
+										className="text-xs px-2 py-0.5 bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-800/50 dark:text-gray-400 dark:border-gray-600 truncate max-w-24"
 									>
-										+
-										{server.languages.length +
-											server.scope.length +
-											server.operating_systems.length -
-											4}
+										{server.category}
 									</Badge>
-								)}
-							</div>
+								</div>
 
-							{/* Footer with category badge and external link */}
-							<div className="flex items-center justify-between gap-2 mt-auto">
-								<Badge
-									variant="secondary"
-									className="bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors text-xs"
+								{/* External Link */}
+								<button
+									onClick={handleExternalLinkClick}
+									className="p-1.5 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+									title="View Repository"
 								>
-									{server.category}
-								</Badge>
-
-								<motion.div
-									className="flex items-center gap-1 text-purple-600 dark:text-purple-400 text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity"
-									initial={{ opacity: 0 }}
-									whileHover={{ opacity: 1 }}
-								>
-									<ExternalLink className="size-3" />
-									<span>View →</span>
-								</motion.div>
+									<ExternalLink className="size-4" />
+								</button>
 							</div>
 						</div>
 					</div>
