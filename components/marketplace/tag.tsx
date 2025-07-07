@@ -37,7 +37,7 @@ export default function Tags() {
 	);
 
 	return (
-		<div className="w-full max-w-7xl mx-auto p-4 space-y-6">
+		<div className="w-full mx-auto p-4 space-y-6">
 			<div className="flex flex-wrap gap-2">
 				{AI_PLATFORMS.map((platform) => (
 					<TagBadge key={platform} tag={platform} variant="outline" />
