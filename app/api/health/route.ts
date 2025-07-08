@@ -1,24 +1,34 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 
-export async function GET() {
-  try {
-    // Perform basic health checks
-    const healthCheck = {
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-      environment: process.env.NODE_ENV,
-    };
+const client = postgres(process.env.POSTGRES_URL!);
+const db = drizzle(client);
 
-    return NextResponse.json(healthCheck, { status: 200 });
-  } catch (error) {
-    return NextResponse.json(
-      {
-        status: 'unhealthy',
-        timestamp: new Date().toISOString(),
-        error: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 503 }
-    );
-  }
-} 
+export async function GET(request: NextRequest) {
+	try {
+		// Test database connectivity
+		const result = await db.execute("SELECT 1 as test");
+
+		return NextResponse.json({
+			status: "healthy",
+			database: "connected",
+			timestamp: new Date().toISOString(),
+			postgres_url_set: !!process.env.POSTGRES_URL,
+			test_query: result,
+		});
+	} catch (error) {
+		console.error("Health check database error:", error);
+
+		return NextResponse.json(
+			{
+				status: "unhealthy",
+				database: "disconnected",
+				error: error instanceof Error ? error.message : "Unknown error",
+				postgres_url_set: !!process.env.POSTGRES_URL,
+				timestamp: new Date().toISOString(),
+			},
+			{ status: 503 }
+		);
+	}
+}
