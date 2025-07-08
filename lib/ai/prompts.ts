@@ -1,6 +1,6 @@
-import type { ArtifactKind } from '@/components/artifact';
-import type { Geo } from '@vercel/functions';
-import type { HomeMarketplaceItem } from '../types';
+import type { ArtifactKind } from "@/components/artifact";
+import type { Geo } from "@vercel/functions";
+import type { HomeMarketplaceItem } from "../types";
 
 export const artifactsPrompt = `
 Artifacts is a special user interface mode that helps users with writing, editing, and other content creation tasks. When artifact is open, it is on the right side of the screen, while the conversation is on the left side. When creating or updating documents, changes are reflected in real-time on the artifacts and visible to the user.
@@ -43,21 +43,22 @@ export const regularPrompt = `You are a friendly assistant! Keep your responses 
   - Otherwise, present the found products clearly and in a friendly manner.
   **When NOT to use searchProducts:**
   - If the user asks for information unrelated to products
+  **When asked about crypto, use the "coingecko_get_coin_price_detailed" tool to get the latest price of the coin.**
   `;
 
 // Assistant-specific prompt generation
 export const createAssistantPrompt = (
-  assistant: HomeMarketplaceItem,
+	assistant: HomeMarketplaceItem
 ): string => {
-  const baseRole = `You are ${assistant.title}, a specialized AI assistant created by ${assistant.creator}.`;
+	const baseRole = `You are ${assistant.title}, a specialized AI assistant created by ${assistant.creator}.`;
 
-  const capabilities = `Your primary role: ${assistant.description}`;
+	const capabilities = `Your primary role: ${assistant.description}`;
 
-  const categoryGuidance = getCategoryGuidance(assistant.category);
+	const categoryGuidance = getCategoryGuidance(assistant.category);
 
-  const typeGuidance = getTypeGuidance(assistant.type);
+	const typeGuidance = getTypeGuidance(assistant.type);
 
-  return `${baseRole}
+	return `${baseRole}
 
 ${capabilities}
 
@@ -67,94 +68,100 @@ ${typeGuidance}
 
 Always maintain a professional, helpful tone while specializing in your designated area. If asked about topics outside your expertise, acknowledge your specialization and provide what relevant information you can, or suggest seeking additional specialized help.
 
-Remember: Your responses should reflect your expertise in ${assistant.category.toLowerCase()} and your role as ${assistant.type === 'assistant' ? 'an AI assistant' : assistant.type === 'plugin' ? 'a specialized tool' : `a ${assistant.type}`}.`;
+Remember: Your responses should reflect your expertise in ${assistant.category.toLowerCase()} and your role as ${
+		assistant.type === "assistant"
+			? "an AI assistant"
+			: assistant.type === "plugin"
+			? "a specialized tool"
+			: `a ${assistant.type}`
+	}.`;
 };
 
 const getCategoryGuidance = (category: string): string => {
-  switch (category.toLowerCase()) {
-    case 'finance':
-      return `**Financial Expertise Guidelines:**
+	switch (category.toLowerCase()) {
+		case "finance":
+			return `**Financial Expertise Guidelines:**
 - Provide accurate, up-to-date financial information and analysis
 - Focus on risk assessment, compliance, and regulatory considerations
 - Offer practical advice for financial decision-making
 - Always include appropriate disclaimers for investment advice
 - Stay current with market trends and regulatory changes`;
 
-    case 'education':
-      return `**Educational Expertise Guidelines:**
+		case "education":
+			return `**Educational Expertise Guidelines:**
 - Provide clear, structured learning guidance
 - Break down complex concepts into understandable steps
 - Offer practical examples and real-world applications
 - Encourage critical thinking and further exploration
 - Adapt explanations to different learning styles`;
 
-    case 'technology':
-      return `**Technology Expertise Guidelines:**
+		case "technology":
+			return `**Technology Expertise Guidelines:**
 - Provide technical accuracy with practical implementation guidance
 - Stay current with latest developments and best practices
 - Offer step-by-step solutions and troubleshooting help
 - Consider security, performance, and scalability implications
 - Bridge technical concepts with business value`;
 
-    case 'business':
-      return `**Business Expertise Guidelines:**
+		case "business":
+			return `**Business Expertise Guidelines:**
 - Focus on practical business strategies and solutions
 - Consider market dynamics and competitive landscapes
 - Provide actionable insights for business growth
 - Balance risk and opportunity in recommendations
 - Align suggestions with business objectives and constraints`;
 
-    default:
-      return `**Specialized Expertise Guidelines:**
+		default:
+			return `**Specialized Expertise Guidelines:**
 - Leverage your deep knowledge in ${category}
 - Provide authoritative and well-researched information
 - Stay within your area of expertise while being helpful
 - Offer practical, actionable advice and insights
 - Maintain professional standards in your specialized field`;
-  }
+	}
 };
 
 const getTypeGuidance = (type: string): string => {
-  switch (type.toLowerCase()) {
-    case 'assistant':
-      return `**As an AI Assistant:**
+	switch (type.toLowerCase()) {
+		case "assistant":
+			return `**As an AI Assistant:**
 - Provide comprehensive, conversational help
 - Engage in detailed discussions and analysis
 - Offer step-by-step guidance and explanations
 - Adapt to user's knowledge level and needs
 - Maintain context throughout conversations`;
 
-    case 'plugin':
-      return `**As a Specialized Plugin:**
+		case "plugin":
+			return `**As a Specialized Plugin:**
 - Focus on specific, targeted functionality
 - Provide efficient, task-oriented assistance
 - Offer quick solutions and direct answers
 - Integrate seamlessly with user workflows
 - Emphasize practical utility and results`;
 
-    case 'ai-model':
-      return `**As an AI Model:**
+		case "ai-model":
+			return `**As an AI Model:**
 - Demonstrate advanced reasoning and analysis capabilities
 - Provide sophisticated insights and predictions
 - Handle complex data analysis and pattern recognition
 - Offer evidence-based conclusions and recommendations
 - Showcase specialized AI capabilities in your domain`;
 
-    default:
-      return `**As a ${type}:**
+		default:
+			return `**As a ${type}:**
 - Focus on delivering value through your specialized capabilities
 - Provide expert-level assistance in your domain
 - Maintain high standards of accuracy and reliability
 - Offer practical solutions tailored to user needs
 - Leverage your unique strengths and features`;
-  }
+	}
 };
 
 export interface RequestHints {
-  latitude: Geo['latitude'];
-  longitude: Geo['longitude'];
-  city: Geo['city'];
-  country: Geo['country'];
+	latitude: Geo["latitude"];
+	longitude: Geo["longitude"];
+	city: Geo["city"];
+	country: Geo["country"];
 }
 
 // export const getRequestPromptFromHints = (requestHints: RequestHints) => `\
@@ -166,36 +173,36 @@ export interface RequestHints {
 // `;
 
 export const getRequestPromptFromHints = (requestHints: RequestHints) =>
-  regularPrompt;
+	regularPrompt;
 
 export const systemPrompt = ({
-  selectedChatModel,
-  requestHints,
-  selectedAssistant,
+	selectedChatModel,
+	requestHints,
+	selectedAssistant,
 }: {
-  selectedChatModel: string;
-  requestHints: RequestHints;
-  selectedAssistant?: HomeMarketplaceItem | null;
+	selectedChatModel: string;
+	requestHints: RequestHints;
+	selectedAssistant?: HomeMarketplaceItem | null;
 }) => {
-  const requestPrompt = getRequestPromptFromHints(requestHints);
+	const requestPrompt = getRequestPromptFromHints(requestHints);
 
-  // If an assistant is selected, use assistant-specific prompt
-  if (selectedAssistant) {
-    const assistantPrompt = createAssistantPrompt(selectedAssistant);
+	// If an assistant is selected, use assistant-specific prompt
+	if (selectedAssistant) {
+		const assistantPrompt = createAssistantPrompt(selectedAssistant);
 
-    if (selectedChatModel === 'chat-model-reasoning') {
-      return `${assistantPrompt}\n\n${requestPrompt}`;
-    } else {
-      return `${assistantPrompt}\n\n${requestPrompt}\n\n${artifactsPrompt}`;
-    }
-  }
+		if (selectedChatModel === "chat-model-reasoning") {
+			return `${assistantPrompt}\n\n${requestPrompt}`;
+		} else {
+			return `${assistantPrompt}\n\n${requestPrompt}\n\n${artifactsPrompt}`;
+		}
+	}
 
-  // Default prompts for base models
-  if (selectedChatModel === 'chat-model-reasoning') {
-    return `${regularPrompt}\n\n${requestPrompt}`;
-  } else {
-    return `${regularPrompt}\n\n${requestPrompt}\n\n${artifactsPrompt}`;
-  }
+	// Default prompts for base models
+	if (selectedChatModel === "chat-model-reasoning") {
+		return `${regularPrompt}\n\n${requestPrompt}`;
+	} else {
+		return `${regularPrompt}\n\n${requestPrompt}\n\n${artifactsPrompt}`;
+	}
 };
 
 export const codePrompt = `
@@ -229,25 +236,25 @@ You are a spreadsheet creation assistant. Create a spreadsheet in csv format bas
 `;
 
 export const updateDocumentPrompt = (
-  currentContent: string | null,
-  type: ArtifactKind,
+	currentContent: string | null,
+	type: ArtifactKind
 ) =>
-  type === 'text'
-    ? `\
+	type === "text"
+		? `\
 Improve the following contents of the document based on the given prompt.
 
 ${currentContent}
 `
-    : type === 'code'
-      ? `\
+		: type === "code"
+		? `\
 Improve the following code snippet based on the given prompt.
 
 ${currentContent}
 `
-      : type === 'sheet'
-        ? `\
+		: type === "sheet"
+		? `\
 Improve the following spreadsheet based on the given prompt.
 
 ${currentContent}
 `
-        : '';
+		: "";

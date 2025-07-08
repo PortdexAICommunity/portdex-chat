@@ -76,7 +76,7 @@ function ProductCard({
 						onClick={() => handleAddToWishlist(product)}
 						aria-label={`Add ${product.name} to wishlist`}
 					>
-						<Heart className="w-4 h-4" />
+						<Heart className="size-4" />
 					</Button>
 				</div>
 				<CardContent className="p-4">
@@ -127,7 +127,7 @@ function ProductCard({
 								className="flex-1"
 								onClick={() => handleAddToCart(product)}
 							>
-								<ShoppingCart className="w-4 h-4 mr-1" />
+								<ShoppingCart className="size-4 mr-1" />
 								Add to Cart
 							</Button>
 							<Button
@@ -136,7 +136,7 @@ function ProductCard({
 								onClick={() => handleViewDetails(product)}
 								aria-label={`View details for ${product.name}`}
 							>
-								<ExternalLink className="w-4 h-4" />
+								<ExternalLink className="size-4" />
 							</Button>
 						</div>
 					</div>
@@ -153,7 +153,7 @@ function ProductCard({
 					<img
 						src={product.image}
 						alt={product.name}
-						className="w-24 h-24 object-cover rounded-lg flex-shrink-0"
+						className="size-24 object-cover rounded-lg shrink-0"
 						onError={(e) => {
 							const target = e.target as HTMLImageElement;
 							target.src = `https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200&h=200&fit=crop&q=80`;
@@ -201,7 +201,7 @@ function ProductCard({
 
 						<div className="flex space-x-2">
 							<Button size="sm" onClick={() => handleAddToCart(product)}>
-								<ShoppingCart className="w-4 h-4 mr-1" />
+								<ShoppingCart className="size-4 mr-1" />
 								Add to Cart
 							</Button>
 							<Button
@@ -209,7 +209,7 @@ function ProductCard({
 								variant="outline"
 								onClick={() => handleAddToWishlist(product)}
 							>
-								<Heart className="w-4 h-4 mr-1" />
+								<Heart className="size-4 mr-1" />
 								Wishlist
 							</Button>
 							<Button
@@ -217,7 +217,7 @@ function ProductCard({
 								variant="outline"
 								onClick={() => handleViewDetails(product)}
 							>
-								<ExternalLink className="w-4 h-4 mr-1" />
+								<ExternalLink className="size-4 mr-1" />
 								Details
 							</Button>
 						</div>
@@ -284,7 +284,7 @@ export const productSearchArtifact = new Artifact<
 			return (
 				<div className="flex items-center justify-center h-96">
 					<div className="text-center space-y-4">
-						<div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center">
+						<div className="mx-auto size-16 bg-muted rounded-full flex items-center justify-center">
 							<SearchIcon size={32} />
 						</div>
 						<div>
@@ -394,7 +394,7 @@ export const productSearchArtifact = new Artifact<
 								onClick={() => setViewMode("grid")}
 								className="px-3"
 							>
-								<Grid3X3 className="w-4 h-4" />
+								<Grid3X3 className="size-4" />
 							</Button>
 							<Button
 								size="sm"
@@ -402,7 +402,7 @@ export const productSearchArtifact = new Artifact<
 								onClick={() => setViewMode("list")}
 								className="px-3"
 							>
-								<List className="w-4 h-4" />
+								<List className="size-4" />
 							</Button>
 						</div>
 					</div>
@@ -455,7 +455,7 @@ export const productSearchArtifact = new Artifact<
 			},
 		},
 		{
-			icon: <ShoppingCart className="w-4 h-4" />,
+			icon: <ShoppingCart className="size-4" />,
 			description: "Add all to cart",
 			onClick: ({ metadata }) => {
 				if (metadata?.products && metadata.products.length > 0) {
@@ -488,7 +488,7 @@ export const productSearchArtifact = new Artifact<
 			},
 		},
 		{
-			icon: <ArrowUpDown className="w-4 h-4" />,
+			icon: <ArrowUpDown className="size-4" />,
 			description: "Sort options",
 			onClick: ({ appendMessage }) => {
 				appendMessage({
