@@ -243,15 +243,15 @@ export async function POST(request: Request) {
 				maxSteps: 5,
 				experimental_activeTools:
 					selectedChatModel === "chat-model-reasoning"
-						? ["searchProducts", ...mcpToolNames]
-						: [
+						? []
+						: ([
 								"getWeather",
 								"createDocument",
 								"updateDocument",
 								"requestSuggestions",
 								"searchProducts",
 								...mcpToolNames,
-						  ],
+						  ] as any),
 				experimental_transform: smoothStream({ chunking: "word" }),
 				experimental_generateMessageId: generateUUID,
 				tools: {
