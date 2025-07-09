@@ -158,6 +158,7 @@ export function MCPServerCard({ server, onClick }: MCPServerCardProps) {
 
 								{/* External Link */}
 								<button
+									type="button"
 									onClick={handleExternalLinkClick}
 									className="p-1.5 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
 									title="View Repository"

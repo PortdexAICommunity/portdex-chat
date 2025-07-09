@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
-const client = postgres(process.env.POSTGRES_URL!);
+const client = postgres(process.env.POSTGRES_URL || "");
 const db = drizzle(client);
 
 export async function GET(request: NextRequest) {

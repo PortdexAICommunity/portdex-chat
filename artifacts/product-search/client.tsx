@@ -103,7 +103,7 @@ function ProductCard({
 									<div className="flex">
 										{[...Array(5)].map((_, i) => (
 											<span
-												key={i}
+												key={`grid-star-${i}`}
 												className={`text-sm ${
 													i < product.rating
 														? "text-yellow-500"
@@ -177,7 +177,7 @@ function ProductCard({
 									<div className="flex">
 										{[...Array(5)].map((_, i) => (
 											<span
-												key={i}
+												key={`list-star-${i}`}
 												className={`text-sm ${
 													i < product.rating
 														? "text-yellow-500"
