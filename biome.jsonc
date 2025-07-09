@@ -38,7 +38,10 @@
           "level": "warn",
           "options": {
             "ignoreNonDom": false,
-            "allowInvalidRoles": ["none", "text"]
+            "allowInvalidRoles": [
+              "none",
+              "text"
+            ]
           }
         },
         "useSemanticElements": "off", // Rule is buggy, revisit later
@@ -77,7 +80,8 @@
         "noUselessElse": "off" // Stylistic opinion
       },
       "suspicious": {
-        "noExplicitAny": "off" // We trust Vercelians to use any only when necessary
+        "noExplicitAny": "off", // We trust Vercelians to use any only when necessary
+        "noArrayIndexKey": "off" // We trust Vercelians to use array index key only when necessary
       },
       "nursery": {
         "noStaticElementInteractions": "warn",
@@ -114,15 +118,23 @@
     }
   },
   "css": {
-    "formatter": { "enabled": false },
-    "linter": { "enabled": false }
+    "formatter": {
+      "enabled": false
+    },
+    "linter": {
+      "enabled": false
+    }
   },
-  "organizeImports": { "enabled": false },
+  "organizeImports": {
+    "enabled": false
+  },
   "overrides": [
     // Playwright requires an object destructure, even if empty
     // https://github.com/microsoft/playwright/issues/30007
     {
-      "include": ["playwright/**"],
+      "include": [
+        "playwright/**"
+      ],
       "linter": {
         "rules": {
           "correctness": {
