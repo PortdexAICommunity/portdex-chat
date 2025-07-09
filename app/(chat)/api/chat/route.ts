@@ -26,12 +26,14 @@ import { geolocation } from "@vercel/functions";
 import {
 	appendClientMessage,
 	appendResponseMessages,
+	experimental_createMCPClient,
 	smoothStream,
 	streamText,
 } from "ai";
 import { differenceInSeconds } from "date-fns";
 import { generateTitleFromUserMessage } from "../../actions";
 import { postRequestBodySchema, type PostRequestBody } from "./schema";
+import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 
 export const maxDuration = 60;
 
@@ -71,6 +73,15 @@ export async function POST(request: Request) {
 		const startTime = Date.now();
 
 		try {
+			//MCP
+			const transport = new StreamableHTTPClientTransport(
+				new URL(
+					"https://server.smithery.ai/@yongkangc/scry-mcp-raw-js/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA"
+				)
+			);
+			const customClient = await experimental_createMCPClient({ transport });
+			const toolSet = await customClient.tools();
+
 			// Quick validation upfront
 			let requestBody: PostRequestBody;
 			try {
@@ -217,6 +228,9 @@ export async function POST(request: Request) {
 				onError: () => {},
 			};
 
+			// Get MCP tool names dynamically
+			const mcpToolNames = Object.keys(toolSet);
+
 			// Start AI response streaming immediately - don't wait for database operations
 			const result = streamText({
 				model: provider.languageModel(selectedChatModel),
@@ -229,14 +243,15 @@ export async function POST(request: Request) {
 				maxSteps: 5,
 				experimental_activeTools:
 					selectedChatModel === "chat-model-reasoning"
-						? ["searchProducts"]
-						: [
+						? []
+						: ([
 								"getWeather",
 								"createDocument",
 								"updateDocument",
 								"requestSuggestions",
 								"searchProducts",
-						  ],
+								...mcpToolNames,
+						  ] as any),
 				experimental_transform: smoothStream({ chunking: "word" }),
 				experimental_generateMessageId: generateUUID,
 				tools: {
@@ -257,8 +272,10 @@ export async function POST(request: Request) {
 						session,
 						dataStream: toolDataWriter,
 					}),
+					...toolSet,
 				},
 				onFinish: async ({ response }) => {
+					await customClient.close();
 					if (!session?.user?.id) return;
 
 					const assistantMessages = response.messages.filter(

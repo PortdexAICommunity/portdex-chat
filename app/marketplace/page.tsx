@@ -10,10 +10,12 @@ import { MarketplaceSection } from "@/components/marketplace/marketplace-section
 import { MCPServerCard } from "@/components/marketplace/mcp-server-card";
 
 import { Pagination } from "@/components/marketplace/pagination";
+import Tags from "@/components/marketplace/tag";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { PREDEFINED_ASSISTANT_CATEGORIES } from "@/lib/constant/marketplace-constant";
 import { siteTemplates, softwareTools } from "@/lib/constants";
 import type { DataTypes, MCPDataTypes, MCPServerType } from "@/lib/types";
 import { AnimatePresence, motion } from "framer-motion";
@@ -118,7 +120,7 @@ export default function Marketplace() {
 		searchTerm: "",
 	});
 	const [aiModelsFilters, setAiModelsFilters] = useState({
-		selectedCategory: null as string | null,
+		selectedCreator: null as string | null,
 		searchTerm: "",
 	});
 	const [softwareFilters, setSoftwareFilters] = useState({
@@ -206,17 +208,49 @@ export default function Marketplace() {
 		});
 		return Array.from(categoryMap.entries())
 			.map(([name, count]) => ({ name, count }))
-			.sort((a, b) => b.count - a.count);
+			.sort((a, b) => a.name.localeCompare(b.name));
+	}, []);
+
+	// Helper function specifically for assistants with predefined categories
+	const getAssistantCategoriesWithCounts = useCallback((items: DataTypes[]) => {
+		const categoryMap = new Map<string, number>();
+
+		// Initialize all predefined categories with 0 count
+		PREDEFINED_ASSISTANT_CATEGORIES.forEach((category) => {
+			categoryMap.set(category, 0);
+		});
+
+		// Count actual items
+		items.forEach((item) => {
+			const category = item.category || "General";
+			categoryMap.set(category, (categoryMap.get(category) || 0) + 1);
+		});
+
+		return Array.from(categoryMap.entries())
+			.map(([name, count]) => ({ name, count }))
+			.sort((a, b) => a.name.localeCompare(b.name));
+	}, []);
+
+	// Helper function to get creators with counts
+	const getCreatorsWithCounts = useCallback((items: DataTypes[]) => {
+		const creatorMap = new Map<string, number>();
+		items.forEach((item) => {
+			const creator = item.creator || "Unknown";
+			creatorMap.set(creator, (creatorMap.get(creator) || 0) + 1);
+		});
+		return Array.from(creatorMap.entries())
+			.map(([name, count]) => ({ name, count }))
+			.sort((a, b) => a.name.localeCompare(b.name));
 	}, []);
 
 	// Category data for each tab
 	const assistantCategories = useMemo(
-		() => getCategoriesWithCounts(assistants),
-		[assistants, getCategoriesWithCounts]
+		() => getAssistantCategoriesWithCounts(assistants),
+		[assistants, getAssistantCategoriesWithCounts]
 	);
-	const aiModelCategories = useMemo(
-		() => getCategoriesWithCounts(aiModels),
-		[aiModels, getCategoriesWithCounts]
+	const aiModelCreators = useMemo(
+		() => getCreatorsWithCounts(aiModels),
+		[aiModels, getCreatorsWithCounts]
 	);
 	const softwareCategories = useMemo(
 		() => getCategoriesWithCounts(softwareTools),
@@ -234,7 +268,7 @@ export default function Marketplace() {
 		});
 		return Array.from(categoryMap.entries())
 			.map(([name, count]) => ({ name, count }))
-			.sort((a, b) => b.count - a.count);
+			.sort((a, b) => a.name.localeCompare(b.name));
 	}, [mcpServers]);
 
 	const handleItemClick = useCallback(
@@ -299,14 +333,42 @@ export default function Marketplace() {
 		[]
 	);
 
+	// Filter function specifically for AI models (by creator)
+	const getFilteredAIModels = useCallback(
+		(
+			items: DataTypes[],
+			filters: { selectedCreator: string | null; searchTerm: string }
+		) => {
+			return items.filter((item) => {
+				const matchesCreator =
+					!filters.selectedCreator || item.creator === filters.selectedCreator;
+				const matchesSearch =
+					!filters.searchTerm ||
+					item.name.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+					item.description
+						.toLowerCase()
+						.includes(filters.searchTerm.toLowerCase()) ||
+					item.creator
+						.toLowerCase()
+						.includes(filters.searchTerm.toLowerCase()) ||
+					(item.category &&
+						item.category
+							.toLowerCase()
+							.includes(filters.searchTerm.toLowerCase()));
+				return matchesCreator && matchesSearch;
+			});
+		},
+		[]
+	);
+
 	// Filtered items for each tab
 	const filteredAssistants = useMemo(
 		() => getFilteredItems(assistants, assistantsFilters),
 		[assistants, assistantsFilters, getFilteredItems]
 	);
 	const filteredAIModels = useMemo(
-		() => getFilteredItems(aiModels, aiModelsFilters),
-		[aiModels, aiModelsFilters, getFilteredItems]
+		() => getFilteredAIModels(aiModels, aiModelsFilters),
+		[aiModels, aiModelsFilters, getFilteredAIModels]
 	);
 	const filteredSoftware = useMemo(
 		() => getFilteredItems(softwareTools, softwareFilters),
@@ -458,9 +520,9 @@ export default function Marketplace() {
 							{ id: "home", label: "Home", icon: Home },
 							{ id: "assistants", label: "AI Agents", icon: Users },
 							{ id: "ai-models", label: "AI Models", icon: Brain },
+							{ id: "mcp-servers", label: "MCP Servers", icon: Server },
 							{ id: "softwares", label: "Softwares", icon: PackageOpen },
 							{ id: "templates", label: "Templates", icon: FileText },
-							{ id: "mcp-servers", label: "MCP Servers", icon: Server },
 						].map((tab) => (
 							<motion.button
 								key={tab.id}
@@ -496,7 +558,7 @@ export default function Marketplace() {
 
 			{/* Content */}
 			<div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-				<div className="max-w-7xl mx-auto">
+				<div className="">
 					<AnimatePresence mode="wait">
 						{(isLoading || aiModelsLoading) && (
 							<div className="py-16 text-center text-gray-500 dark:text-gray-400">
@@ -686,14 +748,14 @@ export default function Marketplace() {
 							>
 								{/* Sidebar Filter */}
 								<MarketplaceFilter
-									categories={aiModelCategories}
-									selectedCategory={aiModelsFilters.selectedCategory}
+									categories={aiModelCreators}
+									selectedCategory={aiModelsFilters.selectedCreator}
 									searchTerm={aiModelsFilters.searchTerm}
 									totalItems={filteredAIModels.length}
-									onCategoryChange={(category) =>
+									onCategoryChange={(creator) =>
 										setAiModelsFilters((prev) => ({
 											...prev,
-											selectedCategory: category,
+											selectedCreator: creator,
 										}))
 									}
 									onSearchChange={(search) =>
@@ -704,28 +766,32 @@ export default function Marketplace() {
 									}
 									onClearFilters={() =>
 										setAiModelsFilters({
-											selectedCategory: null,
+											selectedCreator: null,
 											searchTerm: "",
 										})
 									}
 									title="AI Models List"
 									placeholder="Search AI models..."
+									isCreatorBased={true}
 								/>
 
 								{/* Main Content */}
-								<div className="flex-1">
-									<MarketplaceSection
-										title=""
-										filteredItems={filteredAIModels}
-										paginatedItems={paginatedAIModels}
-										hasMoreItems={hasMoreAIModels}
-										onItemClick={handleItemClick}
-										onLoadMore={loadMore}
-										isLoadingMore={isLoadingMore}
-										itemType="ai-model"
-										shouldUseStaggeredAnimation={shouldUseStaggeredAnimation}
-										hideTitle={true}
-									/>
+								<div className="flex flex-col gap-4">
+									<Tags />
+									<div className="flex-1">
+										<MarketplaceSection
+											title=""
+											filteredItems={filteredAIModels}
+											paginatedItems={paginatedAIModels}
+											hasMoreItems={hasMoreAIModels}
+											onItemClick={handleItemClick}
+											onLoadMore={loadMore}
+											isLoadingMore={isLoadingMore}
+											itemType="ai-model"
+											shouldUseStaggeredAnimation={shouldUseStaggeredAnimation}
+											hideTitle={true}
+										/>
+									</div>
 								</div>
 							</motion.div>
 						)}
@@ -893,7 +959,7 @@ export default function Marketplace() {
 										</div>
 									) : (
 										<>
-											<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+											<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
 												{paginatedMcpServers.map((server, index) => (
 													<motion.div
 														key={`${server.name}-${index}`}
