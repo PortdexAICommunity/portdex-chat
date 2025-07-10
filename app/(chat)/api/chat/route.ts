@@ -73,15 +73,6 @@ export async function POST(request: Request) {
 		const startTime = Date.now();
 
 		try {
-			//MCP
-			const transport = new StreamableHTTPClientTransport(
-				new URL(
-					"https://server.smithery.ai/@yongkangc/scry-mcp-raw-js/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA"
-				)
-			);
-			const customClient = await experimental_createMCPClient({ transport });
-			const toolSet = await customClient.tools();
-
 			// Quick validation upfront
 			let requestBody: PostRequestBody;
 			try {
@@ -108,6 +99,16 @@ export async function POST(request: Request) {
 
 			// Get selected assistant (if any) for dynamic entitlements and prompts
 			const selectedAssistant = getAssistantFromModelId(selectedChatModel);
+
+			// Determine MCP URL based on selected assistant or use default
+			const mcpUrl =
+				selectedAssistant?.mcp_url ||
+				"https://server.smithery.ai/@yongkangc/scry-mcp-raw-js/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA";
+
+			//MCP
+			const transport = new StreamableHTTPClientTransport(new URL(mcpUrl));
+			const customClient = await experimental_createMCPClient({ transport });
+			const toolSet = await customClient.tools();
 
 			// Use dynamic entitlements that include assistant models
 			const assistantForEntitlements = selectedAssistant
