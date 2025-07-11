@@ -43,7 +43,10 @@ type TabType =
 
 // --- SWR fetcher ---
 const fetcher = (url: string) =>
-	fetch(url).then((res) => res.json()) as Promise<{ agents: MCPDataTypes[] }>;
+	fetch(url).then((res) => res.json()) as Promise<{
+		agents: DataTypes[];
+		total?: number;
+	}>;
 
 // AI Models fetcher
 const aiModelsFetcher = (url: string) =>
@@ -95,7 +98,7 @@ MemoizedMCPServerCard.displayName = "MemoizedMCPServerCard";
 
 // Pagination constants
 const ITEMS_PER_PAGE = 24;
-const FEATURED_ITEMS = 6;
+const FEATURED_ITEMS = 8;
 const FEATURED_OTHER_ITEMS = 4;
 
 export default function Marketplace() {
@@ -110,9 +113,17 @@ export default function Marketplace() {
 	const [searchTerm, setSearchTerm] = useState("");
 	const [mounted, setMounted] = useState(false);
 	const [currentPage, setCurrentPage] = useState(1);
-	const [isLoadingMore, setIsLoadingMore] = useState(false);
+	const [assistantsPageSize, setAssistantsPageSize] = useState(ITEMS_PER_PAGE);
 	const [mcpCurrentPage, setMcpCurrentPage] = useState(1);
 	const [mcpPageSize, setMcpPageSize] = useState(20);
+
+	// Page states for other sections
+	const [aiModelsCurrentPage, setAiModelsCurrentPage] = useState(1);
+	const [aiModelsPageSize, setAiModelsPageSize] = useState(ITEMS_PER_PAGE);
+	const [softwareCurrentPage, setSoftwareCurrentPage] = useState(1);
+	const [softwarePageSize, setSoftwarePageSize] = useState(ITEMS_PER_PAGE);
+	const [templatesCurrentPage, setTemplatesCurrentPage] = useState(1);
+	const [templatesPageSize, setTemplatesPageSize] = useState(ITEMS_PER_PAGE);
 
 	// Filter states for each tab
 	const [assistantsFilters, setAssistantsFilters] = useState({
@@ -140,18 +151,44 @@ export default function Marketplace() {
 		setMounted(true);
 	}, []);
 
-	// Reset pagination when search term changes
+	// Reset pagination when search term, filters, or page size change
 	useEffect(() => {
 		setCurrentPage(1);
 		setMcpCurrentPage(1);
-	}, [searchTerm, activeTab]);
+		setAiModelsCurrentPage(1);
+		setSoftwareCurrentPage(1);
+		setTemplatesCurrentPage(1);
+	}, [
+		searchTerm,
+		activeTab,
+		assistantsFilters,
+		assistantsPageSize,
+		aiModelsFilters,
+		softwareFilters,
+		templatesFilters,
+	]);
 
-	// Fetch assistants/agents
+	// Fetch assistants/agents with pagination
 	const {
 		data: aiAgentsData,
 		isLoading,
 		error,
-	} = useSWR<{ agents: DataTypes[] }>("marketplace/api/agents", fetcher);
+	} = useSWR(
+		activeTab === "assistants"
+			? `marketplace/api/agents?page=${currentPage}&pageSize=${assistantsPageSize}${
+					assistantsFilters.selectedCategory
+						? `&category=${encodeURIComponent(
+								assistantsFilters.selectedCategory
+						  )}`
+						: ""
+			  }${
+					assistantsFilters.searchTerm
+						? `&search=${encodeURIComponent(assistantsFilters.searchTerm)}`
+						: ""
+			  }`
+			: "marketplace/api/agents?page=1&pageSize=6", // For home page featured items
+		fetcher
+	);
 
 	// Fetch AI models
 	const {
@@ -192,6 +229,10 @@ export default function Marketplace() {
 	);
 
 	const assistants = useMemo(() => aiAgentsData?.agents ?? [], [aiAgentsData]);
+	const assistantsTotal = useMemo(
+		() => aiAgentsData?.total ?? 0,
+		[aiAgentsData]
+	);
 	const aiModels = useMemo(() => aiModelsData?.models ?? [], [aiModelsData]);
 	const mcpServers = useMemo(() => mcpData?.servers ?? [], [mcpData]);
 	const mcpCategories = useMemo(
@@ -243,10 +284,14 @@ export default function Marketplace() {
 			.sort((a, b) => a.name.localeCompare(b.name));
 	}, []);
 
-	// Category data for each tab
+	// Category data for each tab - for assistants, we'll use predefined categories without counts since we use server-side filtering
 	const assistantCategories = useMemo(
-		() => getAssistantCategoriesWithCounts(assistants),
-		[assistants, getAssistantCategoriesWithCounts]
+		() =>
+			PREDEFINED_ASSISTANT_CATEGORIES.map((category) => ({
+				name: category,
+				count: 0,
+			})),
+		[]
 	);
 	const aiModelCreators = useMemo(
 		() => getCreatorsWithCounts(aiModels),
@@ -361,11 +406,8 @@ export default function Marketplace() {
 		[]
 	);
 
-	// Filtered items for each tab
-	const filteredAssistants = useMemo(
-		() => getFilteredItems(assistants, assistantsFilters),
-		[assistants, assistantsFilters, getFilteredItems]
-	);
+	// For assistants, we use server-side filtering so no client-side filtering needed
+	const filteredAssistants = useMemo(() => assistants, [assistants]);
 	const filteredAIModels = useMemo(
 		() => getFilteredAIModels(aiModels, aiModelsFilters),
 		[aiModels, aiModelsFilters, getFilteredAIModels]
@@ -379,74 +421,56 @@ export default function Marketplace() {
 		[templatesFilters, getFilteredItems]
 	);
 
-	// Paginated items
-	const paginatedAssistants = useMemo(() => {
-		const endIndex = currentPage * ITEMS_PER_PAGE;
-		return filteredAssistants.slice(0, endIndex);
-	}, [filteredAssistants, currentPage]);
+	// For assistants, server returns paginated results
+	const paginatedAssistants = useMemo(() => assistants, [assistants]);
 
 	const paginatedAIModels = useMemo(() => {
-		const endIndex = currentPage * ITEMS_PER_PAGE;
-		return filteredAIModels.slice(0, endIndex);
-	}, [filteredAIModels, currentPage]);
+		const startIndex = (aiModelsCurrentPage - 1) * aiModelsPageSize;
+		const endIndex = startIndex + aiModelsPageSize;
+		return filteredAIModels.slice(startIndex, endIndex);
+	}, [filteredAIModels, aiModelsCurrentPage, aiModelsPageSize]);
 
 	const paginatedSoftware = useMemo(() => {
-		const endIndex = currentPage * ITEMS_PER_PAGE;
-		return filteredSoftware.slice(0, endIndex);
-	}, [filteredSoftware, currentPage]);
+		const startIndex = (softwareCurrentPage - 1) * softwarePageSize;
+		const endIndex = startIndex + softwarePageSize;
+		return filteredSoftware.slice(startIndex, endIndex);
+	}, [filteredSoftware, softwareCurrentPage, softwarePageSize]);
 
 	const paginatedTemplates = useMemo(() => {
-		const endIndex = currentPage * ITEMS_PER_PAGE;
-		return filteredTemplates.slice(0, endIndex);
-	}, [filteredTemplates, currentPage]);
+		const startIndex = (templatesCurrentPage - 1) * templatesPageSize;
+		const endIndex = startIndex + templatesPageSize;
+		return filteredTemplates.slice(startIndex, endIndex);
+	}, [filteredTemplates, templatesCurrentPage, templatesPageSize]);
 
 	const paginatedMcpServers = useMemo(() => mcpServers, [mcpServers]);
 
-	const hasMoreItems = paginatedAssistants.length < filteredAssistants.length;
-	const hasMoreAIModels = paginatedAIModels.length < filteredAIModels.length;
-	const hasMoreSoftware = paginatedSoftware.length < filteredSoftware.length;
-	const hasMoreTemplates = paginatedTemplates.length < filteredTemplates.length;
-	const hasMoreMcpServers = mcpData
-		? mcpCurrentPage * mcpPageSize < mcpData.total
-		: false;
+	// Page change handlers for each section
+	const handleAiModelsPageChange = useCallback((page: number) => {
+		setAiModelsCurrentPage(page);
+	}, []);
 
-	const loadMore = useCallback(async () => {
-		if (isLoadingMore) return;
+	const handleAiModelsPageSizeChange = useCallback((pageSize: number) => {
+		setAiModelsPageSize(pageSize);
+		setAiModelsCurrentPage(1);
+	}, []);
 
-		const hasMore =
-			activeTab === "assistants"
-				? hasMoreItems
-				: activeTab === "ai-models"
-				? hasMoreAIModels
-				: activeTab === "softwares"
-				? hasMoreSoftware
-				: activeTab === "templates"
-				? hasMoreTemplates
-				: activeTab === "mcp-servers"
-				? hasMoreMcpServers
-				: false;
+	const handleSoftwarePageChange = useCallback((page: number) => {
+		setSoftwareCurrentPage(page);
+	}, []);
 
-		if (!hasMore) return;
+	const handleSoftwarePageSizeChange = useCallback((pageSize: number) => {
+		setSoftwarePageSize(pageSize);
+		setSoftwareCurrentPage(1);
+	}, []);
 
-		setIsLoadingMore(true);
-		await new Promise((resolve) => setTimeout(resolve, 300));
+	const handleTemplatesPageChange = useCallback((page: number) => {
+		setTemplatesCurrentPage(page);
+	}, []);
 
-		if (activeTab === "mcp-servers") {
-			setMcpCurrentPage((prev) => prev + 1);
-		} else {
-			setCurrentPage((prev) => prev + 1);
-		}
-
-		setIsLoadingMore(false);
-	}, [
-		isLoadingMore,
-		activeTab,
-		hasMoreItems,
-		hasMoreAIModels,
-		hasMoreSoftware,
-		hasMoreTemplates,
-		hasMoreMcpServers,
-	]);
+	const handleTemplatesPageSizeChange = useCallback((pageSize: number) => {
+		setTemplatesPageSize(pageSize);
+		setTemplatesCurrentPage(1);
+	}, []);
 
 	// Optimized animation settings based on item count
 	const shouldUseStaggeredAnimation = paginatedAssistants.length < 50;
@@ -486,7 +510,7 @@ export default function Marketplace() {
 
 						<div className="flex items-center justify-end space-x-2">
 							<Badge variant="secondary" className="text-xs">
-								{assistants.length + aiModels.length + mcpServers.length} items
+								{assistantsTotal + aiModels.length + mcpServers.length} items
 							</Badge>
 						</div>
 					</div>
@@ -697,7 +721,7 @@ export default function Marketplace() {
 									categories={assistantCategories}
 									selectedCategory={assistantsFilters.selectedCategory}
 									searchTerm={assistantsFilters.searchTerm}
-									totalItems={filteredAssistants.length}
+									totalItems={assistantsTotal}
 									onCategoryChange={(category) =>
 										setAssistantsFilters((prev) => ({
 											...prev,
@@ -721,19 +745,37 @@ export default function Marketplace() {
 								/>
 
 								{/* Main Content */}
-								<div className="flex-1">
+								<div className="flex-1 space-y-6">
 									<MarketplaceSection
 										title=""
-										filteredItems={filteredAssistants}
+										filteredItems={Array(assistantsTotal).fill(null)} // Pass total count for progress indication
 										paginatedItems={paginatedAssistants}
-										hasMoreItems={hasMoreItems}
+										hasMoreItems={false} // Disable load more since we're using pagination
 										onItemClick={handleItemClick}
-										onLoadMore={loadMore}
-										isLoadingMore={isLoadingMore}
+										onLoadMore={() => {}} // No-op function
+										isLoadingMore={false}
 										itemType="assistant"
 										shouldUseStaggeredAnimation={shouldUseStaggeredAnimation}
 										hideTitle={true}
 									/>
+
+									{/* Pagination Controls */}
+									{assistantsTotal > 0 && (
+										<Pagination
+											currentPage={currentPage}
+											totalPages={Math.ceil(
+												assistantsTotal / assistantsPageSize
+											)}
+											pageSize={assistantsPageSize}
+											totalItems={assistantsTotal}
+											onPageChange={(page) => setCurrentPage(page)}
+											onPageSizeChange={(newPageSize) => {
+												setAssistantsPageSize(newPageSize);
+												setCurrentPage(1); // Reset to first page when changing page size
+											}}
+											isLoading={isLoading}
+										/>
+									)}
 								</div>
 							</motion.div>
 						)}
@@ -778,19 +820,34 @@ export default function Marketplace() {
 								{/* Main Content */}
 								<div className="flex flex-col gap-4">
 									<Tags />
-									<div className="flex-1">
+									<div className="flex-1 space-y-6">
 										<MarketplaceSection
 											title=""
 											filteredItems={filteredAIModels}
 											paginatedItems={paginatedAIModels}
-											hasMoreItems={hasMoreAIModels}
+											hasMoreItems={false}
 											onItemClick={handleItemClick}
-											onLoadMore={loadMore}
-											isLoadingMore={isLoadingMore}
+											onLoadMore={() => {}}
+											isLoadingMore={false}
 											itemType="ai-model"
 											shouldUseStaggeredAnimation={shouldUseStaggeredAnimation}
 											hideTitle={true}
 										/>
+
+										{/* Pagination Controls */}
+										{filteredAIModels.length > 0 && (
+											<Pagination
+												currentPage={aiModelsCurrentPage}
+												totalPages={Math.ceil(
+													filteredAIModels.length / aiModelsPageSize
+												)}
+												pageSize={aiModelsPageSize}
+												totalItems={filteredAIModels.length}
+												onPageChange={handleAiModelsPageChange}
+												onPageSizeChange={handleAiModelsPageSizeChange}
+												isLoading={aiModelsLoading}
+											/>
+										)}
 									</div>
 								</div>
 							</motion.div>
@@ -833,19 +890,34 @@ export default function Marketplace() {
 								/>
 
 								{/* Main Content */}
-								<div className="flex-1">
+								<div className="flex-1 space-y-6">
 									<MarketplaceSection
 										title=""
 										filteredItems={filteredSoftware}
 										paginatedItems={paginatedSoftware}
-										hasMoreItems={hasMoreSoftware}
+										hasMoreItems={false}
 										onItemClick={handleItemClick}
-										onLoadMore={loadMore}
-										isLoadingMore={isLoadingMore}
+										onLoadMore={() => {}}
+										isLoadingMore={false}
 										itemType="software"
 										shouldUseStaggeredAnimation={shouldUseStaggeredAnimation}
 										hideTitle={true}
 									/>
+
+									{/* Pagination Controls */}
+									{filteredSoftware.length > 0 && (
+										<Pagination
+											currentPage={softwareCurrentPage}
+											totalPages={Math.ceil(
+												filteredSoftware.length / softwarePageSize
+											)}
+											pageSize={softwarePageSize}
+											totalItems={filteredSoftware.length}
+											onPageChange={handleSoftwarePageChange}
+											onPageSizeChange={handleSoftwarePageSizeChange}
+											isLoading={false}
+										/>
+									)}
 								</div>
 							</motion.div>
 						)}
@@ -887,19 +959,34 @@ export default function Marketplace() {
 								/>
 
 								{/* Main Content */}
-								<div className="flex-1">
+								<div className="flex-1 space-y-6">
 									<MarketplaceSection
 										title=""
 										filteredItems={filteredTemplates}
 										paginatedItems={paginatedTemplates}
-										hasMoreItems={hasMoreTemplates}
+										hasMoreItems={false}
 										onItemClick={handleItemClick}
-										onLoadMore={loadMore}
-										isLoadingMore={isLoadingMore}
+										onLoadMore={() => {}}
+										isLoadingMore={false}
 										itemType="template"
 										shouldUseStaggeredAnimation={shouldUseStaggeredAnimation}
 										hideTitle={true}
 									/>
+
+									{/* Pagination Controls */}
+									{filteredTemplates.length > 0 && (
+										<Pagination
+											currentPage={templatesCurrentPage}
+											totalPages={Math.ceil(
+												filteredTemplates.length / templatesPageSize
+											)}
+											pageSize={templatesPageSize}
+											totalItems={filteredTemplates.length}
+											onPageChange={handleTemplatesPageChange}
+											onPageSizeChange={handleTemplatesPageSizeChange}
+											isLoading={false}
+										/>
+									)}
 								</div>
 							</motion.div>
 						)}

@@ -21,6 +21,7 @@ import { Button } from "./ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { Weather } from "./weather";
 import { AnimatedBadge } from "./animation/shinny-badge";
+import { MCPToolResult } from "./mcp-tool-result";
 
 const PurePreviewMessage = ({
 	chatId,
@@ -225,73 +226,8 @@ const PurePreviewMessage = ({
 													result={result}
 													isLoading={isLoading}
 												/>
-											) : toolName === "coingecko_get_coin_price_detailed" ? (
-												<div className="z-10 flex items-start justify-start">
-													<AnimatedBadge text="✨ Live Prices via CoinGecko" />
-												</div>
-											) : toolName === "get_current_price" ? (
-												<div className="z-10 flex items-start justify-start">
-													<AnimatedBadge text="✨ Live price via CoinGecko" />
-												</div>
-											) : toolName === "get_trending_coins" ? (
-												<div className="z-10 flex items-start justify-start">
-													<AnimatedBadge text="✨ Trending coins powered by CoinGecko" />
-												</div>
-											) : toolName === "get_coin_market_chart_detailed" ? (
-												<div className="z-10 flex items-start justify-start">
-													<AnimatedBadge text="✨ Coin historical trend from CoinGecko" />
-												</div>
-											) : toolName === "get_price_analytics" ? (
-												<div className="z-10 flex items-start justify-start">
-													<AnimatedBadge text="✨ Price analytics via CoinGecko" />
-												</div>
-											) : toolName === "compare_prices" ? (
-												<div className="z-10 flex items-start justify-start">
-													<AnimatedBadge text="✨ Price comparison via CoinGecko" />
-												</div>
-											) : toolName === "get_historical_price" ? (
-												<div className="z-10 flex items-start justify-start">
-													<AnimatedBadge text="✨ Historical price chart from CoinGecko" />
-												</div>
-											) : toolName === "get_protocol_yields_historical" ? (
-												<div className="z-10 flex items-start justify-start">
-													<AnimatedBadge text="✨ Protocol yields via DefiLlama" />
-												</div>
-											) : toolName === "defillama_get_top_protocols" ? (
-												<div className="z-10 flex items-start justify-start">
-													<AnimatedBadge text="✨ Top protocols from DefiLlama" />
-												</div>
-											) : toolName === "defillama_get_chain_historical_tvl" ? (
-												<div className="z-10 flex items-start justify-start">
-													<AnimatedBadge text="✨ Chain TVL data from DefiLlama" />
-												</div>
-											) : toolName === "compare_protocols_historical" ? (
-												<div className="z-10 flex items-start justify-start">
-													<AnimatedBadge text="✨ Compare protocols historically (DefiLlama)" />
-												</div>
-											) : toolName === "get_yields_historical" ? (
-												<div className="z-10 flex items-start justify-start">
-													<AnimatedBadge text="✨ Yield trends from DefiLlama" />
-												</div>
-											) : toolName === "get_stablecoin_historical" ? (
-												<div className="z-10 flex items-start justify-start">
-													<AnimatedBadge text="✨ Stablecoin stats via DefiLlama" />
-												</div>
-											) : toolName === "get_dex_volume" ? (
-												<div className="z-10 flex items-start justify-start">
-													<AnimatedBadge text="✨ DEX volume analytics (DefiLlama)" />
-												</div>
-											) : toolName === "get_derivatives_volume" ? (
-												<div className="z-10 flex items-start justify-start">
-													<AnimatedBadge text="✨ Derivatives volume insight (DefiLlama)" />
-												</div>
-											) : toolName === "get_chain_historical_tvl" ? (
-												<div className="z-10 flex items-start justify-start">
-													<AnimatedBadge text="✨ Chain historical TVL (DefiLlama)" />
-												</div>
 											) : (
-												<pre></pre>
-												// <pre>{JSON.stringify(result, null, 2)}</pre>
+												<MCPToolResult toolName={toolName} result={result} />
 											)}
 										</div>
 									);
