@@ -103,6 +103,40 @@ const renderValue = (
 	return <span>{String(value)}</span>;
 };
 
+const detectError = (result: any): boolean => {
+	if (!result) return false;
+
+	// Check if result is an error object
+	if (result instanceof Error) return true;
+
+	// Check for common error properties
+	if (typeof result === "object") {
+		// Check for explicit error indicators
+		if (result.error || result.errors) return true;
+		if (result.status === "error" || result.success === false) return true;
+		if (result.isError === true || result.failed === true) return true;
+
+		// Check for HTTP error status codes
+		if (typeof result.statusCode === "number" && result.statusCode >= 400)
+			return true;
+		if (typeof result.status === "number" && result.status >= 400) return true;
+
+		// Check for error message patterns
+		if (result.message && typeof result.message === "string") {
+			const errorPatterns =
+				/error|failed|exception|invalid|unauthorized|forbidden|not found|bad request/i;
+			if (errorPatterns.test(result.message)) return true;
+		}
+
+		// Check for error type
+		if (result.type && typeof result.type === "string") {
+			if (result.type.toLowerCase().includes("error")) return true;
+		}
+	}
+
+	return false;
+};
+
 export const MCPToolResult: React.FC<MCPToolResultProps> = ({
 	toolName,
 	result,
@@ -121,6 +155,7 @@ export const MCPToolResult: React.FC<MCPToolResultProps> = ({
 	};
 
 	const isComplexResult = typeof result === "object" && result !== null;
+	const hasError = detectError(result);
 	const resultSummary = isComplexResult
 		? `${
 				Array.isArray(result)
@@ -138,6 +173,21 @@ export const MCPToolResult: React.FC<MCPToolResultProps> = ({
 						<Badge variant="secondary" className="text-xs">
 							{toolName}
 						</Badge>
+						<Badge
+							variant={hasError ? "destructive" : "default"}
+							className={`text-xs flex items-center gap-1 font-sans ${
+								hasError
+									? "bg-red-200 text-red-800"
+									: "bg-green-100 text-green-800 border-green-200"
+							}`}
+						>
+							<div
+								className={`size-2 rounded-full ${
+									hasError ? "bg-red-500 animate-pulse" : "bg-green-500"
+								}`}
+							/>
+							{hasError ? "ERROR" : "SUCCESS"}
+						</Badge>
 					</div>
 					<div className="flex items-center gap-2">
 						<Tooltip>
@@ -146,7 +196,7 @@ export const MCPToolResult: React.FC<MCPToolResultProps> = ({
 									variant="ghost"
 									size="sm"
 									onClick={handleCopy}
-									className="h-7 w-7 p-0"
+									className="size-7 p-0"
 								>
 									<CopyIcon size={12} />
 								</Button>
@@ -160,12 +210,12 @@ export const MCPToolResult: React.FC<MCPToolResultProps> = ({
 								variant="ghost"
 								size="sm"
 								onClick={() => setIsExpanded(!isExpanded)}
-								className="h-7 w-7 p-0"
+								className="size-7 p-0"
 							>
 								{isExpanded ? (
 									<ChevronDownIcon size={12} />
 								) : (
-									<ChevronRight className="h-3 w-3" />
+									<ChevronRight className="size-3" />
 								)}
 							</Button>
 						)}

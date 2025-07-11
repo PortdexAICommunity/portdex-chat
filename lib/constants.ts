@@ -948,36 +948,21 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 			"https://server.smithery.ai/@kukapay/crypto-indicators-mcp/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA",
 		systemPrompt: `Use this to compute technical indicators. Choose from tools like "calculate_macd", "calculate_rsi", or "calculate_sma". Pass the symbol and timeframe to visualize momentum or trend shifts. Return clean indicator values or formatted indicator dashboards.`,
 	},
-	{
-		id: "coingecko-mcp-server",
-		title: "CoinGecko Analytics",
-		description:
-			"Get comprehensive crypto market data from CoinGecko including prices, market caps, trading volumes, and trending cryptocurrencies.",
-		category: "Finance",
-		icon: "🦎",
-		gradient: "from-emerald-500 to-emerald-700",
-		date: "2025-01-20",
-		type: "plugin",
-		creator: "nic0xflamel",
-		mcp_url:
-			"https://server.smithery.ai/@nic0xflamel/coingecko-mcp-server/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA",
-		systemPrompt: `Call CoinGecko tools for general crypto insights. Use "API-simple-price" for coin prices, "API-coins-markets" for detailed stats, or "API-trending-search" to see rising coins. Present as snapshots or comparison tables.`,
-	},
-	{
-		id: "yahoo-finance-mcp",
-		title: "Yahoo Finance Integration",
-		description:
-			"Access comprehensive stock market data including company financials, historical prices, options data, and market analysis from Yahoo Finance.",
-		category: "Finance",
-		icon: "💼",
-		gradient: "from-red-500 to-red-700",
-		date: "2025-01-20",
-		type: "plugin",
-		creator: "hwangwoohyun-nav",
-		mcp_url:
-			"https://server.smithery.ai/@hwangwoohyun-nav/yahoo-finance-mcp/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA",
-		systemPrompt: `Use this plugin to query traditional financial data. For stocks use "get_stock_info", historical charts via "get_historical_stock_prices", and financial health via "get_financial_statement". Format output for investor-grade dashboards or reports.`,
-	},
+	// {
+	// 	id: "coingecko-mcp-server",
+	// 	title: "CoinGecko Analytics",
+	// 	description:
+	// 		"Get comprehensive crypto market data from CoinGecko including prices, market caps, trading volumes, and trending cryptocurrencies.",
+	// 	category: "Finance",
+	// 	icon: "🦎",
+	// 	gradient: "from-emerald-500 to-emerald-700",
+	// 	date: "2025-01-20",
+	// 	type: "plugin",
+	// 	creator: "nic0xflamel",
+	// 	mcp_url:
+	// 		"https://server.smithery.ai/@nic0xflamel/coingecko-mcp-server/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA",
+	// 	systemPrompt: `Call CoinGecko tools for general crypto insights. Use "API-simple-price" for coin prices, "API-coins-markets" for detailed stats, or "API-trending-search" to see rising coins. Present as snapshots or comparison tables.`,
+	// },
 	{
 		id: "web3-mcp-server",
 		title: "Web3 Blockchain Server",
@@ -1007,5 +992,49 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 		mcp_url:
 			"https://server.smithery.ai/@yongkangc/scry-mcp-raw-js/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA",
 		systemPrompt: `Use this for advanced DeFi and protocol analytics. Query "get_top_protocols" or "defillama_search_protocols" for TVL data. Use "get_dex_volume" and "get_derivatives_volume" for liquidity stats. Display results as ecosystem rankings or protocol cards.`,
+	},
+	{
+		id: "crypto-feargreed-mcp",
+		title: "Crypto Fear & Greed Index",
+		description:
+			"Track market sentiment with the Fear & Greed Index. Analyze emotions driving the crypto market and make informed decisions based on crowd psychology.",
+		category: "Finance",
+		icon: "😨",
+		gradient: "from-red-500 to-green-500",
+		date: "2025-01-20",
+		type: "plugin",
+		creator: "kukapay",
+		mcp_url:
+			"https://server.smithery.ai/@kukapay/crypto-feargreed-mcp/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA",
+		systemPrompt: `Use this to access the Fear & Greed Index for crypto market sentiment analysis. The index ranges from 0 (Extreme Fear) to 100 (Extreme Greed) and helps identify market turning points. Present the data with historical context and interpretation for trading decisions.`,
+	},
+	{
+		id: "amazon-product-search",
+		title: "Amazon Product Search",
+		description:
+			"Search and analyze Amazon products with detailed information including prices, ratings, reviews, and availability. Perfect for market research and product discovery.",
+		category: "Shopping",
+		icon: "🛒",
+		gradient: "from-orange-500 to-yellow-600",
+		date: "2025-01-20",
+		type: "plugin",
+		creator: "SiliconValleyInsight",
+		mcp_url:
+			"https://server.smithery.ai/@SiliconValleyInsight/amazon-product-search/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA",
+		systemPrompt: `Use this to search Amazon products and gather detailed product information. You can search by keywords, get product details, prices, ratings, and reviews. Present results as organized product listings with key details like price, rating, and availability for easy comparison.`,
+	},
+	{
+		id: "coinmarketcap-mcp",
+		title: "CoinMarketCap Analytics",
+		description:
+			"Access comprehensive cryptocurrency market data from CoinMarketCap including live prices, market cap rankings, volume data, and detailed coin analytics for informed investment decisions.",
+		category: "Finance",
+		icon: "💎",
+		gradient: "from-blue-600 to-purple-600",
+		date: "2025-01-20",
+		type: "plugin",
+		creator: "shinzo-labs",
+		mcp_url: `https://server.smithery.ai/@shinzo-labs/coinmarketcap-mcp/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA`,
+		systemPrompt: `Use this to access CoinMarketCap data for comprehensive crypto market analysis. Get live prices, market cap rankings, trading volumes, and detailed cryptocurrency information. Present data as market overviews, top coin rankings, or specific coin analysis with key metrics and trends.`,
 	},
 ];
