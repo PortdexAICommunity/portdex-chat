@@ -23,6 +23,7 @@
     }
   },
   "ignorePatterns": [
-    "**/components/ui/**"
+    "**/components/ui/**",
+    "**/lib/scrape-data.json"
   ]
 }

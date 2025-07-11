@@ -1,4 +1,5 @@
 export const PREDEFINED_ASSISTANT_CATEGORIES = [
+	"FEATURED",
 	"Ads",
 	"AI",
 	"Analytics",
