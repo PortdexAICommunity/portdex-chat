@@ -72,4 +72,5 @@ export type HomeMarketplaceItem = {
 	creator: string;
 	mcp_url?: string;
 	systemPrompt?: string;
+	useCases?: string[];
 };

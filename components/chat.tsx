@@ -23,6 +23,7 @@ import { MultimodalInput } from "./multimodal-input";
 import { getChatHistoryPaginationKey } from "./sidebar-history";
 import { toast } from "./toast";
 import type { VisibilityType } from "./visibility-selector";
+import type { HomeMarketplaceItem } from "@/lib/types";
 
 export function Chat({
 	id,
@@ -45,6 +46,23 @@ export function Chat({
 	const [selectedTool, setSelectedTool] = useState<string>("none");
 	const selectedToolRef = useRef(selectedTool);
 	const { cacheChat, cacheMessage } = useChatCache();
+
+	// Get selected assistant from localStorage
+	const [selectedAssistant, setSelectedAssistant] =
+		useState<HomeMarketplaceItem | null>(null);
+
+	useEffect(() => {
+		const savedAssistant = localStorage.getItem("selected-assistant");
+		if (savedAssistant) {
+			try {
+				const assistant = JSON.parse(savedAssistant);
+				setSelectedAssistant(assistant);
+			} catch (error) {
+				console.error("Failed to parse saved assistant:", error);
+				localStorage.removeItem("selected-assistant");
+			}
+		}
+	}, []);
 
 	useEffect(() => {
 		selectedToolRef.current = selectedTool;
@@ -201,6 +219,7 @@ export function Chat({
 					reload={reload}
 					isReadonly={isReadonly}
 					isArtifactVisible={isArtifactVisible}
+					selectedAssistant={selectedAssistant}
 				/>
 
 				<form

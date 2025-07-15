@@ -6,8 +6,10 @@ import equal from "fast-deep-equal";
 import { motion } from "framer-motion";
 import { memo } from "react";
 import { Spotlight } from "./animation/spotlight";
+import { AnimatedBadge } from "./animation/shinny-badge";
 import { Greeting } from "./greeting";
 import { PreviewMessage, ThinkingMessage } from "./message";
+import type { HomeMarketplaceItem } from "@/lib/types";
 
 interface MessagesProps {
 	chatId: string;
@@ -18,6 +20,7 @@ interface MessagesProps {
 	reload: UseChatHelpers["reload"];
 	isReadonly: boolean;
 	isArtifactVisible: boolean;
+	selectedAssistant: HomeMarketplaceItem | null;
 }
 
 function PureMessages({
@@ -28,6 +31,7 @@ function PureMessages({
 	setMessages,
 	reload,
 	isReadonly,
+	selectedAssistant,
 }: MessagesProps) {
 	const {
 		containerRef: messagesContainerRef,
@@ -72,11 +76,31 @@ function PureMessages({
 							<span className="text-purple-500 font-bold font-sans">
 								Portdex Chat
 							</span>
-							<br /> A Financial and Web3.0 AI
+							<br />{" "}
+							{selectedAssistant
+								? selectedAssistant.title
+								: "A Financial and Web3.0 AI"}
 						</h1>
 						<p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-							👋 Access 100+ Powerful AI Models - All in One Place 🌟
+							{selectedAssistant
+								? selectedAssistant.description
+								: "👋 Access 100+ Powerful AI Agents - All in One Place 🌟"}
 						</p>
+
+						{/* Use Cases with Shinny Badges */}
+						{selectedAssistant &&
+							selectedAssistant.useCases &&
+							selectedAssistant.useCases.length > 0 && (
+								<div className="flex flex-wrap justify-center gap-2 mt-4">
+									{selectedAssistant.useCases.map((useCase, index) => (
+										<AnimatedBadge
+											key={index}
+											text={useCase}
+											className="text-sm"
+										/>
+									))}
+								</div>
+							)}
 					</motion.div>
 				</div>
 			</div>
@@ -131,6 +155,8 @@ export const Messages = memo(PureMessages, (prevProps, nextProps) => {
 	if (prevProps.messages.length !== nextProps.messages.length) return false;
 	if (!equal(prevProps.messages, nextProps.messages)) return false;
 	if (!equal(prevProps.votes, nextProps.votes)) return false;
+	if (!equal(prevProps.selectedAssistant, nextProps.selectedAssistant))
+		return false;
 
 	return true;
 });
