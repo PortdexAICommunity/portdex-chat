@@ -205,8 +205,10 @@ export function Chat({
 
 				<form
 					className={cn(
-						"flex mx-auto px-4 sm:px-6 bg-transparent pb-4 md:pb-6 gap-2 w-full max-w-none md:max-w-3xl",
-						messages.length === 0 ? "my-[20dvh]" : "my-0"
+						"flex mx-auto px-4 sm:px-6 bg-transparent pb-4 md:pb-6 gap-2 w-full",
+						messages.length === 0
+							? "max-w-4xl mt-4 mb-8"
+							: "max-w-none md:max-w-3xl my-0"
 					)}
 				>
 					{!isReadonly && (
@@ -228,7 +230,7 @@ export function Chat({
 				</form>
 
 				{messages.length === 0 && (
-					<div className="max-w-7xl mx-auto bg-background/50 my-14 rounded-3xl p-10">
+					<div className="max-w-7xl mx-auto bg-background/50 mt-6 mb-20 rounded-3xl p-10">
 						<HomeMarketplace />
 					</div>
 				)}
