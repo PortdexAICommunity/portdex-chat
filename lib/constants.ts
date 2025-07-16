@@ -884,6 +884,7 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 		date: "2025-01-20",
 		type: "plugin",
 		creator: "aaronjmars",
+		useCases: ["Research", "Search", "Analyze", "Summarize", "Trends"],
 		mcp_url:
 			"https://server.smithery.ai/@aaronjmars/web3-research-mcp/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA",
 		systemPrompt: `Use this toolset to perform blockchain and DeFi research. Start by calling "create-research-plan" with a topic, use "search" or "research-with-keywords" to gather insights, and "fetch-content" to extract article or source content. Present results as a structured plan or content digest.`,
@@ -899,6 +900,7 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 		date: "2025-01-20",
 		type: "plugin",
 		creator: "snjyor",
+		useCases: ["Live Prices", "Trends", "Order Book", "Volume", "Charts"],
 		mcp_url:
 			"https://server.smithery.ai/@snjyor/binance-mcp-data/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA",
 		systemPrompt: `Use this to retrieve Binance market data. For live prices use "get_price" or "get_24hr_ticker", historical candles via "get_klines", or trades through "get_recent_trades". Present output as charts, summaries, or raw metrics based on user intent.`,
@@ -917,6 +919,7 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 		mcp_url:
 			"https://server.smithery.ai/@doggybee/mcp-server-ccxt/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA",
 		systemPrompt: `Use this to access exchange market data and trading actions. Use "get-ticker" for price info, "get-orderbook" for depth, and "place-market-order" to simulate trades. Structure outputs as exchange summaries or actionable trade data.`,
+		useCases: ["Compare", "Balances", "Trading", "Order Book", "Exchanges"],
 	},
 	{
 		id: "mcp-crypto-price",
@@ -932,6 +935,7 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 		mcp_url:
 			"https://server.smithery.ai/@truss44/mcp-crypto-price/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA",
 		systemPrompt: `Use this for real-time price and market analysis. "get-crypto-price" gives current stats, "get-market-analysis" reveals exchange trends, and "get-historical-analysis" offers long-term insights. Display as tables, charts, or alerts.`,
+		useCases: ["Tracking", "History", "Alerts", "Analysis", "Charts"],
 	},
 	{
 		id: "crypto-indicators-mcp",
@@ -947,6 +951,7 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 		mcp_url:
 			"https://server.smithery.ai/@kukapay/crypto-indicators-mcp/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA",
 		systemPrompt: `Use this to compute technical indicators. Choose from tools like "calculate_macd", "calculate_rsi", or "calculate_sma". Pass the symbol and timeframe to visualize momentum or trend shifts. Return clean indicator values or formatted indicator dashboards.`,
+		useCases: ["Indicators", "RSI", "MACD", "Trends", "Dashboards"],
 	},
 	// {
 	// 	id: "coingecko-mcp-server",
@@ -977,6 +982,7 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 		mcp_url:
 			"https://server.smithery.ai/@EmanuelJr/web3-mcp-server/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA",
 		systemPrompt: `For Web3 smart contract operations. Use "fetch_balance" for ETH wallet balances, "read_contract" for reading contract state, and "fetch_token_balance" for ERC20 tokens. Return concise wallet overviews or contract values.`,
+		useCases: ["Wallets", "Contracts", "Balances", "Tokens", "Monitoring"],
 	},
 	{
 		id: "scry-mcp-raw-js",
@@ -992,6 +998,7 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 		mcp_url:
 			"https://server.smithery.ai/@yongkangc/scry-mcp-raw-js/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA",
 		systemPrompt: `Use this for advanced DeFi and protocol analytics. Query "get_top_protocols" or "defillama_search_protocols" for TVL data. Use "get_dex_volume" and "get_derivatives_volume" for liquidity stats. Display results as ecosystem rankings or protocol cards.`,
+		useCases: ["TVL", "Protocols", "Liquidity", "Volume", "Yields"],
 	},
 	{
 		id: "crypto-feargreed-mcp",
@@ -1007,6 +1014,7 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 		mcp_url:
 			"https://server.smithery.ai/@kukapay/crypto-feargreed-mcp/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA",
 		systemPrompt: `Use this to access the Fear & Greed Index for crypto market sentiment analysis. The index ranges from 0 (Extreme Fear) to 100 (Extreme Greed) and helps identify market turning points. Present the data with historical context and interpretation for trading decisions.`,
+		useCases: ["Sentiment", "Trends", "Signals", "Psychology", "History"],
 	},
 	{
 		id: "amazon-product-search",
@@ -1022,6 +1030,7 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 		mcp_url:
 			"https://server.smithery.ai/@SiliconValleyInsight/amazon-product-search/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA",
 		systemPrompt: `Use this to search Amazon products and gather detailed product information. You can search by keywords, get product details, prices, ratings, and reviews. Present results as organized product listings with key details like price, rating, and availability for easy comparison.`,
+		useCases: ["Search", "Compare", "Ratings", "Reviews", "Research"],
 	},
 	{
 		id: "coinmarketcap-mcp",
@@ -1036,5 +1045,6 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 		creator: "shinzo-labs",
 		mcp_url: `https://server.smithery.ai/@shinzo-labs/coinmarketcap-mcp/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA`,
 		systemPrompt: `Use this to access CoinMarketCap data for comprehensive crypto market analysis. Get live prices, market cap rankings, trading volumes, and detailed cryptocurrency information. Present data as market overviews, top coin rankings, or specific coin analysis with key metrics and trends.`,
+		useCases: ["Prices", "Ranking", "Volume", "Metrics", "Trends"],
 	},
 ];

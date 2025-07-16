@@ -23,6 +23,7 @@ import { MultimodalInput } from "./multimodal-input";
 import { getChatHistoryPaginationKey } from "./sidebar-history";
 import { toast } from "./toast";
 import type { VisibilityType } from "./visibility-selector";
+import type { HomeMarketplaceItem } from "@/lib/types";
 
 export function Chat({
 	id,
@@ -45,6 +46,23 @@ export function Chat({
 	const [selectedTool, setSelectedTool] = useState<string>("none");
 	const selectedToolRef = useRef(selectedTool);
 	const { cacheChat, cacheMessage } = useChatCache();
+
+	// Get selected assistant from localStorage
+	const [selectedAssistant, setSelectedAssistant] =
+		useState<HomeMarketplaceItem | null>(null);
+
+	useEffect(() => {
+		const savedAssistant = localStorage.getItem("selected-assistant");
+		if (savedAssistant) {
+			try {
+				const assistant = JSON.parse(savedAssistant);
+				setSelectedAssistant(assistant);
+			} catch (error) {
+				console.error("Failed to parse saved assistant:", error);
+				localStorage.removeItem("selected-assistant");
+			}
+		}
+	}, []);
 
 	useEffect(() => {
 		selectedToolRef.current = selectedTool;
@@ -201,12 +219,15 @@ export function Chat({
 					reload={reload}
 					isReadonly={isReadonly}
 					isArtifactVisible={isArtifactVisible}
+					selectedAssistant={selectedAssistant}
 				/>
 
 				<form
 					className={cn(
-						"flex mx-auto px-4 sm:px-6 bg-transparent pb-4 md:pb-6 gap-2 w-full max-w-none md:max-w-3xl",
-						messages.length === 0 ? "my-[20dvh]" : "my-0"
+						"flex mx-auto px-4 sm:px-6 bg-transparent pb-4 md:pb-6 gap-2 w-full",
+						messages.length === 0
+							? "max-w-4xl mt-4 mb-8"
+							: "max-w-none md:max-w-3xl my-0"
 					)}
 				>
 					{!isReadonly && (
@@ -228,7 +249,7 @@ export function Chat({
 				</form>
 
 				{messages.length === 0 && (
-					<div className="max-w-7xl mx-auto bg-background/50 my-14 rounded-3xl p-10">
+					<div className="max-w-7xl mx-auto bg-background/50 mt-6 mb-20 rounded-3xl p-10">
 						<HomeMarketplace />
 					</div>
 				)}
