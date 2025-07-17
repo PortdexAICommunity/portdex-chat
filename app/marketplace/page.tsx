@@ -186,7 +186,7 @@ export default function Marketplace() {
 						? `&search=${encodeURIComponent(assistantsFilters.searchTerm)}`
 						: ""
 			  }`
-			: "marketplace/api/agents?page=1&pageSize=6", // For home page featured items
+			: `marketplace/api/agents?page=1&pageSize=${FEATURED_ITEMS}`, // For home page featured items
 		fetcher
 	);
 
@@ -478,12 +478,12 @@ export default function Marketplace() {
 	if (!mounted) return null;
 
 	return (
-		<div className="min-h-screen max-w-sm md:max-w-3xl lg:max-w-full w-full bg-background transition-colors duration-200">
+		<div className="min-h-screen max-w-sm md:max-w-3xl lg:max-w-full w-full transition-colors duration-200">
 			{/* Header */}
 			<motion.header
 				initial={{ y: -100 }}
 				animate={{ y: 0 }}
-				className="sticky top-0 z-40 bg-white/80 dark:bg-black backdrop-blur-md border-b border-border transition-colors duration-200"
+				className="sticky top-0 z-40 backdrop-blur-md border-b border-border transition-colors duration-200"
 			>
 				<div className="w-full px-4 sm:px-6 lg:px-8">
 					<div className="flex justify-between items-center gap-4 py-4 sm:h-16 sm:py-0">
@@ -519,7 +519,7 @@ export default function Marketplace() {
 
 			{/* Mobile/Tablet Search - Only for home tab */}
 			{activeTab === "home" && (
-				<div className="lg:hidden bg-white dark:bg-black border-b border-border px-4 py-3 transition-colors duration-200">
+				<div className="lg:hidden border-b border-border px-4 py-3 transition-colors duration-200">
 					<div className="relative">
 						<Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 size-4" />
 						<Input
@@ -536,14 +536,14 @@ export default function Marketplace() {
 			<motion.nav
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
-				className="bg-white dark:bg-black border-b border-border sticky top-16 sm:top-16 z-30 transition-colors duration-200"
+				className="border-b backdrop-blur-md border-border sticky top-16 sm:top-16 z-30 transition-colors duration-200"
 			>
 				<div className="w-full xl:max-w-7xl mx-auto px-4 lg:px-0">
 					<div className="flex overflow-x-auto scrollbar-hide">
 						{[
 							{ id: "home", label: "Home", icon: Home },
-							{ id: "assistants", label: "AI Agents", icon: Users },
-							{ id: "ai-models", label: "AI Models", icon: Brain },
+							{ id: "assistants", label: "Assistants", icon: Users },
+							{ id: "ai-models", label: "Models Providers", icon: Brain },
 							{ id: "mcp-servers", label: "MCP Servers", icon: Server },
 							{ id: "softwares", label: "Softwares", icon: PackageOpen },
 							{ id: "templates", label: "Templates", icon: FileText },
@@ -617,7 +617,7 @@ export default function Marketplace() {
 											Discover More →
 										</Button>
 									</div>
-									<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+									<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
 										{assistants
 											.slice(0, FEATURED_ITEMS)
 											.map((assistant, index) => (

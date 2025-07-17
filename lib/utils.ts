@@ -1,91 +1,109 @@
-import type { Document } from '@/lib/db/schema';
-import type { CoreAssistantMessage, CoreToolMessage, UIMessage } from 'ai';
-import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-import { ChatSDKError, type ErrorCode } from './errors';
+import type { Document } from "@/lib/db/schema";
+import type { CoreAssistantMessage, CoreToolMessage, UIMessage } from "ai";
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+import { ChatSDKError, type ErrorCode } from "./errors";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+	return twMerge(clsx(inputs));
 }
 
 export const fetcher = async (url: string) => {
-  const response = await fetch(url);
+	const response = await fetch(url);
 
-  if (!response.ok) {
-    const { code, cause } = (await response.json()) as any;
-    throw new ChatSDKError(code as ErrorCode, cause);
-  }
+	if (!response.ok) {
+		const { code, cause } = (await response.json()) as any;
+		throw new ChatSDKError(code as ErrorCode, cause);
+	}
 
-  return response.json();
+	return response.json();
 };
 
 export async function fetchWithErrorHandlers(
-  input: RequestInfo | URL,
-  init?: RequestInit,
+	input: RequestInfo | URL,
+	init?: RequestInit
 ) {
-  try {
-    const response = await fetch(input, init);
+	try {
+		const response = await fetch(input, init);
 
-    if (!response.ok) {
-      const { code, cause } = (await response.json()) as any;
-      throw new ChatSDKError(code as ErrorCode, cause);
-    }
+		if (!response.ok) {
+			const { code, cause } = (await response.json()) as any;
+			throw new ChatSDKError(code as ErrorCode, cause);
+		}
 
-    return response;
-  } catch (error: unknown) {
-    if (typeof navigator !== 'undefined' && !navigator.onLine) {
-      throw new ChatSDKError('offline:chat');
-    }
+		return response;
+	} catch (error: unknown) {
+		if (typeof navigator !== "undefined" && !navigator.onLine) {
+			throw new ChatSDKError("offline:chat");
+		}
 
-    throw error;
-  }
+		throw error;
+	}
 }
 
 export function getLocalStorage(key: string) {
-  if (typeof window !== 'undefined') {
-    return JSON.parse(localStorage.getItem(key) || '[]');
-  }
-  return [];
+	if (typeof window !== "undefined") {
+		return JSON.parse(localStorage.getItem(key) || "[]");
+	}
+	return [];
 }
 
 export function generateUUID(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0;
-    const v = c === 'x' ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
+	return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+		const r = (Math.random() * 16) | 0;
+		const v = c === "x" ? r : (r & 0x3) | 0x8;
+		return v.toString(16);
+	});
 }
 
 type ResponseMessageWithoutId = CoreToolMessage | CoreAssistantMessage;
 type ResponseMessage = ResponseMessageWithoutId & { id: string };
 
 export function getMostRecentUserMessage(messages: Array<UIMessage>) {
-  const userMessages = messages.filter((message) => message.role === 'user');
-  return userMessages.at(-1);
+	const userMessages = messages.filter((message) => message.role === "user");
+	return userMessages.at(-1);
 }
 
 export function getDocumentTimestampByIndex(
-  documents: Array<Document>,
-  index: number,
+	documents: Array<Document>,
+	index: number
 ) {
-  if (!documents) return new Date();
-  if (index > documents.length) return new Date();
+	if (!documents) return new Date();
+	if (index > documents.length) return new Date();
 
-  return documents[index].createdAt;
+	return documents[index].createdAt;
 }
 
 export function getTrailingMessageId({
-  messages,
+	messages,
 }: {
-  messages: Array<ResponseMessage>;
+	messages: Array<ResponseMessage>;
 }): string | null {
-  const trailingMessage = messages.at(-1);
+	const trailingMessage = messages.at(-1);
 
-  if (!trailingMessage) return null;
+	if (!trailingMessage) return null;
 
-  return trailingMessage.id;
+	return trailingMessage.id;
 }
 
 export function sanitizeText(text: string) {
-  return text.replace('<has_function_call>', '');
+	return text.replace("<has_function_call>", "");
 }
+
+/**
+ * Parses a string in the format "creator/product" into separate creator and name.
+ * @param input - The string to parse (e.g., "julien040/anyquery").
+ * @returns An object with creator and name properties.
+ */
+export const parseCreatorAndName = (
+	input: string
+): { creator: string; name: string } => {
+	const sep = input.indexOf("/");
+	if (sep === -1) {
+		return { creator: "", name: input };
+	}
+	return {
+		creator: input.slice(0, sep),
+		name: input.slice(sep + 1),
+	};
+};

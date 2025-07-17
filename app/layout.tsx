@@ -1,6 +1,6 @@
 import { Toaster } from "sonner";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { IBM_Plex_Mono, Lora, Plus_Jakarta_Sans } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 
 import "./globals.css";
@@ -106,16 +106,23 @@ export const viewport = {
 	maximumScale: 1, // Disable auto-zoom on mobile Safari
 };
 
-const geist = Geist({
+const JakartaSans = Plus_Jakarta_Sans({
 	subsets: ["latin"],
 	display: "swap",
-	variable: "--font-geist",
+	variable: "--font-jakarta-sans",
 });
 
-const geistMono = Geist_Mono({
+const LoraSerif = Lora({
 	subsets: ["latin"],
 	display: "swap",
-	variable: "--font-geist-mono",
+	variable: "--font-lora-serif",
+});
+
+const IBMPlexMono = IBM_Plex_Mono({
+	subsets: ["latin"],
+	display: "swap",
+	variable: "--font-ibm-plex-mono",
+	weight: "500",
 });
 
 const LIGHT_THEME_COLOR = "hsl(0 0% 100%)";
@@ -150,7 +157,7 @@ export default async function RootLayout({
 			// visual flicker before hydration. Hence the `suppressHydrationWarning`
 			// prop is necessary to avoid the React hydration mismatch warning.
 			// https://github.com/pacocoursey/next-themes?tab=readme-ov-file#with-app
-			className={`${geist.variable} ${geistMono.variable}`}
+			className={`${JakartaSans.variable} ${LoraSerif.variable} ${IBMPlexMono.variable}`}
 		>
 			<head>
 				<script

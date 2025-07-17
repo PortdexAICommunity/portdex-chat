@@ -22,10 +22,7 @@ export function AIModelCard({ aiModel, onClick }: AIModelCardProps) {
 			whileTap={{ scale: 0.98 }}
 			className="cursor-pointer h-full"
 		>
-			<Card
-				className="h-full bg-white dark:bg-transparent border-gray-200 dark:border-gray-800/50 hover:shadow-lg dark:hover:shadow-2xl transition-all duration-300 hover:border-purple-300 dark:hover:border-purple-600/50 flex flex-col"
-				onClick={onClick}
-			>
+			<Card className="h-full flex flex-col" onClick={onClick}>
 				<CardContent className="p-4 flex-1 flex flex-col">
 					<div className="flex items-start gap-4 flex-1">
 						{/* Avatar Section */}
