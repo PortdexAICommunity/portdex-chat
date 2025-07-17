@@ -64,10 +64,7 @@ export function MCPServerCard({ server, onClick }: MCPServerCardProps) {
 			whileTap={{ scale: 0.99 }}
 			className="cursor-pointer h-full"
 		>
-			<Card
-				className="h-full bg-white dark:bg-transparent border border-gray-200 dark:border-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600/50 hover:shadow-md dark:hover:shadow-lg transition-all duration-200 group"
-				onClick={onClick}
-			>
+			<Card className="h-full group" onClick={onClick}>
 				<CardContent className="p-4">
 					<div className="flex items-start gap-3">
 						{/* Icon */}

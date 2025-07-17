@@ -303,7 +303,8 @@ export const aiModels: DataTypes[] = [
 			"Advanced AI image generation model capable of producing high-quality, creative pictures from text prompts.",
 		category: "Image Generation",
 		icon: "https://cdn.activepieces.com/pieces/openai.png",
-		gradient: "linear-gradient(135deg, #00f2fe 0%, #4facfe 100%)",
+		gradient:
+			"linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)",
 		date: "2024-05-15",
 	},
 	{
@@ -314,7 +315,7 @@ export const aiModels: DataTypes[] = [
 			"Second generation of OpenAI's image generation model, known for creative visuals.",
 		category: "Image Generation",
 		icon: "https://cdn.activepieces.com/pieces/openai.png",
-		gradient: "linear-gradient(135deg, #ffb347 0%, #ffcc33 100%)",
+		gradient: "linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%)",
 		date: "2023-03-01",
 	},
 	{
@@ -325,7 +326,7 @@ export const aiModels: DataTypes[] = [
 			"Ultra-fast diffusion-based image synthesis model, optimized for quick results.",
 		category: "Image Generation",
 		icon: "https://cdn.activepieces.com/pieces/replicate.png",
-		gradient: "linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)",
+		gradient: "linear-gradient(135deg, var(--chart-1) 0%, var(--chart-2) 100%)",
 		date: "2024-04-10",
 	},
 	{
@@ -336,7 +337,7 @@ export const aiModels: DataTypes[] = [
 			"Open-source diffusion model for generating images from natural language descriptions.",
 		category: "Image Generation",
 		icon: "https://cdn.activepieces.com/pieces/replicate.png",
-		gradient: "linear-gradient(135deg, #f7971e 0%, #ffd200 100%)",
+		gradient: "linear-gradient(135deg, var(--chart-3) 0%, var(--chart-4) 100%)",
 		date: "2023-10-18",
 	},
 	{
@@ -347,7 +348,8 @@ export const aiModels: DataTypes[] = [
 			"Fast and flexible model for creative image generation, available on Replicate.",
 		category: "Image Generation",
 		icon: "https://cdn.activepieces.com/pieces/replicate.png",
-		gradient: "linear-gradient(135deg, #f953c6 0%, #b91d73 100%)",
+		gradient:
+			"linear-gradient(135deg, var(--destructive) 0%, var(--primary) 100%)",
 		date: "2024-01-22",
 	},
 ];
@@ -364,7 +366,8 @@ export const softwareTools: DataTypes[] = [
 		subcategory: "Infrastructure Management",
 		useCase: "Cloud Infrastructure Monitoring",
 		icon: "🛠️",
-		gradient: "from-gray-500 to-zinc-700",
+		gradient:
+			"linear-gradient(135deg, var(--gray-500) 0%, var(--zinc-700) 100%)",
 		date: "2025-02-20",
 		tags: ["infrastructure", "monitoring", "cloud", "dashboard"],
 	},
@@ -378,7 +381,8 @@ export const softwareTools: DataTypes[] = [
 		subcategory: "Documentation",
 		useCase: "API Documentation",
 		icon: "📄",
-		gradient: "from-blue-500 to-blue-700",
+		gradient:
+			"linear-gradient(135deg, var(--blue-500) 0%, var(--blue-700) 100%)",
 		date: "2025-03-05",
 		tags: ["documentation", "ai", "api", "automation"],
 	},
@@ -392,7 +396,8 @@ export const softwareTools: DataTypes[] = [
 		subcategory: "Team Analytics",
 		useCase: "Development Team Performance",
 		icon: "📈",
-		gradient: "from-green-400 to-emerald-500",
+		gradient:
+			"linear-gradient(135deg, var(--green-400) 0%, var(--emerald-500) 100%)",
 		date: "2025-04-12",
 		tags: ["analytics", "team-performance", "metrics", "development"],
 	},
@@ -407,7 +412,8 @@ export const softwareTools: DataTypes[] = [
 		subcategory: "Container Management",
 		useCase: "Container Orchestration",
 		icon: "🐳",
-		gradient: "from-blue-600 to-indigo-700",
+		gradient:
+			"linear-gradient(135deg, var(--blue-600) 0%, var(--indigo-700) 100%)",
 		date: "2025-03-15",
 		tags: ["kubernetes", "docker", "containers", "orchestration"],
 	},
@@ -421,7 +427,7 @@ export const softwareTools: DataTypes[] = [
 		subcategory: "Security",
 		useCase: "Server Security Monitoring",
 		icon: "🛡️",
-		gradient: "from-red-500 to-red-700",
+		gradient: "linear-gradient(135deg, var(--red-500) 0%, var(--red-700) 100%)",
 		date: "2025-04-01",
 		tags: ["security", "monitoring", "threat-detection", "server"],
 	},
@@ -436,7 +442,8 @@ export const softwareTools: DataTypes[] = [
 		subcategory: "User Analytics",
 		useCase: "User Behavior Tracking",
 		icon: "📊",
-		gradient: "from-purple-500 to-purple-700",
+		gradient:
+			"linear-gradient(135deg, var(--purple-500) 0%, var(--purple-700) 100%)",
 		date: "2025-03-20",
 		tags: ["analytics", "user-behavior", "heatmaps", "conversion"],
 	},
@@ -450,7 +457,8 @@ export const softwareTools: DataTypes[] = [
 		subcategory: "API Monitoring",
 		useCase: "API Performance Monitoring",
 		icon: "⚡",
-		gradient: "from-yellow-500 to-orange-600",
+		gradient:
+			"linear-gradient(135deg, var(--yellow-500) 0%, var(--orange-600) 100%)",
 		date: "2025-02-28",
 		tags: ["api", "monitoring", "uptime", "performance"],
 	},
@@ -465,7 +473,8 @@ export const softwareTools: DataTypes[] = [
 		subcategory: "Code Quality",
 		useCase: "Automated Code Review",
 		icon: "🔍",
-		gradient: "from-teal-500 to-cyan-600",
+		gradient:
+			"linear-gradient(135deg, var(--teal-500) 0%, var(--cyan-600) 100%)",
 		date: "2025-04-05",
 		tags: ["code-review", "ai", "security", "quality"],
 	},
@@ -479,7 +488,8 @@ export const softwareTools: DataTypes[] = [
 		subcategory: "Testing",
 		useCase: "Automated Testing",
 		icon: "🧪",
-		gradient: "from-emerald-500 to-teal-600",
+		gradient:
+			"linear-gradient(135deg, var(--emerald-500) 0%, var(--teal-600) 100%)",
 		date: "2025-03-25",
 		tags: ["testing", "automation", "ai", "browser-testing"],
 	},
@@ -494,7 +504,8 @@ export const softwareTools: DataTypes[] = [
 		subcategory: "UI Generation",
 		useCase: "Component Generation",
 		icon: "🎨",
-		gradient: "from-pink-500 to-rose-600",
+		gradient:
+			"linear-gradient(135deg, var(--pink-500) 0%, var(--rose-600) 100%)",
 		date: "2025-04-10",
 		tags: ["ui", "design", "ai", "components"],
 	},
@@ -508,7 +519,8 @@ export const softwareTools: DataTypes[] = [
 		subcategory: "Brand Design",
 		useCase: "Brand Identity Creation",
 		icon: "🏷️",
-		gradient: "from-violet-500 to-purple-600",
+		gradient:
+			"linear-gradient(135deg, var(--violet-500) 0%, var(--purple-600) 100%)",
 		date: "2025-03-30",
 		tags: ["branding", "design", "ai", "identity"],
 	},
@@ -523,7 +535,8 @@ export const softwareTools: DataTypes[] = [
 		subcategory: "Workflow Automation",
 		useCase: "Business Process Automation",
 		icon: "⚙️",
-		gradient: "from-slate-500 to-slate-700",
+		gradient:
+			"linear-gradient(135deg, var(--slate-500) 0%, var(--slate-700) 100%)",
 		date: "2025-02-15",
 		tags: ["workflow", "automation", "business", "productivity"],
 	},
@@ -537,7 +550,8 @@ export const softwareTools: DataTypes[] = [
 		subcategory: "Finance Management",
 		useCase: "Invoice Automation",
 		icon: "💰",
-		gradient: "from-green-600 to-emerald-700",
+		gradient:
+			"linear-gradient(135deg, var(--green-600) 0%, var(--emerald-700) 100%)",
 		date: "2025-04-20",
 		tags: ["invoicing", "finance", "automation", "reporting"],
 	},
@@ -555,7 +569,8 @@ export const siteTemplates: DataTypes[] = [
 		subcategory: "SaaS Landing",
 		useCase: "Product Launch",
 		icon: "🧩",
-		gradient: "from-pink-500 to-rose-600",
+		gradient:
+			"linear-gradient(135deg, var(--pink-500) 0%, var(--rose-600) 100%)",
 		date: "2025-03-10",
 		tags: ["saas", "landing-page", "nextjs", "tailwind"],
 	},
@@ -569,7 +584,8 @@ export const siteTemplates: DataTypes[] = [
 		subcategory: "Pitch Deck",
 		useCase: "Fundraising",
 		icon: "📈",
-		gradient: "from-blue-500 to-blue-700",
+		gradient:
+			"linear-gradient(135deg, var(--blue-500) 0%, var(--blue-700) 100%)",
 		date: "2025-03-22",
 		tags: ["pitch-deck", "investors", "startup", "presentation"],
 	},
@@ -583,7 +599,8 @@ export const siteTemplates: DataTypes[] = [
 		subcategory: "Storefront",
 		useCase: "Online Store",
 		icon: "🛒",
-		gradient: "from-green-500 to-emerald-600",
+		gradient:
+			"linear-gradient(135deg, var(--green-500) 0%, var(--emerald-600) 100%)",
 		date: "2025-04-01",
 		tags: ["ecommerce", "shop", "products", "payments"],
 	},
@@ -598,7 +615,8 @@ export const siteTemplates: DataTypes[] = [
 		subcategory: "Developer Portfolio",
 		useCase: "Personal Branding",
 		icon: "👤",
-		gradient: "from-indigo-500 to-violet-600",
+		gradient:
+			"linear-gradient(135deg, var(--indigo-500) 0%, var(--violet-600) 100%)",
 		date: "2025-02-22",
 		tags: ["portfolio", "personal", "developer", "blog"],
 	},
@@ -612,7 +630,8 @@ export const siteTemplates: DataTypes[] = [
 		subcategory: "Agency Portfolio",
 		useCase: "Creative Showcase",
 		icon: "🎨",
-		gradient: "from-purple-500 to-pink-600",
+		gradient:
+			"linear-gradient(135deg, var(--purple-500) 0%, var(--pink-600) 100%)",
 		date: "2025-03-18",
 		tags: ["agency", "creative", "portfolio", "design"],
 	},
@@ -627,7 +646,8 @@ export const siteTemplates: DataTypes[] = [
 		subcategory: "Admin Panel",
 		useCase: "Internal Tools",
 		icon: "📊",
-		gradient: "from-sky-500 to-blue-600",
+		gradient:
+			"linear-gradient(135deg, var(--sky-500) 0%, var(--blue-600) 100%)",
 		date: "2025-04-08",
 		tags: ["dashboard", "admin", "charts", "tables"],
 	},
@@ -641,7 +661,8 @@ export const siteTemplates: DataTypes[] = [
 		subcategory: "Analytics",
 		useCase: "Data Visualization",
 		icon: "📈",
-		gradient: "from-teal-500 to-cyan-600",
+		gradient:
+			"linear-gradient(135deg, var(--teal-500) 0%, var(--cyan-600) 100%)",
 		date: "2025-03-28",
 		tags: ["analytics", "charts", "data", "visualization"],
 	},
@@ -656,7 +677,8 @@ export const siteTemplates: DataTypes[] = [
 		subcategory: "Tech Blog",
 		useCase: "Technical Writing",
 		icon: "📝",
-		gradient: "from-orange-500 to-red-600",
+		gradient:
+			"linear-gradient(135deg, var(--orange-500) 0%, var(--red-600) 100%)",
 		date: "2025-02-25",
 		tags: ["blog", "technical", "writing", "seo"],
 	},
@@ -670,7 +692,8 @@ export const siteTemplates: DataTypes[] = [
 		subcategory: "Documentation",
 		useCase: "Product Documentation",
 		icon: "📚",
-		gradient: "from-slate-500 to-gray-600",
+		gradient:
+			"linear-gradient(135deg, var(--slate-500) 0%, var(--gray-600) 100%)",
 		date: "2025-04-15",
 		tags: ["documentation", "api", "reference", "guides"],
 	},
@@ -685,7 +708,8 @@ export const siteTemplates: DataTypes[] = [
 		subcategory: "Marketplace",
 		useCase: "Multi-vendor Platform",
 		icon: "🏪",
-		gradient: "from-violet-500 to-purple-700",
+		gradient:
+			"linear-gradient(135deg, var(--violet-500) 0%, var(--purple-700) 100%)",
 		date: "2025-03-12",
 		tags: ["marketplace", "vendors", "ecommerce", "platform"],
 	},
@@ -699,7 +723,8 @@ export const siteTemplates: DataTypes[] = [
 		subcategory: "Subscription",
 		useCase: "Subscription Business",
 		icon: "📦",
-		gradient: "from-emerald-500 to-teal-600",
+		gradient:
+			"linear-gradient(135deg, var(--emerald-500) 0%, var(--teal-600) 100%)",
 		date: "2025-04-05",
 		tags: ["subscription", "recurring", "billing", "boxes"],
 	},
@@ -714,7 +739,8 @@ export const siteTemplates: DataTypes[] = [
 		subcategory: "Corporate Site",
 		useCase: "Company Website",
 		icon: "🏢",
-		gradient: "from-gray-600 to-slate-700",
+		gradient:
+			"linear-gradient(135deg, var(--gray-600) 0%, var(--slate-700) 100%)",
 		date: "2025-02-18",
 		tags: ["corporate", "business", "professional", "services"],
 	},
@@ -728,7 +754,8 @@ export const siteTemplates: DataTypes[] = [
 		subcategory: "Consulting",
 		useCase: "Professional Services",
 		icon: "💼",
-		gradient: "from-blue-600 to-indigo-700",
+		gradient:
+			"linear-gradient(135deg, var(--blue-600) 0%, var(--indigo-700) 100%)",
 		date: "2025-03-08",
 		tags: ["consulting", "professional", "services", "case-studies"],
 	},
@@ -880,7 +907,8 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 			"Research blockchain and DeFi projects with ease. Get comprehensive insights, analyze protocols, and stay updated with the latest Web3 trends.",
 		category: "Finance",
 		icon: "🔬",
-		gradient: "from-blue-500 to-blue-700",
+		gradient:
+			"linear-gradient(135deg, var(--blue-500) 0%, var(--blue-700) 100%)",
 		date: "2025-01-20",
 		type: "plugin",
 		creator: "aaronjmars",
@@ -896,7 +924,8 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 			"Access real-time Binance trading data including live prices, market trends, order books, and trading volume for informed investment decisions.",
 		category: "Finance",
 		icon: "💹",
-		gradient: "from-yellow-500 to-yellow-700",
+		gradient:
+			"linear-gradient(135deg, var(--yellow-500) 0%, var(--yellow-700) 100%)",
 		date: "2025-01-20",
 		type: "plugin",
 		creator: "snjyor",
@@ -912,7 +941,8 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 			"Connect to 100+ crypto exchanges in one place. Compare prices, check balances, and manage your trading across multiple platforms seamlessly.",
 		category: "Finance",
 		icon: "🏦",
-		gradient: "from-green-500 to-green-700",
+		gradient:
+			"linear-gradient(135deg, var(--green-500) 0%, var(--green-700) 100%)",
 		date: "2025-01-20",
 		type: "plugin",
 		creator: "doggybee",
@@ -928,7 +958,8 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 			"Track cryptocurrency prices in real-time with detailed market analysis, historical data, and price alerts for your favorite coins.",
 		category: "Finance",
 		icon: "📈",
-		gradient: "from-purple-500 to-purple-700",
+		gradient:
+			"linear-gradient(135deg, var(--purple-500) 0%, var(--purple-700) 100%)",
 		date: "2025-01-20",
 		type: "plugin",
 		creator: "truss44",
@@ -944,7 +975,8 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 			"Analyze crypto trends with professional trading indicators like RSI, MACD, and Bollinger Bands. Make smarter trading decisions with technical analysis.",
 		category: "Finance",
 		icon: "📊",
-		gradient: "from-indigo-500 to-indigo-700",
+		gradient:
+			"linear-gradient(135deg, var(--indigo-500) 0%, var(--indigo-700) 100%)",
 		date: "2025-01-20",
 		type: "plugin",
 		creator: "kukapay",
@@ -975,7 +1007,8 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 			"Interact with blockchain networks and smart contracts. Check wallet balances, read contract data, and monitor token holdings across EVM chains.",
 		category: "Finance",
 		icon: "⛓️",
-		gradient: "from-cyan-500 to-cyan-700",
+		gradient:
+			"linear-gradient(135deg, var(--cyan-500) 0%, var(--cyan-700) 100%)",
 		date: "2025-01-20",
 		type: "plugin",
 		creator: "EmanuelJr",
@@ -991,7 +1024,8 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 			"Advanced DeFi analytics platform providing insights into protocol performance, liquidity data, yield farming opportunities, and market trends.",
 		category: "Finance",
 		icon: "🔮",
-		gradient: "from-violet-500 to-purple-700",
+		gradient:
+			"linear-gradient(135deg, var(--violet-500) 0%, var(--purple-700) 100%)",
 		date: "2025-01-20",
 		type: "plugin",
 		creator: "yongkangc",
@@ -1007,7 +1041,8 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 			"Track market sentiment with the Fear & Greed Index. Analyze emotions driving the crypto market and make informed decisions based on crowd psychology.",
 		category: "Finance",
 		icon: "😨",
-		gradient: "from-red-500 to-green-500",
+		gradient:
+			"linear-gradient(135deg, var(--red-500) 0%, var(--green-500) 100%)",
 		date: "2025-01-20",
 		type: "plugin",
 		creator: "kukapay",
@@ -1023,7 +1058,8 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 			"Search and analyze Amazon products with detailed information including prices, ratings, reviews, and availability. Perfect for market research and product discovery.",
 		category: "Shopping",
 		icon: "🛒",
-		gradient: "from-orange-500 to-yellow-600",
+		gradient:
+			"linear-gradient(135deg, var(--orange-500) 0%, var(--yellow-600) 100%)",
 		date: "2025-01-20",
 		type: "plugin",
 		creator: "SiliconValleyInsight",
@@ -1039,7 +1075,8 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 			"Access comprehensive cryptocurrency market data from CoinMarketCap including live prices, market cap rankings, volume data, and detailed coin analytics for informed investment decisions.",
 		category: "Finance",
 		icon: "💎",
-		gradient: "from-blue-600 to-purple-600",
+		gradient:
+			"linear-gradient(135deg, var(--blue-600) 0%, var(--purple-600) 100%)",
 		date: "2025-01-20",
 		type: "plugin",
 		creator: "shinzo-labs",

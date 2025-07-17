@@ -249,7 +249,7 @@ export function Chat({
 				</form>
 
 				{messages.length === 0 && (
-					<div className="max-w-7xl mx-auto bg-background/50 mt-6 mb-20 rounded-3xl p-10">
+					<div className="max-w-7xl mx-auto bg-background/30 mt-6 rounded-3xl p-10">
 						<HomeMarketplace />
 					</div>
 				)}
