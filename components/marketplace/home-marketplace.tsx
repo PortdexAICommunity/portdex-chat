@@ -15,9 +15,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Calendar, Download, Sparkles, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, startTransition } from "react";
 import { saveChatModelAsCookie } from "@/app/(chat)/actions";
-import { startTransition } from "react";
 
 interface MarketplaceItemCardProps {
 	item: HomeMarketplaceItem;
@@ -183,15 +182,15 @@ const MarketplaceItemCard = ({
 	const getCategoryColor = (category: string) => {
 		switch (category.toLowerCase()) {
 			case "education":
-				return "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-800/30";
+				return "bg-primary/10 text-primary border-primary/20 dark:bg-primary/20 dark:text-primary dark:border-primary/30";
 			case "courses":
-				return "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-800/30";
+				return "bg-primary/10 text-primary border-primary/20 dark:bg-primary/20 dark:text-primary dark:border-primary/30";
 			case "tutors":
-				return "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800/30";
+				return "bg-primary/10 text-primary border-primary/20 dark:bg-primary/20 dark:text-primary dark:border-primary/30";
 			case "resources":
-				return "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/30 dark:text-purple-300 dark:border-purple-800/30";
+				return "bg-primary/10 text-primary border-primary/20 dark:bg-primary/20 dark:text-primary dark:border-primary/30";
 			case "ai-models":
-				return "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/30 dark:text-orange-300 dark:border-orange-800/30";
+				return "bg-primary/10 text-primary border-primary/20 dark:bg-primary/20 dark:text-primary dark:border-primary/30";
 			case "software":
 				return "bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-950/30 dark:text-cyan-300 dark:border-cyan-800/30";
 			case "templates":
@@ -462,7 +461,7 @@ export const HomeMarketplace = () => {
 							onClick={handleShowMore}
 							variant="outline"
 							size="lg"
-							className="w-full sm:w-auto min-w-[200px] border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+							className=""
 						>
 							Show More ({homeMarketplaceItems.length - showCount} remaining)
 						</Button>
@@ -474,10 +473,7 @@ export const HomeMarketplace = () => {
 					animate={{ opacity: 1, scale: 1 }}
 					transition={{ delay: 0.3 }}
 				>
-					<Link
-						href={"/marketplace"}
-						className="w-full sm:w-auto min-w-[200px] bg-gradient-to-r from-purple-500 to-purple-800 text-transparent bg-clip-text font-semibold"
-					>
+					<Link href={"/marketplace"} className="hover:text-primary">
 						Take Me to Marketplace
 					</Link>
 				</motion.div>
