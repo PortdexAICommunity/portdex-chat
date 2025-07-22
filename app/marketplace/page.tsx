@@ -107,7 +107,7 @@ export default function Marketplace() {
 		DataTypes | MCPDataTypes | MCPServerType | null
 	>(null);
 	const [dialogType, setDialogType] = useState<
-		"assistant" | "mcp-server" | "ai-model"
+		"assistant" | "mcp-server" | "ai-model" | "software" | "template"
 	>("assistant");
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [searchTerm, setSearchTerm] = useState("");
@@ -329,6 +329,10 @@ export default function Marketplace() {
 					? "ai-model"
 					: type === "mcp-server"
 					? "mcp-server"
+					: type === "software"
+					? "software"
+					: type === "template"
+					? "template"
 					: "assistant"
 			);
 			setIsDialogOpen(true);
