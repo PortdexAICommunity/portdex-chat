@@ -1,116 +1,113 @@
-'use client';
+"use client";
 
-import { ChevronUp } from 'lucide-react';
-import Image from 'next/image';
-import type { User } from 'next-auth';
-import { signOut, useSession } from 'next-auth/react';
-import { useTheme } from 'next-themes';
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from '@/components/ui/sidebar';
-import { useRouter } from 'next/navigation';
-import { toast } from './toast';
-import { LoaderIcon } from './icons';
-import { guestRegex } from '@/lib/constants';
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/hooks/use-auth";
 
-export function SidebarUserNav({ user }: { user: User }) {
-  const router = useRouter();
-  const { data, status } = useSession();
-  const { setTheme, resolvedTheme } = useTheme();
+export function SidebarUserNav() {
+	const { user, signOut, isGuest, loading } = useAuth();
+	const router = useRouter();
 
-  const isGuest = guestRegex.test(data?.user?.email ?? '');
+	if (loading) {
+		return (
+			<div className="flex items-center justify-center p-2">
+				<div className="text-sm text-muted-foreground">Loading...</div>
+			</div>
+		);
+	}
 
-  return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            {status === 'loading' ? (
-              <SidebarMenuButton className="data-[state=open]:bg-sidebar-accent bg-background data-[state=open]:text-sidebar-accent-foreground h-10 justify-between">
-                <div className="flex flex-row gap-2">
-                  <div className="size-6 bg-zinc-500/30 rounded-full animate-pulse" />
-                  <span className="bg-zinc-500/30 text-transparent rounded-md animate-pulse">
-                    Loading auth status
-                  </span>
-                </div>
-                <div className="animate-spin text-zinc-500">
-                  <LoaderIcon />
-                </div>
-              </SidebarMenuButton>
-            ) : (
-              <SidebarMenuButton
-                data-testid="user-nav-button"
-                className="data-[state=open]:bg-sidebar-accent bg-background data-[state=open]:text-sidebar-accent-foreground h-10"
-              >
-                <Image
-                  src={`https://avatar.vercel.sh/${user.email}`}
-                  alt={user.email ?? 'User Avatar'}
-                  width={24}
-                  height={24}
-                  className="rounded-full"
-                />
-                <span data-testid="user-email" className="truncate">
-                  {isGuest ? 'Guest' : user?.email}
-                </span>
-                <ChevronUp className="ml-auto" />
-              </SidebarMenuButton>
-            )}
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            data-testid="user-nav-menu"
-            side="top"
-            className="w-[--radix-popper-anchor-width]"
-          >
-            <DropdownMenuItem
-              data-testid="user-nav-item-theme"
-              className="cursor-pointer"
-              onSelect={() =>
-                setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
-              }
-            >
-              {`Toggle ${resolvedTheme === 'light' ? 'dark' : 'light'} mode`}
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild data-testid="user-nav-item-auth">
-              <button
-                type="button"
-                className="w-full cursor-pointer"
-                onClick={() => {
-                  if (status === 'loading') {
-                    toast({
-                      type: 'error',
-                      description:
-                        'Checking authentication status, please try again!',
-                    });
+	const handleSignOut = async () => {
+		await signOut();
+		router.push("/");
+	};
 
-                    return;
-                  }
+	const handleSignIn = () => {
+		router.push("/login");
+	};
 
-                  if (isGuest) {
-                    router.push('/login');
-                  } else {
-                    signOut({
-                      redirectTo: '/',
-                    });
-                  }
-                }}
-              >
-                {isGuest ? 'Login to your account' : 'Sign out'}
-              </button>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </SidebarMenuItem>
-    </SidebarMenu>
-  );
+	const displayName = isGuest
+		? "Guest User"
+		: user?.username || user?.signInDetails?.loginId || "User";
+
+	const displayEmail = isGuest
+		? "Not signed in"
+		: user?.signInDetails?.loginId || "No email";
+
+	const avatarInitial = isGuest
+		? "G"
+		: (
+				user?.username?.[0] ||
+				user?.signInDetails?.loginId?.[0] ||
+				"U"
+		  ).toUpperCase();
+
+	return (
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>
+				<Button
+					variant="ghost"
+					className="relative h-10 w-full justify-start px-2"
+				>
+					<Avatar className="size-8 mr-3">
+						<AvatarImage
+							src={isGuest ? undefined : "/avatar.png"}
+							alt="Avatar"
+						/>
+						<AvatarFallback className={isGuest ? "bg-muted" : ""}>
+							{avatarInitial}
+						</AvatarFallback>
+					</Avatar>
+					<div className="flex flex-col items-start text-left">
+						<p className="text-sm font-medium leading-none truncate">
+							{displayName}
+						</p>
+						<p className="text-xs leading-none text-muted-foreground truncate">
+							{isGuest ? "Guest Mode" : "Signed In"}
+						</p>
+					</div>
+				</Button>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent className="w-56" align="end" forceMount>
+				<DropdownMenuLabel className="font-normal">
+					<div className="flex flex-col space-y-1">
+						<p className="text-sm font-medium leading-none">{displayName}</p>
+						<p className="text-xs leading-none text-muted-foreground">
+							{displayEmail}
+						</p>
+					</div>
+				</DropdownMenuLabel>
+				<DropdownMenuSeparator />
+
+				{isGuest ? (
+					<>
+						<DropdownMenuItem onClick={handleSignIn}>Sign In</DropdownMenuItem>
+						<DropdownMenuItem asChild>
+							<Link href="/register">Create Account</Link>
+						</DropdownMenuItem>
+					</>
+				) : (
+					<>
+						<DropdownMenuItem asChild>
+							<Link href="/profile">Profile Settings</Link>
+						</DropdownMenuItem>
+						<DropdownMenuSeparator />
+						<DropdownMenuItem onClick={handleSignOut}>
+							Sign Out
+						</DropdownMenuItem>
+					</>
+				)}
+			</DropdownMenuContent>
+		</DropdownMenu>
+	);
 }

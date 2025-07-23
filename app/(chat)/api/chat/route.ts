@@ -1,8 +1,8 @@
-import { auth, type UserType } from "@/app/(auth)/auth";
+import { getServerSession } from "@/lib/amplify-server";
 import { getDynamicEntitlements } from "@/lib/ai/entitlements";
 import { extractAssistantId, isAssistantModel } from "@/lib/ai/models";
 import { systemPrompt, type RequestHints } from "@/lib/ai/prompts";
-import { createDynamicProvider, myProvider } from "@/lib/ai/providers";
+import { createDynamicProvider } from "@/lib/ai/providers";
 import { createDocument } from "@/lib/ai/tools/create-document";
 import { getWeather } from "@/lib/ai/tools/get-weather";
 import { requestSuggestions } from "@/lib/ai/tools/request-suggestions";
@@ -86,7 +86,7 @@ export async function POST(request: Request) {
 				return;
 			}
 
-			const session = await auth();
+			const session = await getServerSession();
 			if (!session?.user) {
 				writer.write(`data: ${JSON.stringify({ error: "Unauthorized" })}\n\n`);
 				await writer.close();
@@ -95,20 +95,34 @@ export async function POST(request: Request) {
 
 			const { id, message, selectedChatModel, selectedVisibilityType } =
 				requestBody;
-			const userType: UserType = session.user.type;
+			const userType: "guest" | "regular" = session.user.type;
 
 			// Get selected assistant (if any) for dynamic entitlements and prompts
 			const selectedAssistant = getAssistantFromModelId(selectedChatModel);
 
-			// Determine MCP URL based on selected assistant or use default
-			const mcpUrl =
-				selectedAssistant?.mcp_url ||
-				"https://server.smithery.ai/@yongkangc/scry-mcp-raw-js/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA";
+			// Only initialize MCP for assistant models
+			let customClient: any = null;
+			let toolSet: any = {};
 
-			//MCP
-			const transport = new StreamableHTTPClientTransport(new URL(mcpUrl));
-			const customClient = await experimental_createMCPClient({ transport });
-			const toolSet = await customClient.tools();
+			if (selectedAssistant && isAssistantModel(selectedChatModel)) {
+				try {
+					// Determine MCP URL based on selected assistant or use default
+					const mcpUrl = selectedAssistant?.mcp_url;
+
+					if (mcpUrl) {
+						const transport = new StreamableHTTPClientTransport(
+							new URL(mcpUrl)
+						);
+						customClient = await experimental_createMCPClient({ transport });
+						toolSet = await customClient.tools();
+					}
+				} catch (mcpError) {
+					console.error("MCP initialization failed:", mcpError);
+					// Continue without MCP if it fails
+					customClient = null;
+					toolSet = {};
+				}
+			}
 
 			// Use dynamic entitlements that include assistant models
 			const assistantForEntitlements = selectedAssistant
@@ -128,20 +142,29 @@ export async function POST(request: Request) {
 				return;
 			}
 
-			// Run critical checks in parallel
-			const [messageCount, chat] = await Promise.all([
-				getMessageCountByUserId({
-					id: session.user.id,
-					differenceInHours: 24,
-				}).catch((error) => {
-					console.error("Failed to get message count:", error);
-					return 0;
-				}),
-				getChatById({ id }).catch((error) => {
-					console.error("Failed to get chat:", error);
-					return null;
-				}),
-			]);
+			// Run critical checks in parallel - skip database checks for guest users
+			let messageCount = 0;
+			let chat = null;
+
+			if (session.user.type !== "guest") {
+				const [messageCountResult, chatResult] = await Promise.all([
+					getMessageCountByUserId({
+						id: session.user.id,
+						differenceInHours: 24,
+					}).catch((error) => {
+						console.error("Failed to get message count:", error);
+						return 0;
+					}),
+					getChatById({ id }).catch((error) => {
+						console.error("Failed to get chat:", error);
+						return null;
+					}),
+				]);
+				messageCount = messageCountResult;
+				chat = chatResult;
+			} else {
+				console.log("Skipping database checks for guest user");
+			}
 
 			if (messageCount > maxMessagesPerDay) {
 				writer.write(
@@ -166,23 +189,30 @@ export async function POST(request: Request) {
 				country,
 			};
 
-			// Get previous messages for context
-			const previousMessages = await getMessagesByChatId({ id }).catch(
-				() => []
-			);
+			// Get previous messages for context - skip for guest users
+			let previousMessages: any[] = [];
+			if (session.user.type !== "guest") {
+				previousMessages = await getMessagesByChatId({ id }).catch(() => []);
+			} else {
+				console.log("Skipping previous messages retrieval for guest user");
+			}
+
 			const messages = appendClientMessage({
-				// @ts-expect-error: todo add type conversion from DBMessage[] to UIMessage[]
 				messages: previousMessages,
 				message,
 			});
 
 			// Create appropriate provider based on whether an assistant is selected
-			const provider = selectedAssistant
-				? createDynamicProvider(assistantForEntitlements)
-				: myProvider;
+			const provider = createDynamicProvider(selectedAssistant);
 
-			// Start database operations in background - don't wait for them
+			// Start database operations in background - only for authenticated users
 			const saveOperationsPromise = (async () => {
+				// Skip database operations for guest users
+				if (session.user.type === "guest") {
+					console.log("Skipping database operations for guest user");
+					return generateUUID(); // Return a fallback stream ID
+				}
+
 				try {
 					if (!chat) {
 						const title = await generateTitleFromUserMessage({ message });
@@ -229,8 +259,30 @@ export async function POST(request: Request) {
 				onError: () => {},
 			};
 
-			// Get MCP tool names dynamically
+			// Get MCP tool names dynamically (only for assistant models)
 			const mcpToolNames = Object.keys(toolSet);
+
+			// Define base tools (no MCP)
+			const baseTools = [
+				"getWeather",
+				"createDocument",
+				"updateDocument",
+				"requestSuggestions",
+				"searchProducts",
+			];
+
+			// Determine active tools based on model type
+			let activeTools: string[] = [];
+			if (selectedChatModel === "chat-model-reasoning") {
+				// No tools for reasoning model
+				activeTools = [];
+			} else if (isAssistantModel(selectedChatModel)) {
+				// Assistant models get base tools + MCP tools
+				activeTools = [...baseTools, ...mcpToolNames];
+			} else {
+				// Regular chat-model gets only base tools (no MCP)
+				activeTools = baseTools;
+			}
 
 			// Start AI response streaming immediately - don't wait for database operations
 			const result = streamText({
@@ -242,17 +294,7 @@ export async function POST(request: Request) {
 				}),
 				messages,
 				maxSteps: 5,
-				experimental_activeTools:
-					selectedChatModel === "chat-model-reasoning"
-						? []
-						: ([
-								"getWeather",
-								"createDocument",
-								"updateDocument",
-								"requestSuggestions",
-								"searchProducts",
-								...mcpToolNames,
-						  ] as any),
+				experimental_activeTools: activeTools as any,
 				experimental_transform: smoothStream({ chunking: "word" }),
 				experimental_generateMessageId: generateUUID,
 				tools: {
@@ -273,10 +315,18 @@ export async function POST(request: Request) {
 						session,
 						dataStream: toolDataWriter,
 					}),
-					...toolSet,
+					// Only include MCP tools for assistant models
+					...(isAssistantModel(selectedChatModel) ? toolSet : {}),
 				},
 				onFinish: async ({ response }) => {
-					await customClient.close();
+					// Only close MCP client if it was initialized
+					if (customClient) {
+						try {
+							await customClient.close();
+						} catch (closeError) {
+							console.error("Error closing MCP client:", closeError);
+						}
+					}
 					if (!session?.user?.id) return;
 
 					const assistantMessages = response.messages.filter(
@@ -294,25 +344,30 @@ export async function POST(request: Request) {
 					});
 
 					// Wait for background operations to complete before saving assistant message
-					saveOperationsPromise.then(async () => {
-						try {
-							await saveMessages({
-								messages: [
-									{
-										id: assistantId,
-										chatId: id,
-										role: assistantMessage.role,
-										parts: assistantMessage.parts,
-										attachments:
-											assistantMessage.experimental_attachments ?? [],
-										createdAt: new Date(),
-									},
-								],
-							});
-						} catch (error) {
-							console.error("Failed to save assistant message:", error);
-						}
-					});
+					// Only save for authenticated users
+					if (session.user.type !== "guest") {
+						saveOperationsPromise.then(async () => {
+							try {
+								await saveMessages({
+									messages: [
+										{
+											id: assistantId,
+											chatId: id,
+											role: assistantMessage.role,
+											parts: assistantMessage.parts,
+											attachments:
+												assistantMessage.experimental_attachments ?? [],
+											createdAt: new Date(),
+										},
+									],
+								});
+							} catch (error) {
+								console.error("Failed to save assistant message:", error);
+							}
+						});
+					} else {
+						console.log("Skipping assistant message save for guest user");
+					}
 				},
 				experimental_telemetry: {
 					isEnabled: isProductionEnvironment,
@@ -361,7 +416,7 @@ export async function GET(request: Request) {
 		return new ChatSDKError("bad_request:api").toResponse();
 	}
 
-	const session = await auth();
+	const session = await getServerSession();
 
 	if (!session?.user) {
 		return new ChatSDKError("unauthorized:chat").toResponse();
@@ -435,7 +490,7 @@ export async function DELETE(request: Request) {
 		return new ChatSDKError("bad_request:api").toResponse();
 	}
 
-	const session = await auth();
+	const session = await getServerSession();
 
 	if (!session?.user) {
 		return new ChatSDKError("unauthorized:chat").toResponse();
