@@ -2,7 +2,7 @@ import { getServerSession } from "@/lib/amplify-server";
 import { getDynamicEntitlements } from "@/lib/ai/entitlements";
 import { extractAssistantId, isAssistantModel } from "@/lib/ai/models";
 import { systemPrompt, type RequestHints } from "@/lib/ai/prompts";
-import { createDynamicProvider, myProvider } from "@/lib/ai/providers";
+import { createDynamicProvider } from "@/lib/ai/providers";
 import { createDocument } from "@/lib/ai/tools/create-document";
 import { getWeather } from "@/lib/ai/tools/get-weather";
 import { requestSuggestions } from "@/lib/ai/tools/request-suggestions";
@@ -142,20 +142,29 @@ export async function POST(request: Request) {
 				return;
 			}
 
-			// Run critical checks in parallel
-			const [messageCount, chat] = await Promise.all([
-				getMessageCountByUserId({
-					id: session.user.id,
-					differenceInHours: 24,
-				}).catch((error) => {
-					console.error("Failed to get message count:", error);
-					return 0;
-				}),
-				getChatById({ id }).catch((error) => {
-					console.error("Failed to get chat:", error);
-					return null;
-				}),
-			]);
+			// Run critical checks in parallel - skip database checks for guest users
+			let messageCount = 0;
+			let chat = null;
+
+			if (session.user.type !== "guest") {
+				const [messageCountResult, chatResult] = await Promise.all([
+					getMessageCountByUserId({
+						id: session.user.id,
+						differenceInHours: 24,
+					}).catch((error) => {
+						console.error("Failed to get message count:", error);
+						return 0;
+					}),
+					getChatById({ id }).catch((error) => {
+						console.error("Failed to get chat:", error);
+						return null;
+					}),
+				]);
+				messageCount = messageCountResult;
+				chat = chatResult;
+			} else {
+				console.log("Skipping database checks for guest user");
+			}
 
 			if (messageCount > maxMessagesPerDay) {
 				writer.write(
@@ -180,23 +189,30 @@ export async function POST(request: Request) {
 				country,
 			};
 
-			// Get previous messages for context
-			const previousMessages = await getMessagesByChatId({ id }).catch(
-				() => []
-			);
+			// Get previous messages for context - skip for guest users
+			let previousMessages: any[] = [];
+			if (session.user.type !== "guest") {
+				previousMessages = await getMessagesByChatId({ id }).catch(() => []);
+			} else {
+				console.log("Skipping previous messages retrieval for guest user");
+			}
+
 			const messages = appendClientMessage({
-				// @ts-expect-error: todo add type conversion from DBMessage[] to UIMessage[]
 				messages: previousMessages,
 				message,
 			});
 
 			// Create appropriate provider based on whether an assistant is selected
-			const provider = selectedAssistant
-				? createDynamicProvider(selectedAssistant)
-				: myProvider;
+			const provider = createDynamicProvider(selectedAssistant);
 
-			// Start database operations in background - don't wait for them
+			// Start database operations in background - only for authenticated users
 			const saveOperationsPromise = (async () => {
+				// Skip database operations for guest users
+				if (session.user.type === "guest") {
+					console.log("Skipping database operations for guest user");
+					return generateUUID(); // Return a fallback stream ID
+				}
+
 				try {
 					if (!chat) {
 						const title = await generateTitleFromUserMessage({ message });
@@ -328,25 +344,30 @@ export async function POST(request: Request) {
 					});
 
 					// Wait for background operations to complete before saving assistant message
-					saveOperationsPromise.then(async () => {
-						try {
-							await saveMessages({
-								messages: [
-									{
-										id: assistantId,
-										chatId: id,
-										role: assistantMessage.role,
-										parts: assistantMessage.parts,
-										attachments:
-											assistantMessage.experimental_attachments ?? [],
-										createdAt: new Date(),
-									},
-								],
-							});
-						} catch (error) {
-							console.error("Failed to save assistant message:", error);
-						}
-					});
+					// Only save for authenticated users
+					if (session.user.type !== "guest") {
+						saveOperationsPromise.then(async () => {
+							try {
+								await saveMessages({
+									messages: [
+										{
+											id: assistantId,
+											chatId: id,
+											role: assistantMessage.role,
+											parts: assistantMessage.parts,
+											attachments:
+												assistantMessage.experimental_attachments ?? [],
+											createdAt: new Date(),
+										},
+									],
+								});
+							} catch (error) {
+								console.error("Failed to save assistant message:", error);
+							}
+						});
+					} else {
+						console.log("Skipping assistant message save for guest user");
+					}
 				},
 				experimental_telemetry: {
 					isEnabled: isProductionEnvironment,

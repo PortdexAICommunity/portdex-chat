@@ -115,6 +115,7 @@ export default function Page() {
 						</SubmitButton>
 					</form>
 					<button
+						type="button"
 						onClick={() => setIsConfirming(false)}
 						className="text-sm text-center text-blue-500 hover:underline w-full"
 					>
