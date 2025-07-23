@@ -10,7 +10,6 @@ import { ChatSDKError } from "@/lib/errors";
 import { cn, fetcher, fetchWithErrorHandlers, generateUUID } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
 import type { Attachment, UIMessage } from "ai";
-import type { Session } from "next-auth";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import useSWR, { useSWRConfig } from "swr";
@@ -24,6 +23,18 @@ import { getChatHistoryPaginationKey } from "./sidebar-history";
 import { toast } from "./toast";
 import type { VisibilityType } from "./visibility-selector";
 import type { HomeMarketplaceItem } from "@/lib/types";
+import { useAuth } from "@/hooks/use-auth";
+
+interface Session {
+	user: {
+		id: string;
+		name: string | null;
+		email: string | null;
+		image: string | null;
+		type: "guest" | "regular";
+	};
+	expires: string;
+}
 
 export function Chat({
 	id,
@@ -31,7 +42,6 @@ export function Chat({
 	initialChatModel,
 	initialVisibilityType,
 	isReadonly,
-	session,
 	autoResume,
 }: {
 	id: string;
@@ -39,9 +49,35 @@ export function Chat({
 	initialChatModel: string;
 	initialVisibilityType: VisibilityType;
 	isReadonly: boolean;
-	session: Session;
 	autoResume: boolean;
 }) {
+	const { user, isGuest, loading } = useAuth();
+	const session: Session | null = loading
+		? null
+		: isGuest
+		? {
+				user: {
+					id: "guest",
+					name: "Guest",
+					email: null,
+					image: null,
+					type: "guest",
+				},
+				expires: new Date(Date.now() + 3600 * 1000).toISOString(),
+		  }
+		: user
+		? {
+				user: {
+					id: user.userId,
+					name: user.username,
+					email: user.signInDetails?.loginId || null,
+					image: null,
+					type: "regular",
+				},
+				expires: new Date(Date.now() + 3600 * 1000).toISOString(),
+		  }
+		: null;
+
 	const { mutate } = useSWRConfig();
 	const [selectedTool, setSelectedTool] = useState<string>("none");
 	const selectedToolRef = useRef(selectedTool);
@@ -192,6 +228,32 @@ export function Chat({
 		data,
 		setMessages,
 	});
+
+	// Show loading state while authentication is being determined
+	if (loading) {
+		return (
+			<div className="flex h-dvh bg-background">
+				<div className="flex flex-col items-center justify-center w-full">
+					<div className="text-lg">Loading...</div>
+				</div>
+			</div>
+		);
+	}
+
+	// Ensure session is available before rendering components that depend on it
+	if (!session) {
+		return (
+			<div className="flex h-dvh bg-background">
+				<div className="flex flex-col items-center justify-center w-full">
+					<div className="text-lg text-red-500">Authentication Error</div>
+					<div className="text-sm text-muted-foreground">
+						Unable to initialize session
+					</div>
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<>
 			<div
@@ -210,17 +272,19 @@ export function Chat({
 					session={session}
 				/>
 
-				<Messages
-					chatId={id}
-					status={status}
-					votes={votes}
-					messages={messages}
-					setMessages={setMessages}
-					reload={reload}
-					isReadonly={isReadonly}
-					isArtifactVisible={isArtifactVisible}
-					selectedAssistant={selectedAssistant}
-				/>
+				{session && (
+					<Messages
+						chatId={id}
+						status={status}
+						votes={votes}
+						messages={messages}
+						setMessages={setMessages}
+						reload={reload}
+						isReadonly={isReadonly}
+						isArtifactVisible={isArtifactVisible}
+						selectedAssistant={selectedAssistant}
+					/>
+				)}
 
 				<form
 					className={cn(

@@ -1,12 +1,13 @@
-import { Toaster } from "sonner";
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, Lora, Plus_Jakarta_Sans } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 
 import "./globals.css";
-import { SessionProvider } from "next-auth/react";
 import UseCaseTooltip from "@/components/use-case-tooltip";
 import { ThemeAwareToaster } from "@/components/theme-aware-toaster";
+import { Analytics } from "@vercel/analytics/react";
+import ConfigureAmplifyClientSide from "@/lib/amplify-client";
+import "@aws-amplify/ui-react/styles.css";
 
 export const metadata: Metadata = {
 	metadataBase: new URL("https://chat.vercel.ai"),
@@ -168,6 +169,7 @@ export default async function RootLayout({
 				/>
 			</head>
 			<body suppressHydrationWarning className="antialiased">
+				<ConfigureAmplifyClientSide />
 				<ThemeProvider
 					attribute="class"
 					defaultTheme="system"
@@ -177,7 +179,8 @@ export default async function RootLayout({
 					{/* <Toaster position="bottom-center" richColors /> */}
 					<ThemeAwareToaster />
 					<UseCaseTooltip />
-					<SessionProvider>{children}</SessionProvider>
+					{children}
+					<Analytics />
 				</ThemeProvider>
 			</body>
 		</html>
