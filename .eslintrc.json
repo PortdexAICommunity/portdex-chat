@@ -12,7 +12,8 @@
   "rules": {
     "tailwindcss/no-custom-classname": "off",
     "tailwindcss/classnames-order": "off",
-    "react/no-array-index-key": "off" // or "warn"
+    "react/no-array-index-key": "off", // or "warn"
+    "@typescript-eslint/no-implicit-any": "off"
   },
   "settings": {
     "import/resolver": {
