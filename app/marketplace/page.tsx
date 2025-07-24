@@ -5,9 +5,11 @@
 import { AIModelCard } from "@/components/marketplace/ai-model-card";
 import { AssistantCard } from "@/components/marketplace/assistant-card";
 import { DetailDialog } from "@/components/marketplace/detail-dialog";
+import { LoginPopup } from "@/components/marketplace/login-popup";
 import { MarketplaceFilter } from "@/components/marketplace/marketplace-filter";
 import { MarketplaceSection } from "@/components/marketplace/marketplace-section";
 import { MCPServerCard } from "@/components/marketplace/mcp-server-card";
+import { WorkflowCard } from "@/components/marketplace/workflow-card";
 
 import { Pagination } from "@/components/marketplace/pagination";
 import Tags from "@/components/marketplace/tag";
@@ -17,7 +19,12 @@ import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { PREDEFINED_ASSISTANT_CATEGORIES } from "@/lib/constant/marketplace-constant";
 import { siteTemplates, softwareTools } from "@/lib/constants";
-import type { DataTypes, MCPDataTypes, MCPServerType } from "@/lib/types";
+import type {
+	DataTypes,
+	MCPDataTypes,
+	MCPServerType,
+	WorkflowType,
+} from "@/lib/types";
 import { AnimatePresence, motion } from "framer-motion";
 import {
 	Brain,
@@ -31,6 +38,17 @@ import {
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 
+// Configure SWR to reduce API calls
+const swrConfig = {
+	revalidateOnFocus: false,
+	revalidateOnReconnect: false,
+	refreshWhenOffline: false,
+	refreshWhenHidden: false,
+	refreshInterval: 0, // Disable automatic refresh
+	dedupingInterval: 300000, // 5 minutes deduping
+	focusThrottleInterval: 300000, // 5 minutes focus throttle
+};
+
 // Infer agent type from API - using DataTypes for consistency
 
 type TabType =
@@ -39,7 +57,8 @@ type TabType =
 	| "ai-models"
 	| "softwares"
 	| "templates"
-	| "mcp-servers";
+	| "mcp-servers"
+	| "workflows";
 
 // --- SWR fetcher ---
 const fetcher = (url: string) =>
@@ -73,6 +92,15 @@ const mcpServersFetcher = (url: string) =>
 		pageSize: number;
 	}>;
 
+// Workflows fetcher
+const workflowsFetcher = (url: string) =>
+	fetch(url).then((res) => res.json()) as Promise<{
+		workflows: WorkflowType[];
+		total: number;
+		page: number;
+		pageSize: number;
+	}>;
+
 // Memoized Components
 const MemoizedAssistantCard = React.memo(
 	({ assistant, onClick }: { assistant: DataTypes; onClick: () => void }) => (
@@ -92,9 +120,31 @@ const MemoizedMCPServerCard = React.memo(
 	)
 );
 
+const MemoizedWorkflowCard = React.memo(
+	({
+		workflow,
+		onClick,
+		onDownload,
+		onLoginRequired,
+	}: {
+		workflow: WorkflowType;
+		onClick: () => void;
+		onDownload: (workflow: WorkflowType) => void;
+		onLoginRequired: () => void;
+	}) => (
+		<WorkflowCard
+			workflow={workflow}
+			onClick={onClick}
+			onDownload={onDownload}
+			onLoginRequired={onLoginRequired}
+		/>
+	)
+);
+
 MemoizedAssistantCard.displayName = "MemoizedAssistantCard";
 MemoizedAIModelCard.displayName = "MemoizedAIModelCard";
 MemoizedMCPServerCard.displayName = "MemoizedMCPServerCard";
+MemoizedWorkflowCard.displayName = "MemoizedWorkflowCard";
 
 // Pagination constants
 const ITEMS_PER_PAGE = 24;
@@ -104,12 +154,18 @@ const FEATURED_OTHER_ITEMS = 4;
 export default function Marketplace() {
 	const [activeTab, setActiveTab] = useState<TabType>("home");
 	const [selectedItem, setSelectedItem] = useState<
-		DataTypes | MCPDataTypes | MCPServerType | null
+		DataTypes | MCPDataTypes | MCPServerType | WorkflowType | null
 	>(null);
 	const [dialogType, setDialogType] = useState<
-		"assistant" | "mcp-server" | "ai-model" | "software" | "template"
+		| "assistant"
+		| "mcp-server"
+		| "ai-model"
+		| "software"
+		| "template"
+		| "workflow"
 	>("assistant");
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
+	const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [mounted, setMounted] = useState(false);
 	const [currentPage, setCurrentPage] = useState(1);
@@ -124,6 +180,8 @@ export default function Marketplace() {
 	const [softwarePageSize, setSoftwarePageSize] = useState(ITEMS_PER_PAGE);
 	const [templatesCurrentPage, setTemplatesCurrentPage] = useState(1);
 	const [templatesPageSize, setTemplatesPageSize] = useState(ITEMS_PER_PAGE);
+	const [workflowsCurrentPage, setWorkflowsCurrentPage] = useState(1);
+	const [workflowsPageSize, setWorkflowsPageSize] = useState(ITEMS_PER_PAGE);
 
 	// Filter states for each tab
 	const [assistantsFilters, setAssistantsFilters] = useState({
@@ -146,6 +204,10 @@ export default function Marketplace() {
 		selectedCategory: null as string | null,
 		searchTerm: "",
 	});
+	const [workflowsFilters, setWorkflowsFilters] = useState({
+		selectedCategory: null as string | null,
+		searchTerm: "",
+	});
 
 	useEffect(() => {
 		setMounted(true);
@@ -158,6 +220,7 @@ export default function Marketplace() {
 		setAiModelsCurrentPage(1);
 		setSoftwareCurrentPage(1);
 		setTemplatesCurrentPage(1);
+		setWorkflowsCurrentPage(1);
 	}, [
 		searchTerm,
 		activeTab,
@@ -166,6 +229,7 @@ export default function Marketplace() {
 		aiModelsFilters,
 		softwareFilters,
 		templatesFilters,
+		workflowsFilters,
 	]);
 
 	// Fetch assistants/agents with pagination
@@ -187,7 +251,8 @@ export default function Marketplace() {
 						: ""
 			  }`
 			: `marketplace/api/agents?page=1&pageSize=${FEATURED_ITEMS}`, // For home page featured items
-		fetcher
+		fetcher,
+		swrConfig
 	);
 
 	// Fetch AI models
@@ -201,7 +266,8 @@ export default function Marketplace() {
 				? `?search=${encodeURIComponent(aiModelsFilters.searchTerm)}`
 				: ""
 		}`,
-		aiModelsFetcher
+		aiModelsFetcher,
+		swrConfig
 	);
 
 	// Fetch MCP servers
@@ -219,13 +285,38 @@ export default function Marketplace() {
 				? `&search=${encodeURIComponent(mcpFilters.searchTerm)}`
 				: ""
 		}`,
-		mcpServersFetcher
+		mcpServersFetcher,
+		swrConfig
 	);
 
 	const { data: categoriesData } = useSWR(
 		"marketplace/api/mcp-servers/categories",
 		(url: string) =>
-			fetch(url).then((res) => res.json()) as Promise<{ categories: string[] }>
+			fetch(url).then((res) => res.json()) as Promise<{ categories: string[] }>,
+		swrConfig
+	);
+
+	// Fetch workflows - only when needed
+	const {
+		data: workflowsData,
+		isLoading: workflowsLoading,
+		error: workflowsError,
+	} = useSWR(
+		activeTab === "workflows" || activeTab === "home"
+			? `marketplace/api/workflows?page=${workflowsCurrentPage}&pageSize=${workflowsPageSize}${
+					workflowsFilters.selectedCategory
+						? `&category=${encodeURIComponent(
+								workflowsFilters.selectedCategory
+						  )}`
+						: ""
+			  }${
+					workflowsFilters.searchTerm && activeTab === "workflows"
+						? `&search=${encodeURIComponent(workflowsFilters.searchTerm)}`
+						: ""
+			  }`
+			: null,
+		workflowsFetcher,
+		swrConfig
 	);
 
 	const assistants = useMemo(() => aiAgentsData?.agents ?? [], [aiAgentsData]);
@@ -238,6 +329,10 @@ export default function Marketplace() {
 	const mcpCategories = useMemo(
 		() => categoriesData?.categories ?? [],
 		[categoriesData]
+	);
+	const workflows = useMemo(
+		() => workflowsData?.workflows ?? [],
+		[workflowsData]
 	);
 
 	// Helper function to get categories with counts
@@ -316,10 +411,27 @@ export default function Marketplace() {
 			.sort((a, b) => a.name.localeCompare(b.name));
 	}, [mcpServers]);
 
+	const workflowCategoriesWithCounts = useMemo(() => {
+		const categoryMap = new Map<string, number>();
+		workflows.forEach((workflow) => {
+			const category = workflow.category || "General";
+			categoryMap.set(category, (categoryMap.get(category) || 0) + 1);
+		});
+		return Array.from(categoryMap.entries())
+			.map(([name, count]) => ({ name, count }))
+			.sort((a, b) => a.name.localeCompare(b.name));
+	}, [workflows]);
+
 	const handleItemClick = useCallback(
 		(
-			item: DataTypes | MCPDataTypes | MCPServerType,
-			type: "assistant" | "ai-model" | "software" | "template" | "mcp-server"
+			item: DataTypes | MCPDataTypes | MCPServerType | WorkflowType,
+			type:
+				| "assistant"
+				| "ai-model"
+				| "software"
+				| "template"
+				| "mcp-server"
+				| "workflow"
 		) => {
 			setSelectedItem(item);
 			setDialogType(
@@ -333,6 +445,8 @@ export default function Marketplace() {
 					? "software"
 					: type === "template"
 					? "template"
+					: type === "workflow"
+					? "workflow"
 					: "assistant"
 			);
 			setIsDialogOpen(true);
@@ -447,6 +561,7 @@ export default function Marketplace() {
 	}, [filteredTemplates, templatesCurrentPage, templatesPageSize]);
 
 	const paginatedMcpServers = useMemo(() => mcpServers, [mcpServers]);
+	const paginatedWorkflows = useMemo(() => workflows, [workflows]);
 
 	// Page change handlers for each section
 	const handleAiModelsPageChange = useCallback((page: number) => {
@@ -474,6 +589,48 @@ export default function Marketplace() {
 	const handleTemplatesPageSizeChange = useCallback((pageSize: number) => {
 		setTemplatesPageSize(pageSize);
 		setTemplatesCurrentPage(1);
+	}, []);
+
+	const handleWorkflowsPageChange = useCallback((page: number) => {
+		setWorkflowsCurrentPage(page);
+	}, []);
+
+	const handleWorkflowsPageSizeChange = useCallback((pageSize: number) => {
+		setWorkflowsPageSize(pageSize);
+		setWorkflowsCurrentPage(1);
+	}, []);
+
+	// Download functionality for workflows
+	const handleWorkflowDownload = useCallback(async (workflow: WorkflowType) => {
+		try {
+			const response = await fetch(
+				`/marketplace/api/workflows/download/${workflow.id}`
+			);
+
+			if (!response.ok) {
+				throw new Error("Download failed");
+			}
+
+			const data = await response.json();
+			const blob = new Blob([JSON.stringify(data, null, 2)], {
+				type: "application/json",
+			});
+			const url = window.URL.createObjectURL(blob);
+			const link = document.createElement("a");
+			link.href = url;
+			link.download = `${workflow.id}.json`;
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+			window.URL.revokeObjectURL(url);
+		} catch (error) {
+			console.error("Download error:", error);
+			throw error;
+		}
+	}, []);
+
+	const handleLoginRequired = useCallback(() => {
+		setIsLoginPopupOpen(true);
 	}, []);
 
 	// Optimized animation settings based on item count
@@ -514,7 +671,11 @@ export default function Marketplace() {
 
 						<div className="flex items-center justify-end space-x-2">
 							<Badge variant="secondary" className="text-xs">
-								{assistantsTotal + aiModels.length + mcpServers.length} items
+								{assistantsTotal +
+									aiModels.length +
+									mcpServers.length +
+									workflows.length}{" "}
+								items
 							</Badge>
 						</div>
 					</div>
@@ -551,6 +712,7 @@ export default function Marketplace() {
 							{ id: "mcp-servers", label: "MCP Servers", icon: Server },
 							{ id: "softwares", label: "Softwares", icon: PackageOpen },
 							{ id: "templates", label: "Templates", icon: FileText },
+							{ id: "workflows", label: "Workflows", icon: PackageOpen },
 						].map((tab) => (
 							<motion.button
 								key={tab.id}
@@ -588,7 +750,8 @@ export default function Marketplace() {
 			<div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
 				<div className="">
 					<AnimatePresence mode="wait">
-						{(isLoading || aiModelsLoading) && (
+						{/* Show loading only for core sections, not workflows */}
+						{(isLoading || aiModelsLoading) && activeTab === "home" && (
 							<div className="py-16 text-center text-gray-500 dark:text-gray-400">
 								Loading...
 							</div>
@@ -708,6 +871,61 @@ export default function Marketplace() {
 												</motion.div>
 											))}
 									</div>
+								</section>
+
+								{/* Featured Workflows - Load independently */}
+								<section>
+									<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+										<h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+											Featured Workflows
+										</h2>
+										<Button
+											variant="ghost"
+											onClick={() => setActiveTab("workflows")}
+											className="text-gray-600 dark:text-gray-400 hover:text-orange-600 dark:hover:text-orange-400 self-start sm:self-auto"
+										>
+											Discover More →
+										</Button>
+									</div>
+									{workflowsLoading ? (
+										<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+											{Array.from({ length: FEATURED_OTHER_ITEMS }).map(
+												(_, index) => (
+													<div
+														key={index}
+														className="bg-gray-100 dark:bg-gray-800 rounded-lg h-48 animate-pulse"
+													/>
+												)
+											)}
+										</div>
+									) : workflowsError ? (
+										<div className="text-center py-8 text-gray-500 dark:text-gray-400">
+											Unable to load workflows. They will be available in the
+											Workflows section.
+										</div>
+									) : (
+										<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+											{workflows
+												.slice(0, FEATURED_OTHER_ITEMS)
+												.map((workflow, index) => (
+													<motion.div
+														key={workflow.id}
+														initial={{ opacity: 0, y: 20 }}
+														animate={{ opacity: 1, y: 0 }}
+														transition={{ delay: index * 0.1 }}
+													>
+														<MemoizedWorkflowCard
+															workflow={workflow}
+															onClick={() =>
+																handleItemClick(workflow, "workflow")
+															}
+															onDownload={handleWorkflowDownload}
+															onLoginRequired={handleLoginRequired}
+														/>
+													</motion.div>
+												))}
+										</div>
+									)}
 								</section>
 							</motion.div>
 						)}
@@ -1086,6 +1304,112 @@ export default function Marketplace() {
 								</div>
 							</motion.div>
 						)}
+
+						{activeTab === "workflows" && (
+							<motion.div
+								key="workflows"
+								initial={{ opacity: 0, y: 20 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: -20 }}
+								className="flex flex-col lg:flex-row gap-6"
+							>
+								{/* Sidebar Filter */}
+								<MarketplaceFilter
+									categories={workflowCategoriesWithCounts}
+									selectedCategory={workflowsFilters.selectedCategory}
+									searchTerm={workflowsFilters.searchTerm}
+									totalItems={workflowsData?.total || 0}
+									onCategoryChange={(category) =>
+										setWorkflowsFilters((prev) => ({
+											...prev,
+											selectedCategory: category,
+										}))
+									}
+									onSearchChange={(search) =>
+										setWorkflowsFilters((prev) => ({
+											...prev,
+											searchTerm: search,
+										}))
+									}
+									onClearFilters={() =>
+										setWorkflowsFilters({
+											selectedCategory: null,
+											searchTerm: "",
+										})
+									}
+									title="Workflows"
+									placeholder="Search workflows..."
+								/>
+
+								{/* Main Content */}
+								<div className="flex-1 space-y-6">
+									{workflowsLoading ? (
+										<div className="text-center py-16">
+											<div className="text-gray-400 dark:text-gray-500 text-lg mb-2">
+												Loading workflows...
+											</div>
+										</div>
+									) : workflowsError ? (
+										<div className="text-center py-16">
+											<div className="text-red-400 dark:text-red-500 text-lg mb-2">
+												Failed to load workflows
+											</div>
+											<p className="text-gray-500 dark:text-gray-400 text-sm">
+												Please try refreshing the page or check your connection
+											</p>
+										</div>
+									) : paginatedWorkflows.length === 0 ? (
+										<div className="text-center py-16">
+											<div className="text-gray-400 dark:text-gray-500 text-lg mb-2">
+												No workflows found
+											</div>
+											<p className="text-gray-500 dark:text-gray-400 text-sm">
+												Try adjusting your search terms or filters
+											</p>
+										</div>
+									) : (
+										<>
+											<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+												{paginatedWorkflows.map((workflow, index) => (
+													<motion.div
+														key={workflow.id}
+														initial={{ opacity: 0, y: 20 }}
+														animate={{ opacity: 1, y: 0 }}
+														transition={{ delay: index * 0.1 }}
+													>
+														<MemoizedWorkflowCard
+															workflow={workflow}
+															onClick={() =>
+																handleItemClick(workflow, "workflow")
+															}
+															onDownload={handleWorkflowDownload}
+															onLoginRequired={handleLoginRequired}
+														/>
+													</motion.div>
+												))}
+											</div>
+
+											{workflowsData &&
+												workflowsData.total > workflowsPageSize && (
+													<div className="mt-8">
+														<Pagination
+															currentPage={workflowsCurrentPage}
+															totalPages={Math.ceil(
+																workflowsData.total / workflowsPageSize
+															)}
+															pageSize={workflowsPageSize}
+															totalItems={workflowsData.total}
+															onPageChange={handleWorkflowsPageChange}
+															onPageSizeChange={handleWorkflowsPageSizeChange}
+															isLoading={workflowsLoading}
+														/>
+													</div>
+												)}
+										</>
+									)}
+								</div>
+							</motion.div>
+						)}
 					</AnimatePresence>
 				</div>
 			</div>
@@ -1096,6 +1420,12 @@ export default function Marketplace() {
 				onClose={() => setIsDialogOpen(false)}
 				item={selectedItem}
 				type={dialogType}
+			/>
+
+			{/* Login Popup */}
+			<LoginPopup
+				isOpen={isLoginPopupOpen}
+				onClose={() => setIsLoginPopupOpen(false)}
 			/>
 		</div>
 	);

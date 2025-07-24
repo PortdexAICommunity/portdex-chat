@@ -60,3 +60,116 @@ pnpm dev
 ```
 
 Your app template should now be running on [localhost:3000](http://localhost:3000).
+
+# Portdex Chat
+
+An open-source AI chatbot built with Next.js, the Vercel AI SDK, and AWS Amplify.
+
+## Features
+
+- Advanced AI-powered conversations
+- Document artifacts (text, code, images, spreadsheets)
+- Model Context Protocol (MCP) server integration
+- AI marketplace with agents, models, and tools
+- **Workflow Marketplace with S3 Integration** ⭐
+
+## S3 Workflow Integration
+
+The marketplace now includes a workflows section that integrates with AWS S3 for storing and serving workflow files.
+
+### Environment Variables Required
+
+Add these to your `.env.local` file:
+
+```env
+# AWS S3 Configuration for Workflows
+AWS_REGION=your-aws-region
+AWS_ACCESS_KEY_ID=your-access-key-id
+AWS_SECRET_ACCESS_KEY=your-secret-access-key
+S3_BUCKET_NAME=your-workflow-bucket-name
+```
+
+### S3 Bucket Structure
+
+Your S3 bucket should have this structure:
+
+```
+your-bucket/
+└── workflows/
+    ├── marketing/
+    │   ├── email-campaign.json
+    │   └── social-media-automation.json
+    ├── data/
+    │   ├── etl-pipeline.json
+    │   └── analytics-report.json
+    └── general/
+        └── basic-workflow.json
+```
+
+### Testing S3 Integration
+
+1. **Test S3 Connection**: Visit `/marketplace/api/workflows/test` to run comprehensive S3 tests
+2. **Check Logs**: Monitor console logs for detailed S3 operation information
+3. **Debug Issues**: The test endpoint provides specific error messages for common issues
+
+### Common S3 Issues & Solutions
+
+| Issue                             | Solution                                       |
+| --------------------------------- | ---------------------------------------------- |
+| **Missing environment variables** | Ensure all 4 env vars are set in `.env.local`  |
+| **Access Denied**                 | Check IAM permissions for your AWS credentials |
+| **NoSuchBucket**                  | Verify bucket name and region are correct      |
+| **No workflows found**            | Ensure JSON files are in `workflows/` folder   |
+
+### Required IAM Permissions
+
+Your AWS user/role needs these permissions:
+
+```json
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Effect": "Allow",
+			"Action": ["s3:GetObject", "s3:ListBucket"],
+			"Resource": [
+				"arn:aws:s3:::your-bucket-name",
+				"arn:aws:s3:::your-bucket-name/*"
+			]
+		}
+	]
+}
+```
+
+### Debugging
+
+Enable detailed logging by checking the console output when:
+
+- Visiting `/marketplace` → Workflows tab
+- Downloading workflow files
+- Running the test endpoint
+
+All S3 operations include emoji-prefixed logs for easy identification:
+
+- 🔍 **API requests**
+- ☁️ **S3 operations**
+- ✅ **Success**
+- ❌ **Errors**
+- 🧪 **Tests**
+
+## Getting Started
+
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Set up environment variables
+4. Run the development server: `npm run dev`
+5. Test S3 integration: Visit `/marketplace/api/workflows/test`
+
+## Documentation
+
+- [Docker Deployment](README.docker.md)
+- [SEO Optimization](SEO-OPTIMIZATION-SUMMARY.md)
+
+## License
+
+This project is licensed under the MIT License.
