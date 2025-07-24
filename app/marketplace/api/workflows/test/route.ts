@@ -348,7 +348,7 @@ export async function GET() {
 		`🏁 N8N Workflow Test Summary: ${passedTests}/${totalTests} tests passed, ${warningTests} warnings`
 	);
 
-	let summaryMessage;
+	let summaryMessage: string;
 	if (allPassed) {
 		summaryMessage =
 			"🎉 All tests passed! N8N workflow S3 integration is working perfectly.";

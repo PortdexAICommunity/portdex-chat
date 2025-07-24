@@ -80,7 +80,7 @@ export async function GET(
 			const fileContent = new TextDecoder().decode(bodyBytes);
 
 			// Parse and validate N8N workflow JSON
-			let n8nWorkflow;
+			let n8nWorkflow: any;
 			try {
 				n8nWorkflow = JSON.parse(fileContent);
 			} catch (parseError) {
