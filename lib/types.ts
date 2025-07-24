@@ -52,6 +52,36 @@ export type Assistant = {
 	description: string;
 };
 
+/**
+ * WorkflowType - Represents a workflow in the marketplace
+ * Designed to work with N8N workflow files from S3 storage
+ * Metadata is intelligently extracted from N8N workflow structure
+ */
+export type WorkflowType = {
+	/** Unique identifier (derived from filename) */
+	id: string;
+	/** Display name (from N8N workflow.name or derived from filename) */
+	name: string;
+	/** Generated description based on N8N nodes and workflow content */
+	description: string;
+	/** Auto-categorized based on N8N node types (e.g., "Email Marketing", "AI Automation") */
+	category: string;
+	/** Emoji icon based on category and workflow content */
+	icon: string;
+	/** Creator name (from N8N metadata or "N8N Community") */
+	creator: string;
+	/** Date from S3 file LastModified */
+	date: string;
+	/** Download endpoint URL */
+	downloadUrl: string;
+	/** File size in human-readable format */
+	fileSize?: string;
+	/** File type (e.g., "N8N Workflow") */
+	fileType?: string;
+	/** Generated tags from N8N nodes and workflow content */
+	tags?: string[];
+};
+
 export type Plugin = {
 	name: string;
 	category: string;

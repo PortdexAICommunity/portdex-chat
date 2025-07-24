@@ -24,6 +24,8 @@ import { toast } from "./toast";
 import type { VisibilityType } from "./visibility-selector";
 import type { HomeMarketplaceItem } from "@/lib/types";
 import { useAuth } from "@/hooks/use-auth";
+import { RateLimitDialog } from "./rate-limit-dialog";
+import { useGuestRateLimit } from "@/hooks/use-guest-rate-limit";
 
 interface Session {
 	user: {
@@ -140,10 +142,10 @@ export function Chat({
 	const {
 		messages,
 		setMessages,
-		handleSubmit,
+		handleSubmit: originalHandleSubmit,
 		input,
 		setInput,
-		append,
+		append: originalAppend,
 		status,
 		stop,
 		reload,
@@ -168,13 +170,59 @@ export function Chat({
 		},
 		onError: (error) => {
 			if (error instanceof ChatSDKError) {
-				toast({
-					type: "error",
-					description: error.message,
-				});
+				// Check if this is a rate limit error for guest users
+				if (error.message.includes("Rate limit exceeded") && isGuest) {
+					setShowRateLimitDialog(true);
+				} else {
+					toast({
+						type: "error",
+						description: error.message,
+					});
+				}
 			}
 		},
 	});
+
+	// Wrapped handleSubmit to check guest rate limits
+	const handleSubmit = (
+		event?: { preventDefault?: (() => void) | undefined },
+		chatRequestOptions?: any
+	) => {
+		if (isGuest && !canSendMessage()) {
+			setShowRateLimitDialog(true);
+			return;
+		}
+
+		// Increment guest message count before sending
+		if (isGuest) {
+			const canSend = incrementMessageCount();
+			if (!canSend) {
+				setShowRateLimitDialog(true);
+				return;
+			}
+		}
+
+		originalHandleSubmit(event, chatRequestOptions);
+	};
+
+	// Wrapped append to check guest rate limits
+	const append = async (message: any, chatRequestOptions?: any) => {
+		if (isGuest && !canSendMessage()) {
+			setShowRateLimitDialog(true);
+			return;
+		}
+
+		// Increment guest message count before sending
+		if (isGuest) {
+			const canSend = incrementMessageCount();
+			if (!canSend) {
+				setShowRateLimitDialog(true);
+				return;
+			}
+		}
+
+		return await originalAppend(message, chatRequestOptions);
+	};
 
 	// Cache messages as they are added or updated
 	useEffect(() => {
@@ -220,6 +268,11 @@ export function Chat({
 
 	const [attachments, setAttachments] = useState<Array<Attachment>>([]);
 	const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
+	const [showRateLimitDialog, setShowRateLimitDialog] = useState(false);
+
+	// Guest rate limiting
+	const { canSendMessage, incrementMessageCount, isLimitReached } =
+		useGuestRateLimit(isGuest);
 
 	useAutoResume({
 		autoResume,
@@ -320,6 +373,11 @@ export function Chat({
 
 				{messages.length === 0 && <Footer />}
 			</div>
+
+			<RateLimitDialog
+				open={showRateLimitDialog}
+				onOpenChange={setShowRateLimitDialog}
+			/>
 
 			<Artifact
 				chatId={id}
