@@ -9,7 +9,13 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
-import type { Assistant, DataTypes, MCPServerType, Plugin } from "@/lib/types";
+import type {
+	Assistant,
+	DataTypes,
+	MCPServerType,
+	Plugin,
+	WorkflowType,
+} from "@/lib/types";
 import { motion } from "framer-motion";
 import {
 	Calendar,
@@ -26,14 +32,15 @@ import { toast } from "sonner";
 interface DetailDialogProps {
 	isOpen: boolean;
 	onClose: () => void;
-	item: Assistant | Plugin | DataTypes | MCPServerType | null;
+	item: Assistant | Plugin | DataTypes | MCPServerType | WorkflowType | null;
 	type:
 		| "assistant"
 		| "plugin"
 		| "mcp-server"
 		| "ai-model"
 		| "software"
-		| "template";
+		| "template"
+		| "workflow";
 }
 
 export function DetailDialog({
@@ -48,6 +55,7 @@ export function DetailDialog({
 	const isPlugin = type === "plugin";
 	const isMcpServer = type === "mcp-server";
 	const isAIModel = type === "ai-model";
+	const isWorkflow = type === "workflow";
 	const isSoftware = type === "software";
 	const isTemplate = type === "template";
 
@@ -67,6 +75,10 @@ export function DetailDialog({
 			toast.info("Software download will be available soon. Stay tuned!");
 		} else if (isTemplate) {
 			toast.info("Template download is coming soon. Thanks for your patience!");
+		} else if (isWorkflow) {
+			toast.info(
+				"Workflow download functionality - please use the download button on the card."
+			);
 		} else {
 			console.log(`Using ${item.name}`);
 		}
@@ -80,6 +92,7 @@ export function DetailDialog({
 		if (isAIModel) return "Use AI Model";
 		if (isSoftware) return "Download Software";
 		if (isTemplate) return "Download Template";
+		if (isWorkflow) return "View Details";
 		return "Use";
 	};
 
@@ -115,7 +128,11 @@ export function DetailDialog({
 										: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
 								} w-fit`}
 							>
-								{isMcpServer ? "MCP Server" : item.category}
+								{isMcpServer
+									? "MCP Server"
+									: isWorkflow
+									? "Workflow"
+									: item.category}
 							</Badge>
 						</div>
 					</DialogHeader>

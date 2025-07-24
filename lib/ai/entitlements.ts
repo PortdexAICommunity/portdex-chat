@@ -7,12 +7,16 @@ interface Entitlements {
 	availableChatModelIds: Array<ChatModel["id"]>;
 }
 
+// Configurable rate limits - change these numbers to update limits
+const GUEST_MESSAGE_LIMIT = 3;
+const REGULAR_USER_MESSAGE_LIMIT = 100;
+
 export const entitlementsByUserType: Record<UserType, Entitlements> = {
 	/*
 	 * For users without an account
 	 */
 	guest: {
-		maxMessagesPerDay: 20,
+		maxMessagesPerDay: GUEST_MESSAGE_LIMIT,
 		availableChatModelIds: ["chat-model", "chat-model-reasoning"],
 	},
 
@@ -20,7 +24,7 @@ export const entitlementsByUserType: Record<UserType, Entitlements> = {
 	 * For users with an account
 	 */
 	regular: {
-		maxMessagesPerDay: 100,
+		maxMessagesPerDay: REGULAR_USER_MESSAGE_LIMIT,
 		availableChatModelIds: ["chat-model", "chat-model-reasoning"],
 	},
 
@@ -28,6 +32,9 @@ export const entitlementsByUserType: Record<UserType, Entitlements> = {
 	 * TODO: For users with an account and a paid membership
 	 */
 };
+
+// Export the constants for use in other parts of the application
+export { GUEST_MESSAGE_LIMIT, REGULAR_USER_MESSAGE_LIMIT };
 
 // Dynamic entitlements that include assistant models
 export const getDynamicEntitlements = (
