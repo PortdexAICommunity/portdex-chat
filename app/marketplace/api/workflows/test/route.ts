@@ -8,10 +8,10 @@ import {
 
 // Initialize S3 client
 const s3Client = new S3Client({
-	region: process.env.AWS_REGION,
+	region: process.env.NEXT_PUBLIC_AWS_REGION,
 	credentials: {
-		accessKeyId: process.env.AWS_ACCESS_KEY_ID || "",
-		secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "",
+		accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID || "",
+		secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY || "",
 	},
 });
 
@@ -22,12 +22,16 @@ export async function GET() {
 		timestamp: new Date().toISOString(),
 		testType: "n8n-workflow-integration",
 		environment: {
-			AWS_REGION: process.env.AWS_REGION || "NOT_SET",
-			AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID ? "SET" : "NOT_SET",
-			AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY
+			NEXT_PUBLIC_AWS_REGION: process.env.NEXT_PUBLIC_AWS_REGION || "NOT_SET",
+			NEXT_PUBLIC_AWS_ACCESS_KEY_ID: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID
 				? "SET"
 				: "NOT_SET",
-			S3_BUCKET_NAME: process.env.S3_BUCKET_NAME || "NOT_SET",
+			NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY: process.env
+				.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY
+				? "SET"
+				: "NOT_SET",
+			NEXT_PUBLIC_S3_BUCKET_NAME:
+				process.env.NEXT_PUBLIC_S3_BUCKET_NAME || "NOT_SET",
 		},
 		tests: [] as Array<{
 			name: string;
@@ -40,10 +44,10 @@ export async function GET() {
 	// Test 1: Environment Variables
 	console.log("🔧 Testing environment variables...");
 	const requiredVars = [
-		"AWS_REGION",
-		"AWS_ACCESS_KEY_ID",
-		"AWS_SECRET_ACCESS_KEY",
-		"S3_BUCKET_NAME",
+		"NEXT_PUBLIC_AWS_REGION",
+		"NEXT_PUBLIC_AWS_ACCESS_KEY_ID",
+		"NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY",
+		"NEXT_PUBLIC_S3_BUCKET_NAME",
 	];
 	const missingVars = requiredVars.filter((varName) => !process.env[varName]);
 
@@ -89,7 +93,7 @@ export async function GET() {
 	console.log("🪣 Testing bucket access...");
 	try {
 		const headBucketCommand = new HeadBucketCommand({
-			Bucket: process.env.S3_BUCKET_NAME,
+			Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
 		});
 
 		const startTime = Date.now();
@@ -100,7 +104,7 @@ export async function GET() {
 			name: "Bucket Access",
 			status: "PASS",
 			message: `Bucket accessible in ${duration}ms`,
-			details: { duration, bucket: process.env.S3_BUCKET_NAME },
+			details: { duration, bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME },
 		});
 		console.log("✅ Bucket access test passed");
 	} catch (error: any) {
@@ -111,7 +115,7 @@ export async function GET() {
 			details: {
 				errorName: error.name,
 				errorCode: error.code,
-				bucket: process.env.S3_BUCKET_NAME,
+				bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
 				statusCode: error.$metadata?.httpStatusCode,
 			},
 		});
@@ -123,7 +127,7 @@ export async function GET() {
 	console.log("📁 Testing N8N workflows folder listing...");
 	try {
 		const listCommand = new ListObjectsV2Command({
-			Bucket: process.env.S3_BUCKET_NAME,
+			Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
 			Prefix: "workflows/",
 			MaxKeys: 100,
 		});
@@ -184,7 +188,7 @@ export async function GET() {
 	console.log("📄 Testing N8N workflow file validation...");
 	try {
 		const listCommand = new ListObjectsV2Command({
-			Bucket: process.env.S3_BUCKET_NAME,
+			Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
 			Prefix: "workflows/",
 			MaxKeys: 3,
 		});
@@ -208,7 +212,7 @@ export async function GET() {
 				// Test first 2 files
 				try {
 					const getObjectCommand = new GetObjectCommand({
-						Bucket: process.env.S3_BUCKET_NAME,
+						Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
 						Key: file.Key,
 					});
 
@@ -305,7 +309,7 @@ export async function GET() {
 								name: data.workflows[0].name,
 								category: data.workflows[0].category,
 								creator: data.workflows[0].creator,
-						  }
+							}
 						: null,
 				},
 			});
@@ -380,7 +384,7 @@ export async function GET() {
 				...(warningTests > 0
 					? [
 							"Upload N8N workflow JSON files to the 'workflows/' folder in your S3 bucket",
-					  ]
+						]
 					: []),
 				...(passedTests < totalTests
 					? ["Check AWS credentials and S3 bucket permissions"]

@@ -8,10 +8,10 @@ import {
 
 // Initialize S3 client with environment variables
 const s3Client = new S3Client({
-	region: process.env.AWS_REGION,
+	region: process.env.NEXT_PUBLIC_AWS_REGION,
 	credentials: {
-		accessKeyId: process.env.AWS_ACCESS_KEY_ID || "",
-		secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "",
+		accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID || "",
+		secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY || "",
 	},
 });
 
@@ -271,10 +271,11 @@ export async function GET(req: NextRequest) {
 
 	// Validate environment variables
 	const requiredEnvVars = {
-		AWS_REGION: process.env.AWS_REGION,
-		AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
-		AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
-		S3_BUCKET_NAME: process.env.S3_BUCKET_NAME,
+		NEXT_PUBLIC_AWS_REGION: process.env.NEXT_PUBLIC_AWS_REGION,
+		NEXT_PUBLIC_AWS_ACCESS_KEY_ID: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
+		NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY:
+			process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
+		NEXT_PUBLIC_S3_BUCKET_NAME: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
 	};
 
 	const missingVars = Object.entries(requiredEnvVars)
@@ -296,7 +297,7 @@ export async function GET(req: NextRequest) {
 	try {
 		// List objects in S3 bucket (files are in root, not workflows/ folder)
 		const command = new ListObjectsV2Command({
-			Bucket: process.env.S3_BUCKET_NAME,
+			Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
 			MaxKeys: 1000,
 		});
 
@@ -323,7 +324,7 @@ export async function GET(req: NextRequest) {
 		const workflowPromises = jsonFiles.map(async (file) => {
 			try {
 				const getObjectCommand = new GetObjectCommand({
-					Bucket: process.env.S3_BUCKET_NAME,
+					Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
 					Key: file.Key,
 				});
 

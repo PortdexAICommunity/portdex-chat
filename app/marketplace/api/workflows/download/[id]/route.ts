@@ -4,10 +4,10 @@ import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 
 // Initialize S3 client
 const s3Client = new S3Client({
-	region: process.env.AWS_REGION,
+	region: process.env.NEXT_PUBLIC_AWS_REGION,
 	credentials: {
-		accessKeyId: process.env.AWS_ACCESS_KEY_ID || "",
-		secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "",
+		accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID || "",
+		secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY || "",
 	},
 });
 
@@ -35,10 +35,11 @@ export async function GET(
 
 		// Validate environment variables
 		const requiredEnvVars = {
-			AWS_REGION: process.env.AWS_REGION,
-			AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
-			AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
-			S3_BUCKET_NAME: process.env.S3_BUCKET_NAME,
+			NEXT_PUBLIC_AWS_REGION: process.env.NEXT_PUBLIC_AWS_REGION,
+			NEXT_PUBLIC_AWS_ACCESS_KEY_ID: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
+			NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY:
+				process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
+			NEXT_PUBLIC_S3_BUCKET_NAME: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
 		};
 
 		const missingVars = Object.entries(requiredEnvVars)
@@ -61,7 +62,7 @@ export async function GET(
 
 		// Fetch workflow file from S3
 		const getObjectCommand = new GetObjectCommand({
-			Bucket: process.env.S3_BUCKET_NAME,
+			Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
 			Key: s3Key,
 		});
 
