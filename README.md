@@ -83,10 +83,10 @@ Add these to your `.env.local` file:
 
 ```env
 # AWS S3 Configuration for Workflows
-AWS_REGION=your-aws-region
-AWS_ACCESS_KEY_ID=your-access-key-id
-AWS_SECRET_ACCESS_KEY=your-secret-access-key
-S3_BUCKET_NAME=your-workflow-bucket-name
+NEXT_PUBLIC_AWS_REGION=your-aws-region
+NEXT_PUBLIC_AWS_ACCESS_KEY_ID=your-access-key-id
+NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY=your-secret-access-key
+NEXT_PUBLIC_S3_BUCKET_NAME=your-workflow-bucket-name
 ```
 
 ### S3 Bucket Structure
