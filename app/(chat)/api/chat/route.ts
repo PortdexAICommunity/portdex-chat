@@ -249,6 +249,12 @@ export async function POST(request: Request) {
 				isTestEnvironment: isProductionEnvironment ? "No" : "Yes",
 				hasPortdexApiKey: process.env.PORTDEX_API_KEY ? "Yes" : "No",
 				nodeEnv: process.env.NODE_ENV,
+				envVarKeys: Object.keys(process.env)
+					.filter(
+						(key) =>
+							key.includes("PORT") || key.includes("API") || key.includes("KEY")
+					)
+					.join(", "),
 			});
 
 			// Start database operations in background - only for authenticated users
@@ -452,6 +458,12 @@ export async function POST(request: Request) {
 			// Process the stream with error handling
 			try {
 				logWithTimestamp("Starting to process stream");
+
+				// Check if we have the API key for non-test environments
+				if (!process.env.PORTDEX_API_KEY && !isProductionEnvironment) {
+					throw new Error("Missing PORTDEX_API_KEY environment variable");
+				}
+
 				const reader = result.toDataStream().getReader();
 
 				let chunkCount = 0;
@@ -479,7 +491,13 @@ export async function POST(request: Request) {
 			} catch (streamError) {
 				logWithTimestamp("Stream error", streamError);
 				writer.write(
-					`data: ${JSON.stringify({ error: "Stream processing error" })}\n\n`
+					`data: ${JSON.stringify({
+						error: "Stream processing error",
+						details:
+							streamError instanceof Error
+								? streamError.message
+								: "Unknown error",
+					})}\n\n`
 				);
 			}
 		} catch (err) {
