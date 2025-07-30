@@ -244,6 +244,13 @@ export async function POST(request: Request) {
 			const provider = createDynamicProvider(selectedAssistant);
 			logWithTimestamp("Provider created");
 
+			// Log environment variables (safely)
+			logWithTimestamp("Environment check", {
+				isTestEnvironment: isProductionEnvironment ? "No" : "Yes",
+				hasPortdexApiKey: process.env.PORTDEX_API_KEY ? "Yes" : "No",
+				nodeEnv: process.env.NODE_ENV,
+			});
+
 			// Start database operations in background - only for authenticated users
 			const saveOperationsPromise = (async () => {
 				// Skip database operations for guest users
@@ -427,6 +434,17 @@ export async function POST(request: Request) {
 				},
 			});
 
+			// Log provider details to help diagnose the issue
+			try {
+				logWithTimestamp("AI Provider details", {
+					type: provider.constructor.name,
+					modelName: selectedChatModel,
+					modelAvailable: !!provider.languageModel,
+				});
+			} catch (providerError) {
+				logWithTimestamp("Error inspecting provider", providerError);
+			}
+
 			// Important: Ensure the stream is consumed even if the client disconnects
 			// This is critical for AWS Amplify deployments
 			result.consumeStream();
@@ -436,15 +454,28 @@ export async function POST(request: Request) {
 				logWithTimestamp("Starting to process stream");
 				const reader = result.toDataStream().getReader();
 
+				let chunkCount = 0;
 				while (true) {
 					const { done, value } = await reader.read();
 					if (done) {
-						logWithTimestamp("Stream processing completed");
+						logWithTimestamp(
+							`Stream processing completed after ${chunkCount} chunks`
+						);
 						break;
 					}
+
+					chunkCount++;
+					if (chunkCount === 1) {
+						logWithTimestamp("First chunk received", {
+							valueLength: value?.length,
+						});
+					}
+
 					await writer.write(value);
 				}
-				logWithTimestamp(`Request processed in ${Date.now() - startTime}ms`);
+				logWithTimestamp(
+					`Request processed in ${Date.now() - startTime}ms with ${chunkCount} chunks`
+				);
 			} catch (streamError) {
 				logWithTimestamp("Stream error", streamError);
 				writer.write(
