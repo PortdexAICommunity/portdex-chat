@@ -5,6 +5,7 @@
 import { AIModelCard } from "@/components/marketplace/ai-model-card";
 import { AssistantCard } from "@/components/marketplace/assistant-card";
 import { DetailDialog } from "@/components/marketplace/detail-dialog";
+import { FeaturedMarketplaceSection } from "@/components/marketplace/feature-marketplace-section";
 import { LoginPopup } from "@/components/marketplace/login-popup";
 import { MarketplaceFilter } from "@/components/marketplace/marketplace-filter";
 import { MarketplaceSection } from "@/components/marketplace/marketplace-section";
@@ -27,16 +28,20 @@ import type {
 } from "@/lib/types";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+	BitcoinIcon,
 	Brain,
+	ChartBarIcon,
 	FileText,
 	Home,
 	PackageOpen,
 	Search,
-	Server,
+	TowerControlIcon,
 	Users,
 } from "lucide-react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
+import { BlockchainIcon, MCPIcon, N8NIcon } from "@/components/icons";
+import { FAQSection } from "@/components/faq";
 
 // Configure SWR to reduce API calls
 const swrConfig = {
@@ -48,6 +53,41 @@ const swrConfig = {
 	dedupingInterval: 300000, // 5 minutes deduping
 	focusThrottleInterval: 300000, // 5 minutes focus throttle
 };
+
+// Marketplace FAQs
+const marketplaceFAQs = [
+	{
+		question: "What is an AI agent?",
+		answer:
+			"An AI agent is a LLM-powered intelligence that has access to capabilities/tools and uses them to accomplish specific tasks. Our marketplace offers a variety of AI agents designed for crypto and financial applications that can help automate tasks, provide insights, and enhance your workflow.",
+	},
+	{
+		question: "What is the difference between a plugin and a connector?",
+		answer:
+			"A plugin is a capability of an AI agent that contains everything needed to execute a specific task or business process. A connector is a reusable component that primarily handles authentication and integration with your business system, allowing AI agents to securely access your data.",
+	},
+	{
+		question: "How do I install an AI Agent?",
+		answer:
+			"You can install AI Agents directly from our Marketplace to your AI Assistant with just a few clicks. Browse the available agents, select the one you need, and follow the simple installation process. Our system will handle the integration automatically.",
+	},
+	{
+		question:
+			"I have an idea for an AI agent, but it's not in the marketplace yet. How can I get it added?",
+		answer:
+			"You can submit your idea for a new AI agent through our submission process. We recommend sharing your concept with us so we can better understand your requirements and help bring your idea to life. When you're ready, you can submit it for review and potential inclusion in our marketplace.",
+	},
+	{
+		question: "Where do I build AI agents?",
+		answer:
+			"You can build AI Agents in our Plugin Workspace, which is part of our Agent Studio platform. This provides all the tools and resources you need to create, test, and deploy your own custom AI agents for crypto and financial applications.",
+	},
+	{
+		question: "What are the different types of plugins available?",
+		answer:
+			"We offer several types of plugins: Built-In capabilities supported out-of-the-box, Idea plugins that are conceptually possible but not yet validated, Validated plugins that have been verified through API research, Guided plugins with step-by-step development documentation, Template pre-built plugins that can be installed in minutes, and Polling Required plugins that connect to event APIs for proactive functionality.",
+	},
+];
 
 // Infer agent type from API - using DataTypes for consistency
 
@@ -148,8 +188,7 @@ MemoizedWorkflowCard.displayName = "MemoizedWorkflowCard";
 
 // Pagination constants
 const ITEMS_PER_PAGE = 24;
-const FEATURED_ITEMS = 8;
-const FEATURED_OTHER_ITEMS = 4;
+const FEATURED_ITEMS = 6;
 
 export default function Marketplace() {
 	const [activeTab, setActiveTab] = useState<TabType>("home");
@@ -243,13 +282,13 @@ export default function Marketplace() {
 					assistantsFilters.selectedCategory
 						? `&category=${encodeURIComponent(
 								assistantsFilters.selectedCategory
-						  )}`
+							)}`
 						: ""
-			  }${
+				}${
 					assistantsFilters.searchTerm
 						? `&search=${encodeURIComponent(assistantsFilters.searchTerm)}`
 						: ""
-			  }`
+				}`
 			: `marketplace/api/agents?page=1&pageSize=${FEATURED_ITEMS}`, // For home page featured items
 		fetcher,
 		swrConfig
@@ -307,13 +346,13 @@ export default function Marketplace() {
 					workflowsFilters.selectedCategory
 						? `&category=${encodeURIComponent(
 								workflowsFilters.selectedCategory
-						  )}`
+							)}`
 						: ""
-			  }${
+				}${
 					workflowsFilters.searchTerm && activeTab === "workflows"
 						? `&search=${encodeURIComponent(workflowsFilters.searchTerm)}`
 						: ""
-			  }`
+				}`
 			: null,
 		workflowsFetcher,
 		swrConfig
@@ -438,16 +477,16 @@ export default function Marketplace() {
 				type === "assistant"
 					? "assistant"
 					: type === "ai-model"
-					? "ai-model"
-					: type === "mcp-server"
-					? "mcp-server"
-					: type === "software"
-					? "software"
-					: type === "template"
-					? "template"
-					: type === "workflow"
-					? "workflow"
-					: "assistant"
+						? "ai-model"
+						: type === "mcp-server"
+							? "mcp-server"
+							: type === "software"
+								? "software"
+								: type === "template"
+									? "template"
+									: type === "workflow"
+										? "workflow"
+										: "assistant"
 			);
 			setIsDialogOpen(true);
 		},
@@ -486,10 +525,9 @@ export default function Marketplace() {
 					item.creator
 						.toLowerCase()
 						.includes(filters.searchTerm.toLowerCase()) ||
-					(item.category &&
-						item.category
-							.toLowerCase()
-							.includes(filters.searchTerm.toLowerCase()));
+					item.category
+						?.toLowerCase()
+						.includes(filters.searchTerm.toLowerCase());
 				return matchesCategory && matchesSearch;
 			});
 		},
@@ -514,10 +552,9 @@ export default function Marketplace() {
 					item.creator
 						.toLowerCase()
 						.includes(filters.searchTerm.toLowerCase()) ||
-					(item.category &&
-						item.category
-							.toLowerCase()
-							.includes(filters.searchTerm.toLowerCase()));
+					item.category
+						?.toLowerCase()
+						.includes(filters.searchTerm.toLowerCase());
 				return matchesCreator && matchesSearch;
 			});
 		},
@@ -707,12 +744,36 @@ export default function Marketplace() {
 					<div className="flex overflow-x-auto scrollbar-hide">
 						{[
 							{ id: "home", label: "Home", icon: Home },
-							{ id: "assistants", label: "Assistants", icon: Users },
-							{ id: "ai-models", label: "Models Providers", icon: Brain },
-							{ id: "mcp-servers", label: "MCP Servers", icon: Server },
-							{ id: "softwares", label: "Softwares", icon: PackageOpen },
-							{ id: "templates", label: "Templates", icon: FileText },
-							{ id: "workflows", label: "Workflows", icon: PackageOpen },
+							{
+								id: "workflows",
+								label: "Workflows",
+								icon: N8NIcon,
+							},
+							{
+								id: "assistants",
+								label: "Assistants",
+								icon: Users,
+							},
+							{
+								id: "ai-models",
+								label: "Models Providers",
+								icon: Brain,
+							},
+							{
+								id: "mcp-servers",
+								label: "MCP Servers",
+								icon: MCPIcon,
+							},
+							{
+								id: "softwares",
+								label: "Softwares",
+								icon: PackageOpen,
+							},
+							{
+								id: "templates",
+								label: "Templates",
+								icon: FileText,
+							},
 						].map((tab) => (
 							<motion.button
 								key={tab.id}
@@ -730,15 +791,17 @@ export default function Marketplace() {
 								<span className="sm:hidden">
 									{tab.id === "home"
 										? "Home"
-										: tab.id === "assistants"
-										? "Assistants"
-										: tab.id === "ai-models"
-										? "AI Models"
-										: tab.id === "softwares"
-										? "Softwares"
-										: tab.id === "templates"
-										? "Templates"
-										: "MCP Servers"}
+										: tab.id === "workflows"
+											? "Workflows"
+											: tab.id === "assistants"
+												? "Assistants"
+												: tab.id === "ai-models"
+													? "AI Models"
+													: tab.id === "softwares"
+														? "Softwares"
+														: tab.id === "templates"
+															? "Templates"
+															: "MCP Servers"}
 								</span>
 							</motion.button>
 						))}
@@ -768,165 +831,136 @@ export default function Marketplace() {
 								initial={{ opacity: 0, y: 20 }}
 								animate={{ opacity: 1, y: 0 }}
 								exit={{ opacity: 0, y: -20 }}
-								className="space-y-8 sm:space-y-12"
+								className="space-y-4 sm:space-y-6"
 							>
-								{/* Featured Assistants */}
-								<section>
-									<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-										<h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-											Featured Assistants
-										</h2>
-										<Button
-											variant="ghost"
-											onClick={() => handleViewMore("assistants")}
-											className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 self-start sm:self-auto"
-										>
-											Discover More →
-										</Button>
-									</div>
-									<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-										{assistants
-											.slice(0, FEATURED_ITEMS)
-											.map((assistant, index) => (
-												<motion.div
-													key={assistant.id}
-													initial={{ opacity: 0, y: 20 }}
-													animate={{ opacity: 1, y: 0 }}
-													transition={{ delay: index * 0.1 }}
-												>
-													<MemoizedAssistantCard
-														assistant={assistant}
-														onClick={() =>
-															handleItemClick(assistant, "assistant")
-														}
-													/>
-												</motion.div>
-											))}
-									</div>
-								</section>
-
-								{/* Featured AI Models */}
-								<section>
-									<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-										<h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-											Featured AI Models
-										</h2>
-										<Button
-											variant="ghost"
-											onClick={() => setActiveTab("ai-models")}
-											className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 self-start sm:self-auto"
-										>
-											Discover More →
-										</Button>
-									</div>
-									<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-										{aiModels
-											.slice(0, FEATURED_OTHER_ITEMS)
-											.map((aiModel, index) => (
-												<motion.div
-													key={aiModel.id}
-													initial={{ opacity: 0, y: 20 }}
-													animate={{ opacity: 1, y: 0 }}
-													transition={{ delay: index * 0.1 }}
-												>
-													<MemoizedAIModelCard
-														aiModel={aiModel}
-														onClick={() => handleItemClick(aiModel, "ai-model")}
-													/>
-												</motion.div>
-											))}
-									</div>
-								</section>
-
-								{/* Featured MCP Servers */}
-								<section>
-									<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-										<h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-											Featured MCP Servers
-										</h2>
-										<Button
-											variant="ghost"
-											onClick={() => setActiveTab("mcp-servers")}
-											className="text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 self-start sm:self-auto"
-										>
-											Discover More →
-										</Button>
-									</div>
-									<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-										{mcpServers
-											.slice(0, FEATURED_OTHER_ITEMS)
-											.map((server, index) => (
-												<motion.div
-													key={`${server.name}-${index}`}
-													initial={{ opacity: 0, y: 20 }}
-													animate={{ opacity: 1, y: 0 }}
-													transition={{ delay: index * 0.1 }}
-												>
-													<MemoizedMCPServerCard
-														server={server}
-														onClick={() =>
-															handleItemClick(server, "mcp-server")
-														}
-													/>
-												</motion.div>
-											))}
-									</div>
-								</section>
-
-								{/* Featured Workflows - Load independently */}
-								<section>
-									<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-										<h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-											Featured Workflows
-										</h2>
-										<Button
-											variant="ghost"
-											onClick={() => setActiveTab("workflows")}
-											className="text-gray-600 dark:text-gray-400 hover:text-orange-600 dark:hover:text-orange-400 self-start sm:self-auto"
-										>
-											Discover More →
-										</Button>
-									</div>
-									{workflowsLoading ? (
-										<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-											{Array.from({ length: FEATURED_OTHER_ITEMS }).map(
-												(_, index) => (
-													<div
-														key={index}
-														className="bg-gray-100 dark:bg-gray-800 rounded-lg h-48 animate-pulse"
-													/>
-												)
-											)}
+								{/* Hero Banner */}
+								<section className="relative overflow-hidden rounded-2xl bg-[url(/marketplace-banner.jpg)] bg-origin-padding bg-cover bg-no-repeat">
+									<div className="flex flex-col sm:flex-row items-center justify-between p-4 sm:p-6 md:p-8">
+										<div className="z-10 max-w-2xl w-full text-left">
+											<h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 sm:mb-3 font-serif">
+												Add AI Agents to your assistant in minutes
+											</h1>
+											<p className="text-white/80 text-xs sm:text-sm mb-4">
+												Transform your financial landscape with the AI
+												Marketplace, the ultimate hub for crypto enthusiasts and
+												finance professionals alike, designed to enhance
+												productivity, reduce operational hurdles, and propel
+												your investments into the fast lane.
+											</p>
+											<Button
+												className="bg-white hover:bg-white/90 text-purple-700 hover:text-purple-800 font-medium px-4 sm:px-6 py-1 sm:py-2 text-sm"
+												onClick={() => setActiveTab("assistants")}
+											>
+												Explore AI agent solutions
+											</Button>
 										</div>
-									) : workflowsError ? (
-										<div className="text-center py-8 text-gray-500 dark:text-gray-400">
-											Unable to load workflows. They will be available in the
-											Workflows section.
-										</div>
-									) : (
-										<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-											{workflows
-												.slice(0, FEATURED_OTHER_ITEMS)
-												.map((workflow, index) => (
-													<motion.div
-														key={workflow.id}
-														initial={{ opacity: 0, y: 20 }}
-														animate={{ opacity: 1, y: 0 }}
-														transition={{ delay: index * 0.1 }}
-													>
-														<MemoizedWorkflowCard
-															workflow={workflow}
-															onClick={() =>
-																handleItemClick(workflow, "workflow")
-															}
-															onDownload={handleWorkflowDownload}
-															onLoginRequired={handleLoginRequired}
+									</div>
+								</section>
+
+								{/* Welcome to Marketplace */}
+								<section className="text-center mb-4">
+									<h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">
+										Discover, deploy, and manage solutions
+									</h2>
+									<p className="text-sm text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+										The most subscribed products this month
+									</p>
+								</section>
+
+								{/* Featured Items with Filter */}
+								<section>
+									<FeaturedMarketplaceSection
+										assistants={assistants}
+										aiModels={aiModels}
+										mcpServers={mcpServers}
+										workflows={workflows}
+										onItemClick={handleItemClick}
+										title="Featured Items"
+										defaultShowAssistantsAndWorkflows={true}
+									/>
+								</section>
+
+								{/* Popular Categories */}
+								<section className="pt-6">
+									<h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+										Popular Categories
+									</h2>
+									<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+										{[
+											{
+												name: "Crypto",
+												icon: <BitcoinIcon />,
+												tab: "assistants",
+												gradient:
+													"from-purple-400 to-indigo-500 dark:from-purple-600 dark:to-indigo-700",
+											},
+											{
+												name: "Workflows",
+												icon: <N8NIcon size={24} />,
+												tab: "workflows",
+												gradient:
+													"from-blue-400 to-cyan-500 dark:from-blue-600 dark:to-cyan-700",
+											},
+											{
+												name: "Machine Learning",
+												icon: <Brain />,
+												tab: "assistants",
+												gradient:
+													"from-green-400 to-emerald-500 dark:from-green-600 dark:to-emerald-700",
+											},
+											{
+												name: "Data Products",
+												icon: <ChartBarIcon />,
+												tab: "assistants",
+												gradient:
+													"from-amber-400 to-orange-500 dark:from-amber-600 dark:to-orange-700",
+											},
+											{
+												name: "Blockchain",
+												icon: <BlockchainIcon size={24} />,
+												tab: "assistants",
+												gradient:
+													"from-pink-400 to-rose-500 dark:from-pink-600 dark:to-rose-700",
+											},
+											{
+												name: "Dev Tools",
+												icon: <TowerControlIcon />,
+												tab: "workflows",
+												gradient:
+													"from-violet-400 to-fuchsia-500 dark:from-violet-600 dark:to-fuchsia-700",
+											},
+										].map((category, index) => (
+											<motion.div
+												key={category.name}
+												initial={{ opacity: 0, y: 10 }}
+												animate={{ opacity: 1, y: 0 }}
+												transition={{ delay: index * 0.05 }}
+												className="cursor-pointer"
+												onClick={() => setActiveTab(category.tab as TabType)}
+											>
+												<div className="flex flex-col items-center p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md group relative overflow-hidden transition-all duration-300">
+													{/* Normal state */}
+													<div className="text-2xl mb-1 relative z-10 transition-transform group-hover:scale-110 duration-300">
+														{category.icon}
+													</div>
+													<div className="text-xs font-medium text-gray-900 dark:text-white text-center relative z-10 transition-colors group-hover:text-white duration-300">
+														{category.name}
+													</div>
+
+													{/* Hover gradient overlay */}
+													<div className="absolute inset-0 opacity-0 group-hover:opacity-90 transition-opacity duration-300 -z-0">
+														<div
+															className={`absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-br ${category.gradient} transition-opacity duration-300`}
 														/>
-													</motion.div>
-												))}
-										</div>
-									)}
+													</div>
+												</div>
+											</motion.div>
+										))}
+									</div>
 								</section>
+
+								{/* FAQ Section */}
+								<FAQSection faqs={marketplaceFAQs} />
 							</motion.div>
 						)}
 

@@ -761,145 +761,23 @@ export const siteTemplates: DataTypes[] = [
 	},
 ];
 
-// export const homeMarketplaceItems: HomeMarketplaceItem[] = [
-// 	{
-// 		id: "web3-research-mcp",
-// 		title: "Web3 Research Tool",
-// 		description:
-// 			"Advanced blockchain research toolkit to generate research plans, search Web3 topics, fetch DeFi content, and analyze protocol data using tools like `create-research-plan`, `search`, `fetch-content`, and `research-with-keywords`.",
-// 		category: "Finance",
-// 		icon: "🔬",
-// 		gradient: "from-blue-500 to-blue-700",
-// 		date: "2025-01-20",
-// 		type: "plugin",
-// 		creator: "aaronjmars",
-// 		mcp_url:
-// 			"https://smithery.ai/server/@aaronjmars/web3-research-mcp?tab=readme&api_key=sk-d8e2f1a7-9b45-4c3e-8f2a-6d1b5e9c7a4f",
-// 		systemPrompt: `Use this toolset to perform blockchain and DeFi research. Start by calling "create-research-plan" with a topic, use "search" or "research-with-keywords" to gather insights, and "fetch-content" to extract article or source content. Present results as a structured plan or content digest.`,
-// 	},
-// 	{
-// 		id: "binance-mcp-data",
-// 		title: "Binance Market Data",
-// 		description:
-// 			"Fetch real-time Binance data including `get_price`, `get_24hr_ticker`, `get_recent_trades`, `get_orderbook`, and `get_klines` for technical and market analysis.",
-// 		category: "Finance",
-// 		icon: "💹",
-// 		gradient: "from-yellow-500 to-yellow-700",
-// 		date: "2025-01-20",
-// 		type: "plugin",
-// 		creator: "snjyor",
-// 		mcp_url:
-// 			"https://smithery.ai/server/@snjyor/binance-mcp-data?tab=readme&api_key=sk-d8e2f1a7-9b45-4c3e-8f2a-6d1b5e9c7a4f",
-// 		systemPrompt: `Use this to retrieve Binance market data. For live prices use "get_price" or "get_24hr_ticker", historical candles via "get_klines", or trades through "get_recent_trades". Present output as charts, summaries, or raw metrics based on user intent.`,
-// 	},
-// 	{
-// 		id: "mcp-server-ccxt",
-// 		title: "CCXT Trading Exchange",
-// 		description:
-// 			"Unified crypto exchange interface with access to `get-ticker`, `get-ohlcv`, `place-market-order`, and `account-balance` across 100+ platforms via CCXT.",
-// 		category: "Finance",
-// 		icon: "🏦",
-// 		gradient: "from-green-500 to-green-700",
-// 		date: "2025-01-20",
-// 		type: "plugin",
-// 		creator: "doggybee",
-// 		mcp_url:
-// 			"https://smithery.ai/server/@doggybee/mcp-server-ccxt?tab=readme&api_key=sk-d8e2f1a7-9b45-4c3e-8f2a-6d1b5e9c7a4f",
-// 		systemPrompt: `Use this to access exchange market data and trading actions. Use "get-ticker" for price info, "get-orderbook" for depth, and "place-market-order" to simulate trades. Structure outputs as exchange summaries or actionable trade data.`,
-// 	},
-// 	{
-// 		id: "mcp-crypto-price",
-// 		title: "Crypto Price Tracker",
-// 		description:
-// 			"Track real-time crypto prices and market analysis using tools like `get-crypto-price`, `get-market-analysis`, and `get-historical-analysis`.",
-// 		category: "Finance",
-// 		icon: "📈",
-// 		gradient: "from-purple-500 to-purple-700",
-// 		date: "2025-01-20",
-// 		type: "plugin",
-// 		creator: "truss44",
-// 		mcp_url:
-// 			"https://smithery.ai/server/@truss44/mcp-crypto-price?tab=readme&api_key=sk-d8e2f1a7-9b45-4c3e-8f2a-6d1b5e9c7a4f",
-// 		systemPrompt: `Use this for real-time price and market analysis. "get-crypto-price" gives current stats, "get-market-analysis" reveals exchange trends, and "get-historical-analysis" offers long-term insights. Display as tables, charts, or alerts.`,
-// 	},
-// 	{
-// 		id: "crypto-indicators-mcp",
-// 		title: "Crypto Technical Indicators",
-// 		description:
-// 			"Advanced technical analysis with tools like `calculate_macd`, `calculate_rsi`, `calculate_ema`, `calculate_bollinger_bands`, and 20+ indicators using Binance OHLCV data.",
-// 		category: "Finance",
-// 		icon: "📊",
-// 		gradient: "from-indigo-500 to-indigo-700",
-// 		date: "2025-01-20",
-// 		type: "plugin",
-// 		creator: "kukapay",
-// 		mcp_url:
-// 			"https://smithery.ai/server/@kukapay/crypto-indicators-mcp?tab=readme&api_key=sk-d8e2f1a7-9b45-4c3e-8f2a-6d1b5e9c7a4f",
-// 		systemPrompt: `Use this to compute technical indicators. Choose from tools like "calculate_macd", "calculate_rsi", or "calculate_sma". Pass the symbol and timeframe to visualize momentum or trend shifts. Return clean indicator values or formatted indicator dashboards.`,
-// 	},
-// 	{
-// 		id: "coingecko-mcp-server",
-// 		title: "CoinGecko Analytics",
-// 		description:
-// 			"Access coin prices, market caps, volume, and OHLC data using `API-simple-price`, `API-coins-markets`, `API-coins-id-ohlc`, and `API-trending-search`.",
-// 		category: "Finance",
-// 		icon: "🦎",
-// 		gradient: "from-emerald-500 to-emerald-700",
-// 		date: "2025-01-20",
-// 		type: "plugin",
-// 		creator: "nic0xflamel",
-// 		mcp_url:
-// 			"https://smithery.ai/server/@nic0xflamel/coingecko-mcp-server?tab=readme&api_key=sk-d8e2f1a7-9b45-4c3e-8f2a-6d1b5e9c7a4f",
-// 		systemPrompt: `Call CoinGecko tools for general crypto insights. Use "API-simple-price" for coin prices, "API-coins-markets" for detailed stats, or "API-trending-search" to see rising coins. Present as snapshots or comparison tables.`,
-// 	},
-// 	{
-// 		id: "yahoo-finance-mcp",
-// 		title: "Yahoo Finance Integration",
-// 		description:
-// 			"Analyze stocks with tools like `get_stock_info`, `get_historical_stock_prices`, `get_financial_statement`, and `get_option_chain` from Yahoo Finance.",
-// 		category: "Finance",
-// 		icon: "💼",
-// 		gradient: "from-red-500 to-red-700",
-// 		date: "2025-01-20",
-// 		type: "plugin",
-// 		creator: "hwangwoohyun-nav",
-// 		mcp_url:
-// 			"https://smithery.ai/server/@hwangwoohyun-nav/yahoo-finance-mcp?tab=readme&api_key=sk-d8e2f1a7-9b45-4c3e-8f2a-6d1b5e9c7a4f",
-// 		systemPrompt: `Use this plugin to query traditional financial data. For stocks use "get_stock_info", historical charts via "get_historical_stock_prices", and financial health via "get_financial_statement". Format output for investor-grade dashboards or reports.`,
-// 	},
-// 	{
-// 		id: "web3-mcp-server",
-// 		title: "Web3 Blockchain Server",
-// 		description:
-// 			"Interact with smart contracts and wallets across EVM chains using `fetch_balance`, `read_contract`, `fetch_token_balance`, and `fetch_quote`.",
-// 		category: "Finance",
-// 		icon: "⛓️",
-// 		gradient: "from-cyan-500 to-cyan-700",
-// 		date: "2025-01-20",
-// 		type: "plugin",
-// 		creator: "EmanuelJr",
-// 		mcp_url:
-// 			"https://smithery.ai/server/@EmanuelJr/web3-mcp-server?tab=readme&api_key=sk-d8e2f1a7-9b45-4c3e-8f2a-6d1b5e9c7a4f",
-// 		systemPrompt: `For Web3 smart contract operations. Use "fetch_balance" for ETH wallet balances, "read_contract" for reading contract state, and "fetch_token_balance" for ERC20 tokens. Return concise wallet overviews or contract values.`,
-// 	},
-// 	{
-// 		id: "scry-mcp-raw-js",
-// 		title: "Scry Blockchain Analytics",
-// 		description:
-// 			"Powerful DeFi and blockchain data monitor with tools like `coingecko_get_coin_price_detailed`, `get_top_protocols`, `get_dex_volume`, and `defillama_get_yield_historical`.",
-// 		category: "Finance",
-// 		icon: "🔮",
-// 		gradient: "from-violet-500 to-purple-700",
-// 		date: "2025-01-20",
-// 		type: "plugin",
-// 		creator: "yongkangc",
-// 		mcp_url:
-// 			"https://server.smithery.ai/@yongkangc/scry-mcp-raw-js/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA",
-// 		systemPrompt: `Use this for advanced DeFi and protocol analytics. Query "get_top_protocols" or "defillama_search_protocols" for TVL data. Use "get_dex_volume" and "get_derivatives_volume" for liquidity stats. Display results as ecosystem rankings or protocol cards.`,
-// 	},
-// ];
-
 export const homeMarketplaceItems: HomeMarketplaceItem[] = [
+	{
+		id: "coinmarketcap-mcp",
+		title: "CoinMarketCap Analytics",
+		description:
+			"Access comprehensive cryptocurrency market data from CoinMarketCap including live prices, market cap rankings, volume data, and detailed coin analytics for informed investment decisions.",
+		category: "Finance",
+		icon: "💎",
+		gradient:
+			"linear-gradient(135deg, var(--blue-600) 0%, var(--purple-600) 100%)",
+		date: "2025-01-20",
+		type: "plugin",
+		creator: "shinzo-labs",
+		mcp_url: `https://server.smithery.ai/@shinzo-labs/coinmarketcap-mcp/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA`,
+		systemPrompt: `Use this to access CoinMarketCap data for comprehensive crypto market analysis. Get live prices, market cap rankings, trading volumes, and detailed cryptocurrency information. Present data as market overviews, top coin rankings, or specific coin analysis with key metrics and trends.`,
+		useCases: ["Prices", "Ranking", "Volume", "Metrics", "Trends"],
+	},
 	{
 		id: "web3-research-mcp",
 		title: "Web3 Research Tool",
@@ -916,6 +794,23 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 		mcp_url:
 			"https://server.smithery.ai/@aaronjmars/web3-research-mcp/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA",
 		systemPrompt: `Use this toolset to perform blockchain and DeFi research. Start by calling "create-research-plan" with a topic, use "search" or "research-with-keywords" to gather insights, and "fetch-content" to extract article or source content. Present results as a structured plan or content digest.`,
+	},
+	{
+		id: "scry-mcp-raw-js",
+		title: "Scry Blockchain Analytics",
+		description:
+			"Advanced DeFi analytics platform providing insights into protocol performance, liquidity data, yield farming opportunities, and market trends.",
+		category: "Finance",
+		icon: "🔮",
+		gradient:
+			"linear-gradient(135deg, var(--violet-500) 0%, var(--purple-700) 100%)",
+		date: "2025-01-20",
+		type: "plugin",
+		creator: "yongkangc",
+		mcp_url:
+			"https://server.smithery.ai/@yongkangc/scry-mcp-raw-js/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA",
+		systemPrompt: `Use this for advanced DeFi and protocol analytics. Query "get_top_protocols" or "defillama_search_protocols" for TVL data. Use "get_dex_volume" and "get_derivatives_volume" for liquidity stats. Display results as ecosystem rankings or protocol cards.`,
+		useCases: ["TVL", "Protocols", "Liquidity", "Volume", "Yields"],
 	},
 	{
 		id: "binance-mcp-data",
@@ -985,21 +880,6 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 		systemPrompt: `Use this to compute technical indicators. Choose from tools like "calculate_macd", "calculate_rsi", or "calculate_sma". Pass the symbol and timeframe to visualize momentum or trend shifts. Return clean indicator values or formatted indicator dashboards.`,
 		useCases: ["Indicators", "RSI", "MACD", "Trends", "Dashboards"],
 	},
-	// {
-	// 	id: "coingecko-mcp-server",
-	// 	title: "CoinGecko Analytics",
-	// 	description:
-	// 		"Get comprehensive crypto market data from CoinGecko including prices, market caps, trading volumes, and trending cryptocurrencies.",
-	// 	category: "Finance",
-	// 	icon: "🦎",
-	// 	gradient: "from-emerald-500 to-emerald-700",
-	// 	date: "2025-01-20",
-	// 	type: "plugin",
-	// 	creator: "nic0xflamel",
-	// 	mcp_url:
-	// 		"https://server.smithery.ai/@nic0xflamel/coingecko-mcp-server/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA",
-	// 	systemPrompt: `Call CoinGecko tools for general crypto insights. Use "API-simple-price" for coin prices, "API-coins-markets" for detailed stats, or "API-trending-search" to see rising coins. Present as snapshots or comparison tables.`,
-	// },
 	{
 		id: "web3-mcp-server",
 		title: "Web3 Blockchain Server",
@@ -1016,23 +896,6 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 			"https://server.smithery.ai/@EmanuelJr/web3-mcp-server/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA",
 		systemPrompt: `For Web3 smart contract operations. Use "fetch_balance" for ETH wallet balances, "read_contract" for reading contract state, and "fetch_token_balance" for ERC20 tokens. Return concise wallet overviews or contract values.`,
 		useCases: ["Wallets", "Contracts", "Balances", "Tokens", "Monitoring"],
-	},
-	{
-		id: "scry-mcp-raw-js",
-		title: "Scry Blockchain Analytics",
-		description:
-			"Advanced DeFi analytics platform providing insights into protocol performance, liquidity data, yield farming opportunities, and market trends.",
-		category: "Finance",
-		icon: "🔮",
-		gradient:
-			"linear-gradient(135deg, var(--violet-500) 0%, var(--purple-700) 100%)",
-		date: "2025-01-20",
-		type: "plugin",
-		creator: "yongkangc",
-		mcp_url:
-			"https://server.smithery.ai/@yongkangc/scry-mcp-raw-js/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA",
-		systemPrompt: `Use this for advanced DeFi and protocol analytics. Query "get_top_protocols" or "defillama_search_protocols" for TVL data. Use "get_dex_volume" and "get_derivatives_volume" for liquidity stats. Display results as ecosystem rankings or protocol cards.`,
-		useCases: ["TVL", "Protocols", "Liquidity", "Volume", "Yields"],
 	},
 	{
 		id: "crypto-feargreed-mcp",
@@ -1067,21 +930,5 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 			"https://server.smithery.ai/@SiliconValleyInsight/amazon-product-search/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA",
 		systemPrompt: `Use this to search Amazon products and gather detailed product information. You can search by keywords, get product details, prices, ratings, and reviews. Present results as organized product listings with key details like price, rating, and availability for easy comparison.`,
 		useCases: ["Search", "Compare", "Ratings", "Reviews", "Research"],
-	},
-	{
-		id: "coinmarketcap-mcp",
-		title: "CoinMarketCap Analytics",
-		description:
-			"Access comprehensive cryptocurrency market data from CoinMarketCap including live prices, market cap rankings, volume data, and detailed coin analytics for informed investment decisions.",
-		category: "Finance",
-		icon: "💎",
-		gradient:
-			"linear-gradient(135deg, var(--blue-600) 0%, var(--purple-600) 100%)",
-		date: "2025-01-20",
-		type: "plugin",
-		creator: "shinzo-labs",
-		mcp_url: `https://server.smithery.ai/@shinzo-labs/coinmarketcap-mcp/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA`,
-		systemPrompt: `Use this to access CoinMarketCap data for comprehensive crypto market analysis. Get live prices, market cap rankings, trading volumes, and detailed cryptocurrency information. Present data as market overviews, top coin rankings, or specific coin analysis with key metrics and trends.`,
-		useCases: ["Prices", "Ranking", "Volume", "Metrics", "Trends"],
 	},
 ];
