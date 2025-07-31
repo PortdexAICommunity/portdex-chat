@@ -14,8 +14,10 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/use-auth";
+import { useTheme } from "next-themes";
 
 export function SidebarUserNav() {
+	const { setTheme, theme } = useTheme();
 	const { user, signOut, isGuest, loading } = useAuth();
 	const router = useRouter();
 
@@ -50,7 +52,7 @@ export function SidebarUserNav() {
 				user?.username?.[0] ||
 				user?.signInDetails?.loginId?.[0] ||
 				"U"
-		  ).toUpperCase();
+			).toUpperCase();
 
 	return (
 		<DropdownMenu>
@@ -91,6 +93,13 @@ export function SidebarUserNav() {
 
 				{isGuest ? (
 					<>
+						<DropdownMenuItem
+							data-testid="user-nav-item-theme"
+							className="cursor-pointer"
+							onSelect={() => setTheme(theme === "dark" ? "light" : "dark")}
+						>
+							{`Toggle ${theme === "light" ? "dark" : "light"} mode`}
+						</DropdownMenuItem>
 						<DropdownMenuItem onClick={handleSignIn}>Sign In</DropdownMenuItem>
 						<DropdownMenuItem asChild>
 							<Link href="/register">Create Account</Link>
@@ -98,6 +107,13 @@ export function SidebarUserNav() {
 					</>
 				) : (
 					<>
+						<DropdownMenuItem
+							data-testid="user-nav-item-theme"
+							className="cursor-pointer"
+							onSelect={() => setTheme(theme === "dark" ? "light" : "dark")}
+						>
+							{`Toggle ${theme === "light" ? "dark" : "light"} mode`}
+						</DropdownMenuItem>
 						<DropdownMenuItem asChild>
 							<Link href="/profile">Profile Settings</Link>
 						</DropdownMenuItem>
