@@ -7,10 +7,6 @@ import Link from "next/link";
 // import Link from "next/link";
 
 export const Footer = () => {
-	console.log("Client side env:", {
-		PORTDEX_API_KEY: process.env.PORTDEX_API_KEY,
-		DASHSCOPE_API_KEY: process.env.DASHSCOPE_API_KEY,
-	});
 	return (
 		<div className="max-w-7xl mx-auto w-full bg-background/50 backdrop-blur-md rounded-2xl my-7">
 			<footer className="">

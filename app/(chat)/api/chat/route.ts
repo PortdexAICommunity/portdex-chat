@@ -72,11 +72,6 @@ export async function POST(request: Request) {
 	const { readable, writable } = new TransformStream();
 	const writer = writable.getWriter();
 
-	console.log("Server side env:", {
-		PORTDEX_API_KEY: process.env.PORTDEX_API_KEY,
-		DASHSCOPE_API_KEY: process.env.DASHSCOPE_API_KEY,
-	});
-
 	const response = new Response(readable, {
 		headers: {
 			"Content-Type": "text/event-stream",
