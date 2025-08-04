@@ -2,7 +2,11 @@ import { cookies } from "next/headers";
 
 import { createServerRunner } from "@aws-amplify/adapter-nextjs";
 import { generateServerClientUsingCookies } from "@aws-amplify/adapter-nextjs/api";
-import { getCurrentUser, fetchAuthSession } from "aws-amplify/auth/server";
+import {
+	getCurrentUser,
+	fetchAuthSession,
+	fetchUserAttributes,
+} from "aws-amplify/auth/server";
 
 import type { Schema } from "@/amplify/data/resource";
 import outputs from "@/amplify_outputs.json";
@@ -28,6 +32,20 @@ export async function getServerAuthSession() {
 	} catch (error) {
 		console.error("Error fetching auth session:", error);
 		return null;
+	}
+}
+
+export async function getFetchUserAttributes() {
+	try {
+		const currentUser = await runWithAmplifyServerContext({
+			nextServerContext: { cookies },
+			operation: (contextSpec) => fetchUserAttributes(contextSpec),
+		});
+		console.log("currentUser", currentUser);
+		return currentUser;
+	} catch (error) {
+		console.log(error);
+		return false;
 	}
 }
 

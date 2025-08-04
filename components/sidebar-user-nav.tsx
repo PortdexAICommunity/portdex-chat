@@ -19,7 +19,7 @@ import { generateUsername } from "@/hooks/username-generator";
 
 export function SidebarUserNav() {
 	const { setTheme, theme } = useTheme();
-	const { user, signOut, isGuest, loading } = useAuth();
+	const { user, signOut, isGuest, loading, userAttributes } = useAuth();
 	const router = useRouter();
 
 	if (loading) {
@@ -42,7 +42,7 @@ export function SidebarUserNav() {
 
 	const displayEmail = isGuest
 		? "Not signed in"
-		: user?.signInDetails?.loginId || "No email";
+		: user?.signInDetails?.loginId || userAttributes?.email || "No email";
 
 	const avatarInitial = isGuest
 		? "G"
@@ -73,7 +73,9 @@ export function SidebarUserNav() {
 							{displayName}
 						</p>
 						<p className="text-xs leading-none text-muted-foreground truncate">
-							{isGuest ? "Guest Mode" : user?.signInDetails?.loginId}
+							{isGuest
+								? "Guest Mode"
+								: user?.signInDetails?.loginId || userAttributes?.email}
 						</p>
 					</div>
 				</Button>
