@@ -1,15 +1,8 @@
-import { createServerRunner } from "@aws-amplify/adapter-nextjs";
-import { getCurrentUser } from "aws-amplify/auth/server";
-// Note: Server-side auth operations will be handled differently
-import { cookies } from "next/headers";
-
-interface AuthUser {
-	userId: string;
-	username: string;
-	signInDetails?: {
-		loginId?: string;
-	};
-}
+import {
+	AuthGetCurrentUserServer,
+	ensureUserInDatabase,
+	getServerAuthSession,
+} from "@/utils/amplify-utils";
 
 interface Session {
 	user: {
@@ -22,47 +15,97 @@ interface Session {
 	expires: string;
 }
 
-const config = {
-	Auth: {
-		Cognito: {
-			userPoolId: process.env.NEXT_PUBLIC_COGNITO_USER_POOL_ID || "",
-			userPoolClientId:
-				process.env.NEXT_PUBLIC_COGNITO_USER_POOL_CLIENT_ID || "",
-			identityPoolId: process.env.NEXT_PUBLIC_COGNITO_IDENTITY_POOL_ID || "",
-		},
-	},
-};
-
-export const { runWithAmplifyServerContext } = createServerRunner({
-	config,
-});
-
-export async function authGetCurrentUserServer(): Promise<AuthUser | null> {
-	try {
-		const user = await runWithAmplifyServerContext({
-			nextServerContext: { cookies },
-			operation: (contextSpec) => getCurrentUser(contextSpec),
-		});
-		console.log("authGetCurrentUserServer: Authenticated user found");
-		return user;
-	} catch (error) {
-		console.log("authGetCurrentUserServer: No authenticated user (guest)");
-		return null;
-	}
-}
-
 // Auth operations handled client-side
 
 export async function getServerSession(): Promise<Session | null> {
 	try {
-		const user = await authGetCurrentUserServer();
+		// First try to get the auth session
+		const authSession = await getServerAuthSession();
 
-		if (!user) {
-			console.log("getServerSession: Returning guest session");
-			// Return guest session
+		// If we couldn't get an auth session at all, return guest
+		if (!authSession) {
+			console.log("getServerSession: No auth session, returning guest");
+			return createGuestSession();
+		}
+
+		// Check for authenticated user based on tokens
+		if (authSession.tokens) {
+			console.log("getServerSession: Authenticated user with tokens");
+
+			try {
+				// Try to get the current user if we have tokens
+				const user = await AuthGetCurrentUserServer();
+
+				if (user) {
+					const userId = user.userId;
+					const email = user.signInDetails?.loginId || "";
+
+					console.log(
+						`getServerSession: User authenticated: ${userId}, ${email}`
+					);
+
+					// Ensure the user exists in our database
+					if (email) {
+						await ensureUserInDatabase(userId, email);
+					}
+
+					return {
+						user: {
+							id: userId,
+							name: user.username,
+							email: email || null,
+							image: null,
+							type: "regular",
+						},
+						expires: new Date(Date.now() + 3600 * 1000).toISOString(),
+					};
+				} else {
+					console.log(
+						"getServerSession: No user from AuthGetCurrentUserServer but have tokens"
+					);
+				}
+			} catch (error) {
+				console.log("Error getting current user:", error);
+				// Fall through to use token data
+			}
+
+			// Fallback to using token data if AuthGetCurrentUserServer fails
+			const idToken = authSession.tokens.idToken?.payload;
+			if (!idToken) {
+				console.log("getServerSession: No idToken in tokens");
+				return createGuestSession();
+			}
+
+			const userId = idToken.sub?.toString() || "unknown";
+			const email = idToken.email?.toString() || null;
+
+			console.log(`getServerSession: Using token data: ${userId}, ${email}`);
+
+			// Ensure the user exists in our database if we have an email
+			if (email) {
+				await ensureUserInDatabase(userId, email);
+			}
+
 			return {
 				user: {
-					id: "guest",
+					id: userId,
+					name: idToken["cognito:username"]?.toString() || "User",
+					email: email,
+					image: null,
+					type: "regular",
+				},
+				expires: new Date(Date.now() + 3600 * 1000).toISOString(),
+			};
+		}
+
+		// Check for guest user based on credentials but no tokens
+		if (authSession.credentials && !authSession.tokens) {
+			console.log("getServerSession: Guest user with credentials");
+			const identityId = authSession.identityId || "guest";
+
+			return {
+				user: {
+					id: identityId,
 					name: "Guest",
 					email: null,
 					image: null,
@@ -72,31 +115,25 @@ export async function getServerSession(): Promise<Session | null> {
 			};
 		}
 
-		console.log("getServerSession: Returning authenticated user session");
-		return {
-			user: {
-				id: user.userId,
-				name: user.username,
-				email: user.signInDetails?.loginId || null,
-				image: null,
-				type: "regular",
-			},
-			expires: new Date(Date.now() + 3600 * 1000).toISOString(),
-		};
+		// Default guest session if no credentials or tokens
+		console.log("getServerSession: Default guest session");
+		return createGuestSession();
 	} catch (error) {
-		console.log("getServerSession: Error, returning guest session");
+		console.log("getServerSession: Error, returning guest session", error);
 		// Return guest session on error
-		return {
-			user: {
-				id: "guest",
-				name: "Guest",
-				email: null,
-				image: null,
-				type: "guest",
-			},
-			expires: new Date(Date.now() + 3600 * 1000).toISOString(),
-		};
+		return createGuestSession();
 	}
 }
 
-// runWithAmplifyServerContext is already exported above
+function createGuestSession(): Session {
+	return {
+		user: {
+			id: "guest",
+			name: "Guest",
+			email: null,
+			image: null,
+			type: "guest",
+		},
+		expires: new Date(Date.now() + 3600 * 1000).toISOString(),
+	};
+}

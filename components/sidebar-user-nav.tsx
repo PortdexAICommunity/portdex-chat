@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "next-themes";
+import { generateUsername } from "@/hooks/username-generator";
 
 export function SidebarUserNav() {
 	const { setTheme, theme } = useTheme();
@@ -29,18 +30,15 @@ export function SidebarUserNav() {
 		);
 	}
 
-	const handleSignOut = async () => {
-		await signOut();
-		router.push("/");
-	};
-
 	const handleSignIn = () => {
 		router.push("/login");
 	};
 
 	const displayName = isGuest
 		? "Guest User"
-		: user?.username || user?.signInDetails?.loginId || "User";
+		: generateUsername(user?.signInDetails?.loginId || "") ||
+			user?.signInDetails?.loginId ||
+			"User";
 
 	const displayEmail = isGuest
 		? "Not signed in"
@@ -48,11 +46,7 @@ export function SidebarUserNav() {
 
 	const avatarInitial = isGuest
 		? "G"
-		: (
-				user?.username?.[0] ||
-				user?.signInDetails?.loginId?.[0] ||
-				"U"
-			).toUpperCase();
+		: `https://avatar.vercel.sh/${user?.userId || "user"}`;
 
 	return (
 		<DropdownMenu>
@@ -63,7 +57,11 @@ export function SidebarUserNav() {
 				>
 					<Avatar className="size-8 mr-3">
 						<AvatarImage
-							src={isGuest ? undefined : "/avatar.png"}
+							src={
+								isGuest
+									? undefined
+									: `https://avatar.vercel.sh/${user?.userId || "user"}`
+							}
 							alt="Avatar"
 						/>
 						<AvatarFallback className={isGuest ? "bg-muted" : ""}>
@@ -75,7 +73,7 @@ export function SidebarUserNav() {
 							{displayName}
 						</p>
 						<p className="text-xs leading-none text-muted-foreground truncate">
-							{isGuest ? "Guest Mode" : "Signed In"}
+							{isGuest ? "Guest Mode" : user?.signInDetails?.loginId}
 						</p>
 					</div>
 				</Button>
@@ -101,9 +99,6 @@ export function SidebarUserNav() {
 							{`Toggle ${theme === "light" ? "dark" : "light"} mode`}
 						</DropdownMenuItem>
 						<DropdownMenuItem onClick={handleSignIn}>Sign In</DropdownMenuItem>
-						<DropdownMenuItem asChild>
-							<Link href="/register">Create Account</Link>
-						</DropdownMenuItem>
 					</>
 				) : (
 					<>
@@ -114,12 +109,15 @@ export function SidebarUserNav() {
 						>
 							{`Toggle ${theme === "light" ? "dark" : "light"} mode`}
 						</DropdownMenuItem>
-						<DropdownMenuItem asChild>
-							<Link href="/profile">Profile Settings</Link>
-						</DropdownMenuItem>
 						<DropdownMenuSeparator />
-						<DropdownMenuItem onClick={handleSignOut}>
-							Sign Out
+						<DropdownMenuItem asChild>
+							<Button
+								variant={"outline"}
+								className="w-full"
+								onClick={async () => await signOut()}
+							>
+								Sign Out
+							</Button>
 						</DropdownMenuItem>
 					</>
 				)}
