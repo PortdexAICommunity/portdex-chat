@@ -1,16 +1,16 @@
-import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
 import { getServerSession } from "@/lib/amplify-server";
 
 import { Chat } from "@/components/chat";
 import { DataStreamHandler } from "@/components/data-stream-handler";
 import { DEFAULT_CHAT_MODEL } from "@/lib/ai/models";
-import { getChatById, getMessagesByChatId } from "@/lib/db/queries";
+// import { getChatById, getMessagesByChatId } from "@/lib/db/queries";
 import type { DBMessage } from "@/lib/db/schema";
 import type { Attachment, UIMessage } from "ai";
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
+	const { getChatById, getMessagesByChatId } = await import("@/lib/db/queries");
 	const params = await props.params;
 	const { id } = params;
 	const chat = await getChatById({ id });
