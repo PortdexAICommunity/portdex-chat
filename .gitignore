@@ -49,3 +49,9 @@ cloudflare-env.d.ts
 .wrangler
 
 daily-task.md
+.cursor
+
+# amplify
+.amplify
+# amplify_outputs*
+amplifyconfiguration*

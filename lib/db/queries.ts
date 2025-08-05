@@ -29,8 +29,6 @@ import {
 	stream,
 } from "./schema";
 import type { ArtifactKind } from "@/components/artifact";
-import { generateUUID } from "../utils";
-import { generateHashedPassword } from "./utils";
 import type { VisibilityType } from "@/components/visibility-selector";
 import { ChatSDKError } from "../errors";
 
@@ -53,10 +51,46 @@ export async function getUser(email: string): Promise<Array<User>> {
 	}
 }
 
-export async function createUser(email: string, is_guest: boolean) {
+export async function getUserById(id: string): Promise<User | null> {
 	try {
-		return await db.insert(user).values({ email, is_guest });
+		const users = await db.select().from(user).where(eq(user.id, id));
+		return users.length > 0 ? users[0] : null;
 	} catch (error) {
+		console.error("Failed to get user by ID:", error);
+		return null;
+	}
+}
+
+export async function createUser(id: string, email: string) {
+	try {
+		// First check if user already exists by ID
+		const existingUserById = await getUserById(id);
+		if (existingUserById) {
+			console.log(`User with ID ${id} already exists`);
+			return existingUserById;
+		}
+
+		// Then check if user exists by email
+		const existingUsersByEmail = await getUser(email);
+		if (existingUsersByEmail.length > 0) {
+			console.log(`User with email ${email} already exists`);
+			return existingUsersByEmail[0];
+		}
+
+		// Create new user with specified ID
+		const result = await db
+			.insert(user)
+			.values({
+				id,
+				email,
+				// Remove is_guest since it doesn't exist in the database
+			})
+			.returning();
+
+		console.log(`Created new user: ${id}, ${email}`);
+		return result[0];
+	} catch (error) {
+		console.error("Failed to create user:", error);
 		throw new ChatSDKError("bad_request:database", "Failed to create user");
 	}
 }
@@ -90,10 +124,7 @@ export async function saveChat({
 }) {
 	try {
 		// Check if user exists first
-		const [existingUser] = await db
-			.select()
-			.from(user)
-			.where(eq(user.id, userId));
+		const existingUser = await getUserById(userId);
 		if (!existingUser) {
 			console.error("User not found when saving chat:", userId);
 			throw new Error(`User with id ${userId} not found`);
@@ -274,7 +305,7 @@ export async function voteMessage({
 		const [existingVote] = await db
 			.select()
 			.from(vote)
-			.where(and(eq(vote.messageId, messageId)));
+			.where(and(eq(vote.messageId, messageId), eq(vote.chatId, chatId)));
 
 		if (existingVote) {
 			return await db
@@ -288,6 +319,7 @@ export async function voteMessage({
 			isUpvoted: type === "up",
 		});
 	} catch (error) {
+		console.error("Error in voteMessage:", error);
 		throw new ChatSDKError("bad_request:database", "Failed to vote message");
 	}
 }

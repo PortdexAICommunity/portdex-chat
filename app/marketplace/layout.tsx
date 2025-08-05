@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { getServerSession } from "@/lib/amplify-server";
+// import { getServerSession } from "@/lib/amplify-server";
 import type { Metadata } from "next";
 
 import { AppSidebar } from "@/components/app-sidebar";
@@ -63,10 +63,10 @@ export default async function MarketplaceLayout({
 }: {
 	children: React.ReactNode;
 }) {
-	const [session, cookieStore] = await Promise.all([
-		getServerSession(),
-		cookies(),
-	]);
+	// const [session, cookieStore] = await Promise.all([
+	// 	// getServerSession(),
+	// 	cookies(),
+	// ]);
 	// const isCollapsed = cookieStore.get('sidebar:state')?.value !== 'true';
 
 	return (
