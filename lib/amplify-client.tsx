@@ -2,6 +2,7 @@
 
 import { Amplify } from "aws-amplify";
 import { Authenticator } from "@aws-amplify/ui-react";
+// eslint-disable-next-line import/no-unresolved
 import outputs from "@/amplify_outputs.json";
 
 Amplify.configure(outputs, {
