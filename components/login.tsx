@@ -1,21 +1,3 @@
-// "use client";
-
-// import { withAuthenticator } from "@aws-amplify/ui-react";
-// import type { AuthUser } from "aws-amplify/auth";
-// import { redirect } from "next/navigation";
-// import { useEffect } from "react";
-
-// function Login({ user }: { user?: AuthUser }) {
-// 	useEffect(() => {
-// 		if (user) {
-// 			redirect("/");
-// 		}
-// 	}, [user]);
-// 	return null;
-// }
-
-// export default withAuthenticator(Login);
-
 "use client";
 
 import {
@@ -32,6 +14,8 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import "@aws-amplify/ui-react/styles.css";
+import { signInWithRedirect } from "aws-amplify/auth";
+import { toast } from "sonner";
 
 const formFields = {
 	signIn: {
@@ -65,12 +49,30 @@ const components = {
 			const { tokens } = useTheme();
 
 			return (
-				<Heading
-					padding={`${tokens.space.xl} 0 0 ${tokens.space.xl}`}
-					level={3}
-				>
-					Sign in to your account
-				</Heading>
+				<>
+					<Heading
+						padding={`${tokens.space.xl} 0 0 ${tokens.space.xl}`}
+						level={3}
+					>
+						Sign in to your account
+					</Heading>
+					<View className="flex justify-center w-full pt-5">
+						<Button
+							// disabled
+							className=""
+							onClick={async () =>
+								// await signInWithRedirect({
+								// 	provider: {
+								// 		custom: "GitHub",
+								// 	},
+								// })
+								toast("Coming Soon")
+							}
+						>
+							Sign in with GitHub
+						</Button>
+					</View>
+				</>
 			);
 		},
 		Footer() {
@@ -197,3 +199,85 @@ function Login() {
 }
 
 export default Login;
+
+/* eslint-disable jsx-a11y/alt-text */
+/* eslint-disable @next/next/no-img-element */
+// "use client";
+// import { get } from "aws-amplify/api";
+// import {
+// 	fetchAuthSession,
+// 	fetchUserAttributes,
+// 	signInWithRedirect,
+// } from "aws-amplify/auth";
+// import Image from "next/image";
+// import { useState } from "react";
+
+// export default function Home() {
+// 	const [userInfo, setUserInfo] = useState<{
+// 		picture: string;
+// 		email: string;
+// 		preferred_username: string;
+// 	} | null>(null);
+
+// 	const signInWithGitHub = async () => {
+// 		await signInWithRedirect({
+// 			provider: {
+// 				custom: "GitHub",
+// 			},
+// 		});
+// 	};
+
+// 	const getPrivateInfo = async () => {
+// 		const { tokens } = await fetchAuthSession();
+// 		const response = await get({
+// 			apiName: "api",
+// 			path: "/private",
+// 			options: {
+// 				headers: {
+// 					Authorization: `${tokens?.idToken?.toString()}`,
+// 				},
+// 			},
+// 		}).response;
+// 		console.log("response", await response.body.json());
+// 	};
+
+// 	const getCurrentUserInfo = async () => {
+// 		const session = await fetchUserAttributes();
+// 		setUserInfo({
+// 			// biome-ignore lint/style/noNonNullAssertion: <explanation>
+// 			picture: session.picture!,
+// 			// biome-ignore lint/style/noNonNullAssertion: <explanation>
+// 			email: session.email!,
+// 			// biome-ignore lint/style/noNonNullAssertion: <explanation>
+// 			preferred_username: session.preferred_username!,
+// 		});
+// 	};
+
+// 	return (
+// 		<>
+// 			<h1>Hello And Login</h1>
+// 			<button type="button" onClick={signInWithGitHub}>
+// 				Sign In With Github
+// 			</button>
+// 			<button type="button" onClick={getCurrentUserInfo}>
+// 				Get Current user Info
+// 			</button>
+// 			<button type="button" onClick={getPrivateInfo}>
+// 				Get Private info
+// 			</button>
+// 			{userInfo?.email !== null ? (
+// 				<>
+// 					<Image
+// 						src={userInfo?.picture || ""}
+// 						alt="User Profile Picture"
+// 						style={{ borderRadius: "50%" }}
+// 						height="100"
+// 						width="100"
+// 					/>
+// 					<div>{userInfo?.email}</div>
+// 					<div>{userInfo?.preferred_username}</div>
+// 				</>
+// 			) : null}
+// 		</>
+// 	);
+// }

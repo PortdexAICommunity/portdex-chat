@@ -13,8 +13,30 @@ export const auth = defineAuth({
 				clientSecret: secret("GOOGLE_CLIENT_SECRET"),
 				scopes: ["email", "openid", "profile"],
 			},
-			callbackUrls: ["http://localhost:3000/", "https://chat.portdex.ai/"],
-			logoutUrls: ["http://localhost:3000/", "https://chat.portdex.ai/"],
+			callbackUrls: [
+				"http://localhost:3000/",
+				"https://chat.portdex.ai/",
+				"https://development.dgdo2awhfom3j.amplifyapp.com/",
+			],
+			logoutUrls: [
+				"http://localhost:3000/",
+				"https://chat.portdex.ai/",
+				"https://development.dgdo2awhfom3j.amplifyapp.com/",
+			],
+		},
+	},
+	userAttributes: {
+		email: {
+			required: true,
+			mutable: true,
+		},
+		preferredUsername: {
+			required: false,
+			mutable: true,
+		},
+		profilePicture: {
+			required: false,
+			mutable: true,
 		},
 	},
 });
