@@ -8,6 +8,8 @@ import { motion } from "framer-motion";
 import { Download } from "lucide-react";
 import { useState } from "react";
 import { toast } from "@/components/toast";
+import { N8NIcon } from "../icons";
+import { formatWorkflowName } from "@/hooks/use-workflow-name-filter";
 
 interface WorkflowCardProps {
 	workflow: WorkflowType;
@@ -51,20 +53,19 @@ export function WorkflowCard({
 		>
 			<Card className="h-full flex flex-col" onClick={onClick}>
 				<CardContent className="p-4 flex-1 flex flex-col">
-					<div className="flex items-start gap-4 flex-1">
-						{/* Icon Section */}
-						<div className="shrink-0">
-							<div className="size-12 rounded-full bg-gradient-to-br from-blue-100 to-purple-200 dark:from-blue-900/30 dark:to-purple-800/30 flex items-center justify-center text-2xl shadow-sm border-2 border-blue-200 dark:border-blue-700/50">
-								{workflow.icon}
+					{/* Content Section */}
+					<div className="flex-1 min-w-0 flex flex-col">
+						<div className="flex flex-row-reverse items-center justify-between flex-1">
+							<div className="">
+								<div className="size-12 rounded-full bg-gradient-to-br from-pink-100 to-pink-200 dark:from-pink-500 dark:to-pink-800/30 flex items-center justify-center text-2xl shadow-sm border-2 border-white dark:border-white">
+									{/* {workflow.icon} */}
+									<N8NIcon size={24} />
+								</div>
 							</div>
-						</div>
-
-						{/* Content Section */}
-						<div className="flex-1 min-w-0 flex flex-col">
 							{/* Title and Creator */}
 							<div className="mb-3">
 								<h3 className="text-gray-900 dark:text-white font-semibold text-base mb-1 line-clamp-1">
-									{workflow.name}
+									{formatWorkflowName(workflow.name)}
 								</h3>
 								<p className="text-gray-600 dark:text-gray-400 text-sm font-medium line-clamp-1">
 									{workflow.creator}
@@ -75,43 +76,43 @@ export function WorkflowCard({
 									</p>
 								)}
 							</div>
+						</div>
 
-							{/* Description */}
-							<div className="flex-1 mb-4">
-								<p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-3 leading-relaxed">
-									{workflow.description}
-								</p>
+						{/* Description */}
+						<div className="flex-1 mb-4">
+							<p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-3 leading-relaxed">
+								{workflow.description}
+							</p>
+						</div>
+
+						{/* File Info */}
+						{(workflow.fileSize || workflow.fileType) && (
+							<div className="flex items-center gap-2 mb-3 text-xs text-gray-500 dark:text-gray-400">
+								{workflow.fileType && (
+									<span className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+										{workflow.fileType}
+									</span>
+								)}
+								{workflow.fileSize && <span>{workflow.fileSize}</span>}
 							</div>
+						)}
 
-							{/* File Info */}
-							{(workflow.fileSize || workflow.fileType) && (
-								<div className="flex items-center gap-2 mb-3 text-xs text-gray-500 dark:text-gray-400">
-									{workflow.fileType && (
-										<span className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-											{workflow.fileType}
-										</span>
-									)}
-									{workflow.fileSize && <span>{workflow.fileSize}</span>}
-								</div>
-							)}
+						{/* Footer with category badge */}
+						<div className="flex items-center justify-between gap-2 mt-auto">
+							<Badge
+								variant="secondary"
+								className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors text-xs"
+							>
+								{workflow.category}
+							</Badge>
 
-							{/* Footer with category badge */}
-							<div className="flex items-center justify-between gap-2 mt-auto">
-								<Badge
-									variant="secondary"
-									className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors text-xs"
-								>
-									{workflow.category}
-								</Badge>
-
-								<motion.div
-									className="text-blue-600 dark:text-blue-400 text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity"
-									initial={{ opacity: 0 }}
-									whileHover={{ opacity: 1 }}
-								>
-									View →
-								</motion.div>
-							</div>
+							<motion.div
+								className="text-blue-600 dark:text-blue-400 text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity"
+								initial={{ opacity: 0 }}
+								whileHover={{ opacity: 1 }}
+							>
+								View →
+							</motion.div>
 						</div>
 					</div>
 				</CardContent>
@@ -126,7 +127,11 @@ export function WorkflowCard({
 						{isDownloading ? (
 							<motion.div
 								animate={{ rotate: 360 }}
-								transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+								transition={{
+									duration: 1,
+									repeat: Number.POSITIVE_INFINITY,
+									ease: "linear",
+								}}
 								className="mr-2"
 							>
 								⏳
