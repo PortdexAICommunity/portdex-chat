@@ -1,3 +1,5 @@
+"use server";
+
 import { getServerSession } from "@/lib/amplify-server";
 import type { NextRequest } from "next/server";
 import { getChatsByUserId } from "@/lib/db/queries";

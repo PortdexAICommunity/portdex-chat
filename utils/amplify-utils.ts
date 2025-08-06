@@ -22,6 +22,8 @@ export const cookiesClient = generateServerClientUsingCookies<Schema>({
 });
 
 export async function getServerAuthSession() {
+	"use server";
+
 	try {
 		return await runWithAmplifyServerContext({
 			nextServerContext: { cookies },
@@ -36,6 +38,8 @@ export async function getServerAuthSession() {
 }
 
 export async function getFetchUserAttributes() {
+	"use server";
+
 	try {
 		const currentUser = await runWithAmplifyServerContext({
 			nextServerContext: { cookies },
@@ -50,6 +54,8 @@ export async function getFetchUserAttributes() {
 }
 
 export async function AuthGetCurrentUserServer() {
+	"use server";
+
 	try {
 		const currentUser = await runWithAmplifyServerContext({
 			nextServerContext: { cookies },
@@ -69,6 +75,8 @@ export async function AuthGetCurrentUserServer() {
  * This bridges the gap between Cognito authentication and our database
  */
 export async function ensureUserInDatabase(userId: string, email: string) {
+	"use server";
+
 	try {
 		// First check if user exists by ID
 		const existingUser = await getUserById(userId);
