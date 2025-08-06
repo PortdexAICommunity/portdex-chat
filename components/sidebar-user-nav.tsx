@@ -16,6 +16,7 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "next-themes";
 import { generateUsername } from "@/hooks/username-generator";
+import { signInWithRedirect } from "aws-amplify/auth";
 
 export function SidebarUserNav() {
 	const { setTheme, theme } = useTheme();
@@ -32,6 +33,7 @@ export function SidebarUserNav() {
 
 	const handleSignIn = () => {
 		router.push("/login");
+		// signInWithRedirect();
 	};
 
 	const displayName = isGuest

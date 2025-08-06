@@ -15,4 +15,19 @@ export default function ConfigureAmplifyClientSide({
 	children: React.ReactNode;
 }) {
 	return <Authenticator.Provider>{children}</Authenticator.Provider>;
+	// return null;
 }
+
+// "use client";
+
+// import React from "react";
+// import { Amplify } from "aws-amplify";
+// import config from "@/amplify_outputs.json";
+
+// Amplify.configure(config, { ssr: true });
+
+// const Auth = ({ children }: { children: React.ReactNode }) => {
+// 	return children;
+// };
+
+// export default Auth;

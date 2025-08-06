@@ -1,9 +1,9 @@
 {
   "auth": {
-    "user_pool_id": "eu-west-2_wylJauG2A",
+    "user_pool_id": "eu-west-2_hivvKenU6",
     "aws_region": "eu-west-2",
-    "user_pool_client_id": "78rtgg567pb2k70nvq1qel0phg",
-    "identity_pool_id": "eu-west-2:34ff60a7-47d0-4571-b602-350842338812",
+    "user_pool_client_id": "70i0ice4t1jv0fkfvev0trfvmj",
+    "identity_pool_id": "eu-west-2:c8632f56-b756-4c99-854f-edeba5b0eb21",
     "mfa_methods": [],
     "standard_required_attributes": [
       "email"
@@ -29,11 +29,13 @@
       ],
       "redirect_sign_in_uri": [
         "http://localhost:3000/",
-        "https://chat.portdex.ai/"
+        "https://chat.portdex.ai/",
+        "https://development.dgdo2awhfom3j.amplifyapp.com/"
       ],
       "redirect_sign_out_uri": [
         "http://localhost:3000/",
-        "https://chat.portdex.ai/"
+        "https://chat.portdex.ai/",
+        "https://development.dgdo2awhfom3j.amplifyapp.com/"
       ],
       "response_type": "code",
       "scopes": [
@@ -48,7 +50,7 @@
     "unauthenticated_identities_enabled": true
   },
   "data": {
-    "url": "https://ow7a64j6nvdffgamuamxkpjvt4.appsync-api.eu-west-2.amazonaws.com/graphql",
+    "url": "https://tkvpuzw47ndbhgrfvg7urrsr74.appsync-api.eu-west-2.amazonaws.com/graphql",
     "aws_region": "eu-west-2",
     "default_authorization_type": "AWS_IAM",
     "authorization_types": [

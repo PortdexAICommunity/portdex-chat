@@ -25,4 +25,18 @@ export const auth = defineAuth({
 			],
 		},
 	},
+	userAttributes: {
+		email: {
+			required: true,
+			mutable: true,
+		},
+		preferredUsername: {
+			required: false,
+			mutable: true,
+		},
+		profilePicture: {
+			required: false,
+			mutable: true,
+		},
+	},
 });

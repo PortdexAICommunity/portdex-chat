@@ -170,6 +170,7 @@ export default async function RootLayout({
 			</head>
 			<body suppressHydrationWarning className="antialiased">
 				<ConfigureAmplifyClientSide>
+					{/* <Auth> */}
 					<ThemeProvider
 						attribute="class"
 						defaultTheme="system"
@@ -182,6 +183,7 @@ export default async function RootLayout({
 						{children}
 						<Analytics />
 					</ThemeProvider>
+					{/* </Auth> */}
 				</ConfigureAmplifyClientSide>
 			</body>
 		</html>
