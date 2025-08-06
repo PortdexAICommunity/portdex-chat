@@ -14,10 +14,10 @@ import { WorkflowCard } from "@/components/marketplace/workflow-card";
 
 import { Pagination } from "@/components/marketplace/pagination";
 import Tags from "@/components/marketplace/tag";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { MarketplaceItemCount } from "@/components/marketplace-item-count";
 import { PREDEFINED_ASSISTANT_CATEGORIES } from "@/lib/constant/marketplace-constant";
 import { siteTemplates, softwareTools } from "@/lib/constants";
 import type {
@@ -41,6 +41,7 @@ import {
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 import { BlockchainIcon, MCPIcon, N8NIcon } from "@/components/icons";
+import { useMarketplaceStore } from "@/store/marketplace-store";
 import { FAQSection } from "@/components/faq";
 
 // Configure SWR to reduce API calls
@@ -248,6 +249,8 @@ export default function Marketplace() {
 		searchTerm: "",
 	});
 
+	const { setTotalItems } = useMarketplaceStore();
+
 	useEffect(() => {
 		setMounted(true);
 	}, []);
@@ -373,6 +376,19 @@ export default function Marketplace() {
 		() => workflowsData?.workflows ?? [],
 		[workflowsData]
 	);
+
+	// Update total items count in persistent store
+	useEffect(() => {
+		const totalCount =
+			assistantsTotal + aiModels.length + mcpServers.length + workflows.length;
+		setTotalItems(totalCount);
+	}, [
+		assistantsTotal,
+		aiModels.length,
+		mcpServers.length,
+		workflows.length,
+		setTotalItems,
+	]);
 
 	// Helper function to get categories with counts
 	const getCategoriesWithCounts = useCallback((items: DataTypes[]) => {
@@ -707,13 +723,7 @@ export default function Marketplace() {
 						</div>
 
 						<div className="flex items-center justify-end space-x-2">
-							<Badge variant="secondary" className="text-xs">
-								{assistantsTotal +
-									aiModels.length +
-									mcpServers.length +
-									workflows.length}{" "}
-								items
-							</Badge>
+							<MarketplaceItemCount />
 						</div>
 					</div>
 				</div>

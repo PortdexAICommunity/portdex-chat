@@ -31,9 +31,9 @@ export const BackgroundGradient = ({
 					animate
 						? {
 								duration: 5,
-								repeat: Infinity,
+								repeat: Number.POSITIVE_INFINITY,
 								repeatType: "reverse",
-						  }
+							}
 						: undefined
 				}
 				style={{
@@ -52,9 +52,9 @@ export const BackgroundGradient = ({
 					animate
 						? {
 								duration: 5,
-								repeat: Infinity,
+								repeat: Number.POSITIVE_INFINITY,
 								repeatType: "reverse",
-						  }
+							}
 						: undefined
 				}
 				style={{

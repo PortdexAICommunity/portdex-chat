@@ -15,8 +15,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Calendar, Download, Sparkles, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, startTransition } from "react";
+import { useState, startTransition, useEffect } from "react";
 import { saveChatModelAsCookie } from "@/app/(chat)/actions";
+import { useMarketplaceStore } from "@/store/marketplace-store";
 
 interface MarketplaceItemCardProps {
 	item: HomeMarketplaceItem;
@@ -385,16 +386,11 @@ const MarketplaceItemCard = ({
 
 export const HomeMarketplace = () => {
 	const router = useRouter();
-	const [showCount, setShowCount] = useState(6);
+	const [showCount, setShowCount] = useState<Number | null>(null);
 	const [selectedItem, setSelectedItem] = useState<HomeMarketplaceItem | null>(
 		null
 	);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-	const handleShowMore = () => {
-		const nextCount = showCount + 8;
-		setShowCount(Math.min(nextCount, marketplaceItems.length));
-	};
 
 	const handleGoToMarketplace = () => {
 		router.push("/marketplace");
@@ -410,8 +406,14 @@ export const HomeMarketplace = () => {
 		setSelectedItem(null);
 	};
 
-	const visibleItems = homeMarketplaceItems.slice(0, showCount);
-	const hasMoreItems = showCount < homeMarketplaceItems.length;
+	const visibleItems = homeMarketplaceItems.slice(0, 6);
+	const { totalItems } = useMarketplaceStore();
+
+	useEffect(() => {
+		if (totalItems) {
+			setShowCount(totalItems);
+		}
+	}, [totalItems]);
 
 	return (
 		<div className="w-full max-w-7xl mx-auto px-4 py-8">
@@ -451,24 +453,22 @@ export const HomeMarketplace = () => {
 
 			{/* Action Buttons */}
 			<div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-				{hasMoreItems && (
-					<motion.div
-						initial={{ opacity: 0, scale: 0.9 }}
-						animate={{ opacity: 1, scale: 1 }}
-						transition={{ delay: 0.2 }}
-					>
-						<Button
-							onClick={handleShowMore}
-							variant="outline"
-							size="lg"
-							className=""
-						>
-							Show More ({homeMarketplaceItems.length - showCount} remaining)
-						</Button>
-					</motion.div>
-				)}
-
 				<motion.div
+					initial={{ opacity: 0, scale: 0.9 }}
+					animate={{ opacity: 1, scale: 1 }}
+					transition={{ delay: 0.2 }}
+				>
+					<Button
+						onClick={() => router.push("/marketplace")}
+						variant="outline"
+						size="lg"
+						className=""
+					>
+						Show More {showCount ? `(${showCount} remaining)` : "Counting..."}
+					</Button>
+				</motion.div>
+
+				{/* <motion.div
 					initial={{ opacity: 0, scale: 0.9 }}
 					animate={{ opacity: 1, scale: 1 }}
 					transition={{ delay: 0.3 }}
@@ -476,7 +476,7 @@ export const HomeMarketplace = () => {
 					<Link href={"/marketplace"} className="hover:text-primary">
 						Take Me to Marketplace
 					</Link>
-				</motion.div>
+				</motion.div> */}
 			</div>
 
 			{/* Dialog */}
