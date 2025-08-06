@@ -14,14 +14,19 @@ import { WorkflowCard } from "@/components/marketplace/workflow-card";
 
 import { Pagination } from "@/components/marketplace/pagination";
 import Tags from "@/components/marketplace/tag";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { MarketplaceItemCount } from "@/components/marketplace-item-count";
 import { PREDEFINED_ASSISTANT_CATEGORIES } from "@/lib/constant/marketplace-constant";
-import { siteTemplates, softwareTools } from "@/lib/constants";
+import {
+	homeMarketplaceItems,
+	siteTemplates,
+	softwareTools,
+} from "@/lib/constants";
 import type {
 	DataTypes,
+	HomeMarketplaceItem,
 	MCPDataTypes,
 	MCPServerType,
 	WorkflowType,
@@ -41,7 +46,29 @@ import {
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 import { BlockchainIcon, MCPIcon, N8NIcon } from "@/components/icons";
+import { useMarketplaceStore } from "@/store/marketplace-store";
 import { FAQSection } from "@/components/faq";
+import { LoaderThree } from "@/components/animation/loader";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardFooter,
+	CardTitle,
+} from "@/components/ui/card";
+import { MarketplaceItemCard } from "@/components/marketplace/marketplace-item-card";
+import { useRouter } from "next/navigation";
+import { startTransition } from "react";
+import { saveChatModelAsCookie } from "@/app/(chat)/actions";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { User, Calendar, Sparkles, Download } from "lucide-react";
+import { memo } from "react";
 
 // Configure SWR to reduce API calls
 const swrConfig = {
@@ -160,31 +187,159 @@ const MemoizedMCPServerCard = React.memo(
 	)
 );
 
-const MemoizedWorkflowCard = React.memo(
-	({
-		workflow,
-		onClick,
-		onDownload,
-		onLoginRequired,
-	}: {
-		workflow: WorkflowType;
-		onClick: () => void;
-		onDownload: (workflow: WorkflowType) => void;
-		onLoginRequired: () => void;
-	}) => (
-		<WorkflowCard
-			workflow={workflow}
-			onClick={onClick}
-			onDownload={onDownload}
-			onLoginRequired={onLoginRequired}
-		/>
-	)
-);
-
-MemoizedAssistantCard.displayName = "MemoizedAssistantCard";
+const MemoizedWorkflowCard = memo(WorkflowCard);
 MemoizedAIModelCard.displayName = "MemoizedAIModelCard";
 MemoizedMCPServerCard.displayName = "MemoizedMCPServerCard";
 MemoizedWorkflowCard.displayName = "MemoizedWorkflowCard";
+
+// Featured Item Dialog Component
+const FeaturedItemDialog = ({
+	item,
+	isOpen,
+	onClose,
+}: {
+	item: any;
+	isOpen: boolean;
+	onClose: () => void;
+}) => {
+	const router = useRouter();
+
+	if (!item) return null;
+
+	const getCategoryIcon = (category: string) => {
+		switch (category) {
+			case "courses":
+				return "📚";
+			case "tutors":
+				return "👨‍🏫";
+			case "resources":
+				return "📖";
+			case "ai-models":
+				return "🤖";
+			case "software":
+				return "💻";
+			case "templates":
+				return "🎨";
+			default:
+				return "📄";
+		}
+	};
+
+	const getCategoryColor = (category: string) => {
+		switch (category) {
+			case "courses":
+				return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
+			case "tutors":
+				return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
+			case "resources":
+				return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300";
+			case "ai-models":
+				return "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300";
+			case "software":
+				return "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300";
+			case "templates":
+				return "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300";
+			default:
+				return "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300";
+		}
+	};
+
+	const handleUseAssistant = () => {
+		const assistantModelId = `assistant-${item.id}`;
+		// Persist assistant selection via server action and then navigate to chat page
+		startTransition(() => {
+			saveChatModelAsCookie(assistantModelId).then(() => {
+				// Persist assistant details in localStorage for client use
+				localStorage.setItem("selected-assistant", JSON.stringify(item));
+				router.push("/");
+			});
+		});
+		onClose();
+	};
+
+	return (
+		<Dialog open={isOpen} onOpenChange={onClose}>
+			<DialogContent className="bg-white dark:bg-gray-950 border-gray-200 dark:border-gray-800/50 text-gray-900 dark:text-white max-w-2xl max-h-[90vh] overflow-y-auto">
+				<motion.div
+					initial={{ opacity: 0, scale: 0.95 }}
+					animate={{ opacity: 1, scale: 1 }}
+					exit={{ opacity: 0, scale: 0.95 }}
+					transition={{ duration: 0.2 }}
+				>
+					<DialogHeader className="pb-6 pr-10">
+						<div className="space-y-3">
+							<DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white leading-tight">
+								{item.title} {getCategoryIcon(item.category)}
+							</DialogTitle>
+							<Badge
+								variant="secondary"
+								className={`${getCategoryColor(item.category)} w-fit`}
+							>
+								{item.category.charAt(0).toUpperCase() + item.category.slice(1)}
+							</Badge>
+						</div>
+					</DialogHeader>
+
+					<div className="space-y-6">
+						{/* Visual Header */}
+						<Card className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900/30 dark:to-gray-800/30 border-gray-200 dark:border-gray-800/50">
+							<CardContent className="p-6">
+								<div className="h-24 w-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800/50 dark:to-gray-700/50 rounded-xl relative overflow-hidden mb-4 flex items-center justify-center">
+									<div className="text-4xl">
+										{getCategoryIcon(item.category)}
+									</div>
+								</div>
+								<div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+									<div className="flex items-center gap-1">
+										<User className="size-4" />
+										<span>{item.creator}</span>
+									</div>
+									<div className="flex items-center gap-1">
+										<Calendar className="size-4" />
+										<span>{item.date}</span>
+									</div>
+								</div>
+							</CardContent>
+						</Card>
+
+						{/* Description */}
+						<div>
+							<h4 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white flex items-center gap-2">
+								<Sparkles className="size-5 text-purple-600 dark:text-purple-400" />
+								Description
+							</h4>
+							<Card className="bg-gray-50 dark:bg-gray-950/50 border-gray-200 dark:border-gray-800/50">
+								<CardContent className="p-4">
+									<p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+										{item.description}
+									</p>
+								</CardContent>
+							</Card>
+						</div>
+
+						{/* Action Buttons */}
+						<div className="flex flex-col sm:flex-row gap-3 pt-4">
+							<Button
+								className="flex-1 bg-purple-600 hover:bg-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+								onClick={handleUseAssistant}
+							>
+								<Download className="size-4 mr-2" />
+								Use Assistant
+							</Button>
+							<Button
+								variant="outline"
+								className="border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800/50 sm:w-auto"
+								onClick={onClose}
+							>
+								Close
+							</Button>
+						</div>
+					</div>
+				</motion.div>
+			</DialogContent>
+		</Dialog>
+	);
+};
 
 // Pagination constants
 const ITEMS_PER_PAGE = 24;
@@ -211,6 +366,12 @@ export default function Marketplace() {
 	const [assistantsPageSize, setAssistantsPageSize] = useState(ITEMS_PER_PAGE);
 	const [mcpCurrentPage, setMcpCurrentPage] = useState(1);
 	const [mcpPageSize, setMcpPageSize] = useState(20);
+
+	const [featuredItem, setFeaturedItem] = useState<any>();
+
+	// Featured item dialog state
+	const [selectedFeaturedItem, setSelectedFeaturedItem] = useState<any>(null);
+	const [isFeaturedDialogOpen, setIsFeaturedDialogOpen] = useState(false);
 
 	// Page states for other sections
 	const [aiModelsCurrentPage, setAiModelsCurrentPage] = useState(1);
@@ -248,9 +409,16 @@ export default function Marketplace() {
 		searchTerm: "",
 	});
 
+	const { setTotalItems } = useMarketplaceStore();
+
 	useEffect(() => {
 		setMounted(true);
+
+		const featuredItems = homeMarketplaceItems.slice(0, 6);
+		setFeaturedItem(featuredItems);
 	}, []);
+
+	console.log("featured", featuredItem);
 
 	// Reset pagination when search term, filters, or page size change
 	useEffect(() => {
@@ -358,6 +526,38 @@ export default function Marketplace() {
 		swrConfig
 	);
 
+	// Fetch all data without pagination or filtering for FeaturedMarketplaceSection
+	const { data: allAssistantsData, isLoading: allAssistantsLoading } = useSWR(
+		activeTab === "home" ? "marketplace/api/agents?page=1&pageSize=1000" : null,
+		fetcher,
+		swrConfig
+	);
+
+	const { data: allAiModelsData, isLoading: allAiModelsLoading } = useSWR<{
+		models: DataTypes[];
+		total: number;
+	}>(
+		activeTab === "home" ? "marketplace/api/ai-models" : null,
+		aiModelsFetcher,
+		swrConfig
+	);
+
+	const { data: allMcpServersData, isLoading: allMcpServersLoading } = useSWR(
+		activeTab === "home"
+			? "marketplace/api/mcp-servers?page=1&pageSize=1000"
+			: null,
+		mcpServersFetcher,
+		swrConfig
+	);
+
+	const { data: allWorkflowsData, isLoading: allWorkflowsLoading } = useSWR(
+		activeTab === "home"
+			? "marketplace/api/workflows?page=1&pageSize=1000"
+			: null,
+		workflowsFetcher,
+		swrConfig
+	);
+
 	const assistants = useMemo(() => aiAgentsData?.agents ?? [], [aiAgentsData]);
 	const assistantsTotal = useMemo(
 		() => aiAgentsData?.total ?? 0,
@@ -373,6 +573,37 @@ export default function Marketplace() {
 		() => workflowsData?.workflows ?? [],
 		[workflowsData]
 	);
+
+	// All unfiltered data for FeaturedMarketplaceSection
+	const allAssistants = useMemo(
+		() => allAssistantsData?.agents ?? [],
+		[allAssistantsData]
+	);
+	const allAiModels = useMemo(
+		() => allAiModelsData?.models ?? [],
+		[allAiModelsData]
+	);
+	const allMcpServers = useMemo(
+		() => allMcpServersData?.servers ?? [],
+		[allMcpServersData]
+	);
+	const allWorkflows = useMemo(
+		() => allWorkflowsData?.workflows ?? [],
+		[allWorkflowsData]
+	);
+
+	// Update total items count in persistent store
+	useEffect(() => {
+		const totalCount =
+			assistantsTotal + aiModels.length + mcpServers.length + workflows.length;
+		setTotalItems(totalCount);
+	}, [
+		assistantsTotal,
+		aiModels.length,
+		mcpServers.length,
+		workflows.length,
+		setTotalItems,
+	]);
 
 	// Helper function to get categories with counts
 	const getCategoriesWithCounts = useCallback((items: DataTypes[]) => {
@@ -492,6 +723,16 @@ export default function Marketplace() {
 		},
 		[]
 	);
+
+	const handleFeaturedItemClick = useCallback((item: any) => {
+		setSelectedFeaturedItem(item);
+		setIsFeaturedDialogOpen(true);
+	}, []);
+
+	const handleCloseFeaturedDialog = useCallback(() => {
+		setIsFeaturedDialogOpen(false);
+		setSelectedFeaturedItem(null);
+	}, []);
 
 	const handleViewMore = useCallback((type: "assistants") => {
 		setActiveTab(type);
@@ -681,7 +922,7 @@ export default function Marketplace() {
 			<motion.header
 				initial={{ y: -100 }}
 				animate={{ y: 0 }}
-				className="sticky top-0 z-40 backdrop-blur-md border-b border-border transition-colors duration-200"
+				className="sticky top-0 z-40 backdrop-blur-xl border-b border-border transition-colors duration-200"
 			>
 				<div className="w-full px-4 sm:px-6 lg:px-8">
 					<div className="flex justify-between items-center gap-4 py-4 sm:h-16 sm:py-0">
@@ -707,17 +948,34 @@ export default function Marketplace() {
 						</div>
 
 						<div className="flex items-center justify-end space-x-2">
-							<Badge variant="secondary" className="text-xs">
-								{assistantsTotal +
-									aiModels.length +
-									mcpServers.length +
-									workflows.length}{" "}
-								items
-							</Badge>
+							<MarketplaceItemCount />
 						</div>
 					</div>
 				</div>
 			</motion.header>
+
+			{/* Hero Banner */}
+			<section className="relative overflow-hidden rounded-2xl bg-[url(/marketplace-banner.jpg)] bg-origin-padding bg-cover bg-no-repeat my-5 mx-10">
+				<div className="flex flex-col sm:flex-row items-center justify-between p-4 sm:p-6 md:p-8">
+					<div className="z-10 max-w-2xl w-full text-left">
+						<h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 sm:mb-3 font-serif">
+							Add AI Agents to your assistant in minutes
+						</h1>
+						<p className="text-white/80 text-xs sm:text-sm mb-4">
+							Transform your financial landscape with the AI Marketplace, the
+							ultimate hub for crypto enthusiasts and finance professionals
+							alike, designed to enhance productivity, reduce operational
+							hurdles, and propel your investments into the fast lane.
+						</p>
+						<Button
+							className="bg-white hover:bg-white/90 text-purple-700 hover:text-purple-800 font-medium px-4 sm:px-6 py-1 sm:py-2 text-sm"
+							onClick={() => setActiveTab("assistants")}
+						>
+							Explore AI agent solutions
+						</Button>
+					</div>
+				</div>
+			</section>
 
 			{/* Mobile/Tablet Search - Only for home tab */}
 			{activeTab === "home" && (
@@ -734,7 +992,7 @@ export default function Marketplace() {
 				</div>
 			)}
 
-			{/* Navigation */}
+			{/* Navigation
 			<motion.nav
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
@@ -807,7 +1065,7 @@ export default function Marketplace() {
 						))}
 					</div>
 				</div>
-			</motion.nav>
+			</motion.nav> */}
 
 			{/* Content */}
 			<div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
@@ -815,8 +1073,8 @@ export default function Marketplace() {
 					<AnimatePresence mode="wait">
 						{/* Show loading only for core sections, not workflows */}
 						{(isLoading || aiModelsLoading) && activeTab === "home" && (
-							<div className="py-16 text-center text-gray-500 dark:text-gray-400">
-								Loading...
+							<div className="py-16 flex justify-center items-center">
+								<LoaderThree />
 							</div>
 						)}
 						{(error || aiModelsError) && (
@@ -833,134 +1091,54 @@ export default function Marketplace() {
 								exit={{ opacity: 0, y: -20 }}
 								className="space-y-4 sm:space-y-6"
 							>
-								{/* Hero Banner */}
-								<section className="relative overflow-hidden rounded-2xl bg-[url(/marketplace-banner.jpg)] bg-origin-padding bg-cover bg-no-repeat">
-									<div className="flex flex-col sm:flex-row items-center justify-between p-4 sm:p-6 md:p-8">
-										<div className="z-10 max-w-2xl w-full text-left">
-											<h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 sm:mb-3 font-serif">
-												Add AI Agents to your assistant in minutes
-											</h1>
-											<p className="text-white/80 text-xs sm:text-sm mb-4">
-												Transform your financial landscape with the AI
-												Marketplace, the ultimate hub for crypto enthusiasts and
-												finance professionals alike, designed to enhance
-												productivity, reduce operational hurdles, and propel
-												your investments into the fast lane.
-											</p>
-											<Button
-												className="bg-white hover:bg-white/90 text-purple-700 hover:text-purple-800 font-medium px-4 sm:px-6 py-1 sm:py-2 text-sm"
-												onClick={() => setActiveTab("assistants")}
+								<section className="flex flex-col justify-start items-start gap-5">
+									<h2 className="text-primary text-2xl font-bold">Featured*</h2>
+									<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+										{featuredItem.map((item: any) => (
+											<Card
+												key={item.id}
+												className="hover:shadow-lg hover:scale-[1.02] transition-all duration-200 cursor-pointer"
+												onClick={() => handleFeaturedItemClick(item)}
 											>
-												Explore AI agent solutions
-											</Button>
-										</div>
+												<CardContent className="p-4">
+													<div className="flex flex-col gap-3">
+														{/* Icon and Title together */}
+														<div className="flex items-center gap-3">
+															<div className="shrink-0 size-10 bg-gradient-to-br from-blue-100 to-purple-200 dark:from-blue-900/30 dark:to-purple-800/30 rounded-lg flex items-center justify-center text-xl shadow-sm border border-blue-200 dark:border-blue-700/50">
+																{item.icon || "🔧"}
+															</div>
+															<h4 className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-2">
+																{item.title}
+															</h4>
+														</div>
+														{/* Description below */}
+														<p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3 leading-relaxed">
+															{item.description}
+														</p>
+													</div>
+												</CardContent>
+											</Card>
+										))}
 									</div>
-								</section>
-
-								{/* Welcome to Marketplace */}
-								<section className="text-center mb-4">
-									<h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">
-										Discover, deploy, and manage solutions
-									</h2>
-									<p className="text-sm text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-										The most subscribed products this month
-									</p>
 								</section>
 
 								{/* Featured Items with Filter */}
 								<section>
 									<FeaturedMarketplaceSection
-										assistants={assistants}
-										aiModels={aiModels}
-										mcpServers={mcpServers}
-										workflows={workflows}
+										assistants={allAssistants}
+										aiModels={allAiModels}
+										mcpServers={allMcpServers}
+										workflows={allWorkflows}
 										onItemClick={handleItemClick}
+										software={softwareTools}
+										templates={siteTemplates}
 										title="Featured Items"
 										defaultShowAssistantsAndWorkflows={true}
 									/>
 								</section>
 
-								{/* Popular Categories */}
-								<section className="pt-6">
-									<h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-										Popular Categories
-									</h2>
-									<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-										{[
-											{
-												name: "Crypto",
-												icon: <BitcoinIcon />,
-												tab: "assistants",
-												gradient:
-													"from-purple-400 to-indigo-500 dark:from-purple-600 dark:to-indigo-700",
-											},
-											{
-												name: "Workflows",
-												icon: <N8NIcon size={24} />,
-												tab: "workflows",
-												gradient:
-													"from-blue-400 to-cyan-500 dark:from-blue-600 dark:to-cyan-700",
-											},
-											{
-												name: "Machine Learning",
-												icon: <Brain />,
-												tab: "assistants",
-												gradient:
-													"from-green-400 to-emerald-500 dark:from-green-600 dark:to-emerald-700",
-											},
-											{
-												name: "Data Products",
-												icon: <ChartBarIcon />,
-												tab: "assistants",
-												gradient:
-													"from-amber-400 to-orange-500 dark:from-amber-600 dark:to-orange-700",
-											},
-											{
-												name: "Blockchain",
-												icon: <BlockchainIcon size={24} />,
-												tab: "assistants",
-												gradient:
-													"from-pink-400 to-rose-500 dark:from-pink-600 dark:to-rose-700",
-											},
-											{
-												name: "Dev Tools",
-												icon: <TowerControlIcon />,
-												tab: "workflows",
-												gradient:
-													"from-violet-400 to-fuchsia-500 dark:from-violet-600 dark:to-fuchsia-700",
-											},
-										].map((category, index) => (
-											<motion.div
-												key={category.name}
-												initial={{ opacity: 0, y: 10 }}
-												animate={{ opacity: 1, y: 0 }}
-												transition={{ delay: index * 0.05 }}
-												className="cursor-pointer"
-												onClick={() => setActiveTab(category.tab as TabType)}
-											>
-												<div className="flex flex-col items-center p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md group relative overflow-hidden transition-all duration-300">
-													{/* Normal state */}
-													<div className="text-2xl mb-1 relative z-10 transition-transform group-hover:scale-110 duration-300">
-														{category.icon}
-													</div>
-													<div className="text-xs font-medium text-gray-900 dark:text-white text-center relative z-10 transition-colors group-hover:text-white duration-300">
-														{category.name}
-													</div>
-
-													{/* Hover gradient overlay */}
-													<div className="absolute inset-0 opacity-0 group-hover:opacity-90 transition-opacity duration-300 -z-0">
-														<div
-															className={`absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-br ${category.gradient} transition-opacity duration-300`}
-														/>
-													</div>
-												</div>
-											</motion.div>
-										))}
-									</div>
-								</section>
-
 								{/* FAQ Section */}
-								<FAQSection faqs={marketplaceFAQs} />
+								{/* <FAQSection faqs={marketplaceFAQs} /> */}
 							</motion.div>
 						)}
 
@@ -1460,6 +1638,13 @@ export default function Marketplace() {
 			<LoginPopup
 				isOpen={isLoginPopupOpen}
 				onClose={() => setIsLoginPopupOpen(false)}
+			/>
+
+			{/* Featured Item Dialog */}
+			<FeaturedItemDialog
+				item={selectedFeaturedItem}
+				isOpen={isFeaturedDialogOpen}
+				onClose={handleCloseFeaturedDialog}
 			/>
 		</div>
 	);
