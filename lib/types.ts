@@ -104,3 +104,19 @@ export type HomeMarketplaceItem = {
 	systemPrompt?: string;
 	useCases?: string[];
 };
+
+export type SoftwareType = {
+	name: string;
+	category: string;
+	icon: string;
+	creator: string;
+	description: string;
+};
+
+export type TemplateType = {
+	name: string;
+	category: string;
+	icon: string;
+	creator: string;
+	description: string;
+};
