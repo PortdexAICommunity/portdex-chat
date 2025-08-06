@@ -169,19 +169,22 @@ export default async function RootLayout({
 				/>
 			</head>
 			<body suppressHydrationWarning className="antialiased">
-				<ConfigureAmplifyClientSide />
-				<ThemeProvider
-					attribute="class"
-					defaultTheme="system"
-					enableSystem
-					disableTransitionOnChange
-				>
-					{/* <Toaster position="bottom-center" richColors /> */}
-					<ThemeAwareToaster />
-					<UseCaseTooltip />
-					{children}
-					<Analytics />
-				</ThemeProvider>
+				<ConfigureAmplifyClientSide>
+					{/* <Auth> */}
+					<ThemeProvider
+						attribute="class"
+						defaultTheme="system"
+						enableSystem
+						disableTransitionOnChange
+					>
+						{/* <Toaster position="bottom-center" richColors /> */}
+						<ThemeAwareToaster />
+						<UseCaseTooltip />
+						{children}
+						<Analytics />
+					</ThemeProvider>
+					{/* </Auth> */}
+				</ConfigureAmplifyClientSide>
 			</body>
 		</html>
 	);
