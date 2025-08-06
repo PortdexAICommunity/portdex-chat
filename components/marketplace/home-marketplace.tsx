@@ -464,7 +464,7 @@ export const HomeMarketplace = () => {
             size="lg"
             className=""
           >
-            {showCount ? `Show More (${showCount} remaining)` : 'Counting...'}
+            {showCount ? `Show More (${showCount} remaining)` : 'Show More'}
           </Button>
         </motion.div>
 
