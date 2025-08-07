@@ -9,7 +9,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { homeMarketplaceItems, marketplaceItems } from '@/lib/constants';
+import {
+  homeMarketplaceItems,
+  marketplaceFAQs,
+  marketplaceItems,
+} from '@/lib/constants';
 import type { HomeMarketplaceItem } from '@/lib/types';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, Calendar, Download, Sparkles, User } from 'lucide-react';
@@ -18,6 +22,7 @@ import { useRouter } from 'next/navigation';
 import { useState, startTransition, useEffect } from 'react';
 import { saveChatModelAsCookie } from '@/app/(chat)/actions';
 import { useMarketplaceStore } from '@/store/marketplace-store';
+import { FAQSection } from '../faq';
 
 interface MarketplaceItemCardProps {
   item: HomeMarketplaceItem;
@@ -251,9 +256,9 @@ const MarketplaceItemCard = ({
       <Card className="h-full bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm border border-gray-200/60 dark:border-gray-800/60 hover:shadow-xl hover:shadow-gray-200/20 dark:hover:shadow-gray-900/40 transition-all duration-300 hover:border-purple-300/60 dark:hover:border-purple-600/40 flex flex-col overflow-hidden">
         {/* Header with gradient and badges */}
         <div className="relative overflow-hidden">
-          {item.gradient ? (
+          {/* {item.gradient ? (
             <div
-              className={`h-28 sm:h-32 lg:h-36 w-full bg-gradient-to-br ${item.gradient} relative flex items-center justify-center`}
+              className={`h-24 w-full bg-gradient-to-br ${item.gradient} relative flex items-center justify-center`}
             >
               <div className="absolute inset-0 bg-black/5 dark:bg-black/20" />
               <motion.div
@@ -266,7 +271,7 @@ const MarketplaceItemCard = ({
               <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
             </div>
           ) : (
-            <div className="h-28 sm:h-32 lg:h-36 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800/50 dark:to-gray-700/50 flex items-center justify-center relative overflow-hidden">
+            <div className="h-24 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800/50 dark:to-gray-700/50 flex items-center justify-center relative overflow-hidden">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent)] dark:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.05),transparent)]" />
               <motion.div
                 className="text-2xl sm:text-3xl lg:text-4xl relative z-10"
@@ -276,7 +281,7 @@ const MarketplaceItemCard = ({
                 {item.icon}
               </motion.div>
             </div>
-          )}
+          )} */}
 
           {/* Type badge - top left */}
           <div className="absolute top-2 sm:top-3 left-2 sm:left-3">
@@ -321,8 +326,8 @@ const MarketplaceItemCard = ({
         <CardContent className="p-3 sm:p-4 lg:p-5 flex-1 flex flex-col">
           {/* Title and Creator in same row */}
           <div className="flex items-start gap-2 sm:gap-3 mb-2">
-            <div className="size-8 sm:size-9 bg-gradient-to-br from-purple-500 via-purple-600 to-blue-600 rounded-full flex items-center justify-center text-white text-xs sm:text-sm font-bold shadow-lg shadow-purple-500/25 shrink-0">
-              {item.creator.charAt(0).toUpperCase()}
+            <div className="size-8 sm:size-9 bg-gradient-to-br from-purple-500/50 via-purple-600/50 to-blue-600/50 rounded-full flex items-center justify-center text-white text-xs sm:text-sm font-bold shadow-lg shadow-purple-500/25 shrink-0">
+              {item.icon}
             </div>
             <div className="flex-1 min-w-0">
               <motion.h3
@@ -338,21 +343,13 @@ const MarketplaceItemCard = ({
             </div>
           </div>
 
-          {/* Date below title */}
-          {item.date && (
-            <div className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 mb-3 sm:mb-4 ml-10 sm:ml-12">
-              <Calendar className="size-3" />
-              <span>{formatDate(item.date)}</span>
-            </div>
-          )}
-
           {/* Description */}
           <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm mb-4 sm:mb-5 line-clamp-3 leading-relaxed flex-1">
             {item.description}
           </p>
 
           {/* Footer with status and action */}
-          <div className="flex items-center justify-between mt-auto pt-2 sm:pt-3 border-t border-gray-100 dark:border-gray-800/50">
+          <div className="flex items-center justify-between mt-auto pt-2 border-t border-border border-dotted">
             <div className="flex items-center gap-2">
               <motion.div
                 className="size-2 bg-emerald-500 rounded-full shadow-sm shadow-emerald-500/50"
@@ -370,13 +367,14 @@ const MarketplaceItemCard = ({
                 Available
               </span>
             </div>
-            <motion.div
-              className="flex items-center gap-1 sm:gap-2 text-purple-600 dark:text-purple-400 text-xs sm:text-sm font-semibold opacity-70 group-hover:opacity-100 transition-all duration-200"
-              whileHover={{ x: 4 }}
-            >
-              <span>Explore</span>
-              <ArrowRight className="size-3 sm:size-4 group-hover:translate-x-1 transition-transform duration-200" />
-            </motion.div>
+            <div className="pt-2">
+              {item.date && (
+                <div className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 mb-3 sm:mb-4 ml-10 sm:ml-12">
+                  <Calendar className="size-3" />
+                  <span>{formatDate(item.date)}</span>
+                </div>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -485,6 +483,11 @@ export const HomeMarketplace = () => {
         isOpen={isDialogOpen}
         onClose={handleCloseDialog}
       />
+
+      {/* FAQs */}
+      <div className="">
+        <FAQSection faqs={marketplaceFAQs} />
+      </div>
     </div>
   );
 };

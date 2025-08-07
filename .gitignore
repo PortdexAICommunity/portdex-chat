@@ -55,3 +55,6 @@ daily-task.md
 .amplify
 # amplify_outputs*
 amplifyconfiguration*
+
+# YoYo AI version control directory
+.yoyo/
