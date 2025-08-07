@@ -1,0 +1,911 @@
+{
+  "metadata": {
+    "repository": "https://github.com/Shubhamsaboo/awesome-llm-apps",
+    "description": "A curated collection of LLM apps built with RAG, AI Agents, Multi-agent Teams, MCP, Voice Agents, and more",
+    "categories": [
+      "Starter AI Agents",
+      "Advanced AI Agents",
+      "Game Playing Agents",
+      "Multi-agent Teams",
+      "Voice AI Agents",
+      "MCP AI Agents",
+      "RAG Tutorials",
+      "Memory Tutorials",
+      "Chat Tutorials"
+    ]
+  },
+  "categories": {
+    "Starter AI Agents": [
+      {
+        "title": "AI Blog to Podcast Agent",
+        "description": "Convert blog posts to podcast format using AI",
+        "category": "Starter AI Agents",
+        "path": "starter_ai_agents/ai_blog_to_podcast_agent/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/starter_ai_agents/ai_blog_to_podcast_agent/",
+        "tags": [
+          "audio",
+          "content creation",
+          "blogging"
+        ],
+        "difficulty": "Beginner",
+        "type": [
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "AI Breakup Recovery Agent",
+        "description": "AI-powered emotional support and recovery guidance",
+        "category": "Starter AI Agents",
+        "path": "starter_ai_agents/ai_breakup_recovery_agent/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/starter_ai_agents/ai_breakup_recovery_agent/",
+        "tags": [
+          "mental health",
+          "emotional support",
+          "wellness"
+        ],
+        "difficulty": "Beginner",
+        "type": [
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "AI Data Analysis Agent",
+        "description": "AI-powered data analysis and visualization",
+        "category": "Starter AI Agents",
+        "path": "starter_ai_agents/ai_data_analysis_agent/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/starter_ai_agents/ai_data_analysis_agent/",
+        "tags": [
+          "data analysis",
+          "visualization",
+          "analytics"
+        ],
+        "difficulty": "Beginner",
+        "type": [
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "AI Medical Imaging Agent",
+        "description": "AI analysis of medical images",
+        "category": "Starter AI Agents",
+        "path": "starter_ai_agents/ai_medical_imaging_agent/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/starter_ai_agents/ai_medical_imaging_agent/",
+        "tags": [
+          "healthcare",
+          "imaging",
+          "medical"
+        ],
+        "difficulty": "Beginner",
+        "type": [
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "AI Meme Generator Agent",
+        "description": "Generate memes using AI and browser automation",
+        "category": "Starter AI Agents",
+        "path": "starter_ai_agents/ai_meme_generator_agent_browseruse/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/starter_ai_agents/ai_meme_generator_agent_browseruse/",
+        "tags": [
+          "memes",
+          "content creation",
+          "browser automation"
+        ],
+        "difficulty": "Beginner",
+        "type": [
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "AI Music Generator Agent",
+        "description": "Generate music using AI",
+        "category": "Starter AI Agents",
+        "path": "starter_ai_agents/ai_music_generator_agent/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/starter_ai_agents/ai_music_generator_agent/",
+        "tags": [
+          "music",
+          "audio",
+          "generation"
+        ],
+        "difficulty": "Beginner",
+        "type": [
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "AI Travel Agent",
+        "description": "AI-powered travel planning and recommendations",
+        "category": "Starter AI Agents",
+        "path": "starter_ai_agents/ai_travel_agent/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/starter_ai_agents/ai_travel_agent/",
+        "tags": [
+          "travel",
+          "planning",
+          "recommendations"
+        ],
+        "difficulty": "Beginner",
+        "type": [
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "Gemini Multimodal Agent",
+        "description": "Multimodal AI agent using Google's Gemini",
+        "category": "Starter AI Agents",
+        "path": "starter_ai_agents/gemini_multimodal_agent_demo/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/starter_ai_agents/gemini_multimodal_agent_demo/",
+        "tags": [
+          "multimodal",
+          "Gemini",
+          "Google"
+        ],
+        "difficulty": "Beginner",
+        "type": [
+          "General"
+        ]
+      },
+      {
+        "title": "Local News Agent",
+        "description": "Local news aggregation and analysis using OpenAI",
+        "category": "Starter AI Agents",
+        "path": "starter_ai_agents/local_news_agent_openai_swarm/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/starter_ai_agents/local_news_agent_openai_swarm/",
+        "tags": [
+          "news",
+          "local",
+          "OpenAI"
+        ],
+        "difficulty": "Beginner",
+        "type": [
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "Mixture of Agents",
+        "description": "Multiple AI agents working together",
+        "category": "Starter AI Agents",
+        "path": "starter_ai_agents/mixture_of_agents/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/starter_ai_agents/mixture_of_agents/",
+        "tags": [
+          "multi-agent",
+          "collaboration",
+          "integration"
+        ],
+        "difficulty": "Beginner",
+        "type": [
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "xAI Finance Agent",
+        "description": "Explainable AI for financial analysis",
+        "category": "Starter AI Agents",
+        "path": "starter_ai_agents/xai_finance_agent/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/starter_ai_agents/xai_finance_agent/",
+        "tags": [
+          "finance",
+          "XAI",
+          "analysis"
+        ],
+        "difficulty": "Beginner",
+        "type": [
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "OpenAI Research Agent",
+        "description": "Research assistant powered by OpenAI",
+        "category": "Starter AI Agents",
+        "path": "starter_ai_agents/opeani_research_agent/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/starter_ai_agents/opeani_research_agent/",
+        "tags": [
+          "research",
+          "OpenAI",
+          "analysis"
+        ],
+        "difficulty": "Beginner",
+        "type": [
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "Web Scrapping AI Agent",
+        "description": "AI-powered web scraping and analysis",
+        "category": "Starter AI Agents",
+        "path": "starter_ai_agents/web_scrapping_ai_agent/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/starter_ai_agents/web_scrapping_ai_agent/",
+        "tags": [
+          "web scraping",
+          "data collection",
+          "analysis"
+        ],
+        "difficulty": "Beginner",
+        "type": [
+          "Single Agent"
+        ]
+      }
+    ],
+    "Advanced AI Agents": [
+      {
+        "title": "AI Deep Research Agent",
+        "description": "Advanced research and analysis using AI",
+        "category": "Advanced AI Agents",
+        "path": "advanced_ai_agents/single_agent_apps/ai_deep_research_agent/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_ai_agents/single_agent_apps/ai_deep_research_agent/",
+        "tags": [
+          "research",
+          "analysis",
+          "deep learning"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "AI Consultant Agent",
+        "description": "AI-powered consulting and advisory",
+        "category": "Advanced AI Agents",
+        "path": "advanced_ai_agents/single_agent_apps/ai_consultant_agent",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_ai_agents/single_agent_apps/ai_consultant_agent",
+        "tags": [
+          "consulting",
+          "business",
+          "advisory"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "AI System Architect Agent",
+        "description": "AI for system architecture design",
+        "category": "Advanced AI Agents",
+        "path": "advanced_ai_agents/single_agent_apps/ai_system_architect_r1/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_ai_agents/single_agent_apps/ai_system_architect_r1/",
+        "tags": [
+          "architecture",
+          "system design",
+          "planning"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "AI Lead Generation Agent",
+        "description": "AI-powered lead generation and qualification",
+        "category": "Advanced AI Agents",
+        "path": "advanced_ai_agents/single_agent_apps/ai_lead_generation_agent/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_ai_agents/single_agent_apps/ai_lead_generation_agent/",
+        "tags": [
+          "sales",
+          "leads",
+          "marketing"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "AI Financial Coach Agent",
+        "description": "Personal finance coaching using AI",
+        "category": "Advanced AI Agents",
+        "path": "advanced_ai_agents/multi_agent_apps/ai_financial_coach_agent/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_ai_agents/multi_agent_apps/ai_financial_coach_agent/",
+        "tags": [
+          "finance",
+          "coaching",
+          "personal"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "Multi-agent"
+        ]
+      },
+      {
+        "title": "AI Movie Production Agent",
+        "description": "AI assistance for movie production",
+        "category": "Advanced AI Agents",
+        "path": "advanced_ai_agents/single_agent_apps/ai_movie_production_agent/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_ai_agents/single_agent_apps/ai_movie_production_agent/",
+        "tags": [
+          "movies",
+          "production",
+          "entertainment"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "AI Investment Agent",
+        "description": "AI-powered investment analysis and recommendations",
+        "category": "Advanced AI Agents",
+        "path": "advanced_ai_agents/single_agent_apps/ai_investment_agent/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_ai_agents/single_agent_apps/ai_investment_agent/",
+        "tags": [
+          "investment",
+          "finance",
+          "analysis"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "AI Health & Fitness Agent",
+        "description": "AI-powered health and fitness coaching",
+        "category": "Advanced AI Agents",
+        "path": "advanced_ai_agents/single_agent_apps/ai_health_fitness_agent/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_ai_agents/single_agent_apps/ai_health_fitness_agent/",
+        "tags": [
+          "health",
+          "fitness",
+          "wellness"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "AI Product Launch Intelligence Agent",
+        "description": "AI for product launch strategy and analysis",
+        "category": "Advanced AI Agents",
+        "path": "advanced_ai_agents/multi_agent_apps/product_launch_intelligence_agent",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_ai_agents/multi_agent_apps/product_launch_intelligence_agent",
+        "tags": [
+          "product launch",
+          "marketing",
+          "strategy"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "Multi-agent"
+        ]
+      },
+      {
+        "title": "AI Mental Wellbeing Agent",
+        "description": "Mental health support using AI",
+        "category": "Advanced AI Agents",
+        "path": "advanced_ai_agents/multi_agent_apps/ai_mental_wellbeing_agent/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_ai_agents/multi_agent_apps/ai_mental_wellbeing_agent/",
+        "tags": [
+          "mental health",
+          "wellness",
+          "support"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "Multi-agent"
+        ]
+      },
+      {
+        "title": "AI Self-Evolving Agent",
+        "description": "Self-improving AI agent",
+        "category": "Advanced AI Agents",
+        "path": "advanced_ai_agents/multi_agent_apps/ai_Self-Evolving_agent/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_ai_agents/multi_agent_apps/ai_Self-Evolving_agent/",
+        "tags": [
+          "evolution",
+          "learning",
+          "improvement"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "Multi-agent"
+        ]
+      }
+    ],
+    "Game Playing Agents": [
+      {
+        "title": "AI 3D Pygame Agent",
+        "description": "AI agent for 3D Pygame games",
+        "category": "Game Playing Agents",
+        "path": "advanced_ai_agents/autonomous_game_playing_agent_apps/ai_3dpygame_r1/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_ai_agents/autonomous_game_playing_agent_apps/ai_3dpygame_r1/",
+        "tags": [
+          "gaming",
+          "3D",
+          "pygame"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "AI Chess Agent",
+        "description": "AI chess player",
+        "category": "Game Playing Agents",
+        "path": "advanced_ai_agents/autonomous_game_playing_agent_apps/ai_chess_agent/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_ai_agents/autonomous_game_playing_agent_apps/ai_chess_agent/",
+        "tags": [
+          "chess",
+          "gaming",
+          "strategy"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "AI Tic-Tac-Toe Agent",
+        "description": "AI Tic-Tac-Toe player",
+        "category": "Game Playing Agents",
+        "path": "advanced_ai_agents/autonomous_game_playing_agent_apps/ai_tic_tac_toe_agent/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_ai_agents/autonomous_game_playing_agent_apps/ai_tic_tac_toe_agent/",
+        "tags": [
+          "tic-tac-toe",
+          "gaming",
+          "strategy"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "Single Agent"
+        ]
+      }
+    ],
+    "Multi-agent Teams": [
+      {
+        "title": "AI Competitor Intelligence Agent Team",
+        "description": "Competitive intelligence using multiple AI agents",
+        "category": "Multi-agent Teams",
+        "path": "advanced_ai_agents/multi_agent_apps/agent_teams/ai_competitor_intelligence_agent_team/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_ai_agents/multi_agent_apps/agent_teams/ai_competitor_intelligence_agent_team/",
+        "tags": [
+          "competitive intelligence",
+          "analysis",
+          "team"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "Multi-agent"
+        ]
+      },
+      {
+        "title": "AI Finance Agent Team",
+        "description": "Financial analysis using multiple AI agents",
+        "category": "Multi-agent Teams",
+        "path": "advanced_ai_agents/multi_agent_apps/agent_teams/ai_finance_agent_team/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_ai_agents/multi_agent_apps/agent_teams/ai_finance_agent_team/",
+        "tags": [
+          "finance",
+          "team",
+          "analysis"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "Multi-agent"
+        ]
+      },
+      {
+        "title": "AI Game Design Agent Team",
+        "description": "Game design using multiple AI agents",
+        "category": "Multi-agent Teams",
+        "path": "advanced_ai_agents/multi_agent_apps/agent_teams/ai_game_design_agent_team/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_ai_agents/multi_agent_apps/agent_teams/ai_game_design_agent_team/",
+        "tags": [
+          "game design",
+          "team",
+          "creativity"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "Multi-agent"
+        ]
+      },
+      {
+        "title": "AI Legal Agent Team",
+        "description": "Legal analysis using multiple AI agents",
+        "category": "Multi-agent Teams",
+        "path": "advanced_ai_agents/multi_agent_apps/agent_teams/ai_legal_agent_team/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_ai_agents/multi_agent_apps/agent_teams/ai_legal_agent_team/",
+        "tags": [
+          "legal",
+          "team",
+          "analysis"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "Multi-agent"
+        ]
+      },
+      {
+        "title": "AI Recruitment Agent Team",
+        "description": "Recruitment and HR using multiple AI agents",
+        "category": "Multi-agent Teams",
+        "path": "advanced_ai_agents/multi_agent_apps/agent_teams/ai_recruitment_agent_team/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_ai_agents/multi_agent_apps/agent_teams/ai_recruitment_agent_team/",
+        "tags": [
+          "recruitment",
+          "HR",
+          "team"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "Multi-agent"
+        ]
+      },
+      {
+        "title": "AI Real Estate Agent Team",
+        "description": "Real estate analysis using multiple AI agents",
+        "category": "Multi-agent Teams",
+        "path": "advanced_ai_agents/multi_agent_apps/agent_teams/ai_real_estate_agent_team",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_ai_agents/multi_agent_apps/agent_teams/ai_real_estate_agent_team",
+        "tags": [
+          "real estate",
+          "team",
+          "analysis"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "Multi-agent"
+        ]
+      }
+    ],
+    "Voice AI Agents": [
+      {
+        "title": "AI Audio Tour Agent",
+        "description": "AI-powered audio tours and guides",
+        "category": "Voice AI Agents",
+        "path": "voice_ai_agents/ai_audio_tour_agent/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/voice_ai_agents/ai_audio_tour_agent/",
+        "tags": [
+          "audio",
+          "tourism",
+          "voice"
+        ],
+        "difficulty": "Intermediate",
+        "type": [
+          "Voice Agent",
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "Customer Support Voice Agent",
+        "description": "Voice-based customer support AI",
+        "category": "Voice AI Agents",
+        "path": "voice_ai_agents/customer_support_voice_agent/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/voice_ai_agents/customer_support_voice_agent/",
+        "tags": [
+          "customer support",
+          "voice",
+          "service"
+        ],
+        "difficulty": "Intermediate",
+        "type": [
+          "Voice Agent",
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "Voice RAG Agent",
+        "description": "Voice-enabled RAG using OpenAI SDK",
+        "category": "Voice AI Agents",
+        "path": "voice_ai_agents/voice_rag_openaisdk/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/voice_ai_agents/voice_rag_openaisdk/",
+        "tags": [
+          "voice",
+          "RAG",
+          "OpenAI"
+        ],
+        "difficulty": "Intermediate",
+        "type": [
+          "RAG",
+          "Voice Agent",
+          "Single Agent"
+        ]
+      }
+    ],
+    "MCP AI Agents": [
+      {
+        "title": "Browser MCP Agent",
+        "description": "Browser automation using MCP",
+        "category": "MCP AI Agents",
+        "path": "mcp_ai_agents/browser_mcp_agent/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/mcp_ai_agents/browser_mcp_agent/",
+        "tags": [
+          "browser",
+          "automation",
+          "MCP"
+        ],
+        "difficulty": "Intermediate",
+        "type": [
+          "MCP",
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "GitHub MCP Agent",
+        "description": "GitHub automation using MCP",
+        "category": "MCP AI Agents",
+        "path": "mcp_ai_agents/github_mcp_agent/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/mcp_ai_agents/github_mcp_agent/",
+        "tags": [
+          "GitHub",
+          "automation",
+          "MCP"
+        ],
+        "difficulty": "Intermediate",
+        "type": [
+          "MCP",
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "Notion MCP Agent",
+        "description": "Notion automation using MCP",
+        "category": "MCP AI Agents",
+        "path": "mcp_ai_agents/notion_mcp_agent",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/mcp_ai_agents/notion_mcp_agent",
+        "tags": [
+          "Notion",
+          "automation",
+          "MCP"
+        ],
+        "difficulty": "Intermediate",
+        "type": [
+          "MCP",
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "AI Travel Planner MCP Agent",
+        "description": "Travel planning using MCP",
+        "category": "MCP AI Agents",
+        "path": "mcp_ai_agents/ai_travel_planner_mcp_agent_team",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/mcp_ai_agents/ai_travel_planner_mcp_agent_team",
+        "tags": [
+          "travel",
+          "planning",
+          "MCP"
+        ],
+        "difficulty": "Intermediate",
+        "type": [
+          "MCP",
+          "Single Agent"
+        ]
+      }
+    ],
+    "RAG Tutorials": [
+      {
+        "title": "Agentic RAG",
+        "description": "Basic agentic RAG implementation",
+        "category": "RAG Tutorials",
+        "path": "rag_tutorials/agentic_rag/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/rag_tutorials/agentic_rag/",
+        "tags": [
+          "RAG",
+          "agents",
+          "tutorials"
+        ],
+        "difficulty": "Intermediate",
+        "type": [
+          "RAG",
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "Agentic RAG with Reasoning",
+        "description": "RAG with advanced reasoning capabilities",
+        "category": "RAG Tutorials",
+        "path": "rag_tutorials/agentic_rag_with_reasoning/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/rag_tutorials/agentic_rag_with_reasoning/",
+        "tags": [
+          "RAG",
+          "reasoning",
+          "agents"
+        ],
+        "difficulty": "Intermediate",
+        "type": [
+          "RAG",
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "AI Blog Search",
+        "description": "Blog search using RAG",
+        "category": "RAG Tutorials",
+        "path": "rag_tutorials/ai_blog_search/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/rag_tutorials/ai_blog_search/",
+        "tags": [
+          "search",
+          "blogs",
+          "RAG"
+        ],
+        "difficulty": "Intermediate",
+        "type": [
+          "RAG"
+        ]
+      },
+      {
+        "title": "Autonomous RAG",
+        "description": "Self-operating RAG system",
+        "category": "RAG Tutorials",
+        "path": "rag_tutorials/autonomous_rag/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/rag_tutorials/autonomous_rag/",
+        "tags": [
+          "RAG",
+          "autonomous",
+          "automation"
+        ],
+        "difficulty": "Intermediate",
+        "type": [
+          "RAG"
+        ]
+      },
+      {
+        "title": "Corrective RAG",
+        "description": "RAG with correction capabilities",
+        "category": "RAG Tutorials",
+        "path": "rag_tutorials/corrective_rag/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/rag_tutorials/corrective_rag/",
+        "tags": [
+          "RAG",
+          "correction",
+          "improvement"
+        ],
+        "difficulty": "Intermediate",
+        "type": [
+          "RAG"
+        ]
+      },
+      {
+        "title": "Vision RAG",
+        "description": "RAG for visual content",
+        "category": "RAG Tutorials",
+        "path": "rag_tutorials/vision_rag/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/rag_tutorials/vision_rag/",
+        "tags": [
+          "RAG",
+          "vision",
+          "images"
+        ],
+        "difficulty": "Intermediate",
+        "type": [
+          "RAG"
+        ]
+      }
+    ],
+    "Memory Tutorials": [
+      {
+        "title": "AI ArXiv Agent with Memory",
+        "description": "ArXiv research agent with memory",
+        "category": "Memory Tutorials",
+        "path": "advanced_llm_apps/llm_apps_with_memory_tutorials/ai_arxiv_agent_memory/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_llm_apps/llm_apps_with_memory_tutorials/ai_arxiv_agent_memory/",
+        "tags": [
+          "memory",
+          "research",
+          "arxiv"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "AI Travel Agent with Memory",
+        "description": "Travel planning with persistent memory",
+        "category": "Memory Tutorials",
+        "path": "advanced_llm_apps/llm_apps_with_memory_tutorials/ai_travel_agent_memory/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_llm_apps/llm_apps_with_memory_tutorials/ai_travel_agent_memory/",
+        "tags": [
+          "memory",
+          "travel",
+          "planning"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "Single Agent"
+        ]
+      },
+      {
+        "title": "Multi-LLM Application with Shared Memory",
+        "description": "Multiple LLMs sharing memory",
+        "category": "Memory Tutorials",
+        "path": "advanced_llm_apps/llm_apps_with_memory_tutorials/multi_llm_memory/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_llm_apps/llm_apps_with_memory_tutorials/multi_llm_memory/",
+        "tags": [
+          "memory",
+          "multi-LLM",
+          "shared"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "General"
+        ]
+      }
+    ],
+    "Chat Tutorials": [
+      {
+        "title": "Chat with GitHub",
+        "description": "Interactive chat with GitHub repositories",
+        "category": "Chat Tutorials",
+        "path": "advanced_llm_apps/chat_with_X_tutorials/chat_with_github/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_llm_apps/chat_with_X_tutorials/chat_with_github/",
+        "tags": [
+          "chat",
+          "GitHub",
+          "interaction"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "General"
+        ]
+      },
+      {
+        "title": "Chat with Gmail",
+        "description": "Interactive chat with Gmail",
+        "category": "Chat Tutorials",
+        "path": "advanced_llm_apps/chat_with_X_tutorials/chat_with_gmail/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_llm_apps/chat_with_X_tutorials/chat_with_gmail/",
+        "tags": [
+          "chat",
+          "email",
+          "Gmail"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "General"
+        ]
+      },
+      {
+        "title": "Chat with PDF",
+        "description": "Interactive chat with PDF documents",
+        "category": "Chat Tutorials",
+        "path": "advanced_llm_apps/chat_with_X_tutorials/chat_with_pdf/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_llm_apps/chat_with_X_tutorials/chat_with_pdf/",
+        "tags": [
+          "chat",
+          "PDF",
+          "documents"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "General"
+        ]
+      },
+      {
+        "title": "Chat with Research Papers",
+        "description": "Interactive chat with research papers",
+        "category": "Chat Tutorials",
+        "path": "advanced_llm_apps/chat_with_X_tutorials/chat_with_research_papers/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_llm_apps/chat_with_X_tutorials/chat_with_research_papers/",
+        "tags": [
+          "chat",
+          "research",
+          "papers"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "General"
+        ]
+      },
+      {
+        "title": "Chat with YouTube Videos",
+        "description": "Interactive chat with YouTube content",
+        "category": "Chat Tutorials",
+        "path": "advanced_llm_apps/chat_with_X_tutorials/chat_with_youtube_videos/",
+        "repo_url": "https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/advanced_llm_apps/chat_with_X_tutorials/chat_with_youtube_videos/",
+        "tags": [
+          "chat",
+          "YouTube",
+          "videos"
+        ],
+        "difficulty": "Advanced",
+        "type": [
+          "General"
+        ]
+      }
+    ]
+  }
+}

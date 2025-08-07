@@ -17,7 +17,7 @@ import Tags from '@/components/marketplace/tag';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { MarketplaceItemCount } from '@/components/marketplace-item-count';
+// import { MarketplaceItemCount } from '@/components/marketplace-item-count';
 import { PREDEFINED_ASSISTANT_CATEGORIES } from '@/lib/constant/marketplace-constant';
 import {
   homeMarketplaceItems,
@@ -34,14 +34,14 @@ import type {
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   // BitcoinIcon,
-  // Brain,
+  Brain,
   // ChartBarIcon,
-  // FileText,
-  // Home,
-  // PackageOpen,
+  FileText,
+  Home,
+  PackageOpen,
   Search,
   // TowerControlIcon,
-  // Users,
+  Users,
   User,
   Calendar,
   Sparkles,
@@ -56,7 +56,7 @@ import React, {
   startTransition,
 } from 'react';
 import useSWR from 'swr';
-// import { BlockchainIcon, MCPIcon, N8NIcon } from "@/components/icons";
+import { BlockchainIcon, MCPIcon, N8NIcon } from '@/components/icons';
 import { useMarketplaceStore } from '@/store/marketplace-store';
 // import { FAQSection } from "@/components/faq";
 import { LoaderThree } from '@/components/animation/loader';
@@ -105,6 +105,8 @@ const workflowSwrConfig = {
   revalidateOnMount: true,
   // Don't revalidate on focus to prevent unnecessary requests
   revalidateIfStale: false,
+  // Keep data in cache even when errors occur
+  keepPreviousData: true,
 };
 
 // Infer agent type from API - using DataTypes for consistency
@@ -949,6 +951,99 @@ export default function Marketplace() {
         </div>
       </motion.header>
 
+      {/* Mobile/Tablet Search - Only for home tab */}
+      {activeTab === 'home' && (
+        <div className="lg:hidden border-b border-border px-4 py-3 transition-colors duration-200">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 size-4" />
+            <Input
+              placeholder="Search marketplace..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 w-full bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Navigation */}
+      <motion.nav
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="border-b backdrop-blur-md border-border sticky top-16 sm:top-16 z-30 transition-colors duration-200"
+      >
+        <div className="w-full xl:max-w-7xl mx-auto px-4 lg:px-0">
+          <div className="flex overflow-x-auto scrollbar-hide">
+            {[
+              { id: 'home', label: 'Home', icon: Home },
+              {
+                id: 'workflows',
+                label: 'Workflows',
+                icon: N8NIcon,
+              },
+              {
+                id: 'assistants',
+                label: 'Assistants',
+                icon: Users,
+              },
+              {
+                id: 'ai-models',
+                label: 'Models Providers',
+                icon: Brain,
+              },
+              {
+                id: 'mcp-servers',
+                label: 'MCP Servers',
+                icon: MCPIcon,
+              },
+              {
+                id: 'softwares',
+                label: 'Softwares',
+                icon: PackageOpen,
+              },
+              {
+                id: 'templates',
+                label: 'Templates',
+                icon: FileText,
+              },
+            ].map((tab) => (
+              <motion.button
+                key={tab.id}
+                onClick={() => {
+                  setActiveTab(tab.id as TabType);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className={`flex items-center gap-2 p-4 sm:px-6 text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap ${
+                  activeTab === tab.id
+                    ? 'border-purple-500 text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20'
+                    : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800'
+                }`}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <tab.icon className="size-4" />
+                <span className="hidden sm:inline">{tab.label}</span>
+                <span className="sm:hidden">
+                  {tab.id === 'home'
+                    ? 'Home'
+                    : tab.id === 'workflows'
+                      ? 'Workflows'
+                      : tab.id === 'assistants'
+                        ? 'Assistants'
+                        : tab.id === 'ai-models'
+                          ? 'AI Models'
+                          : tab.id === 'softwares'
+                            ? 'Softwares'
+                            : tab.id === 'templates'
+                              ? 'Templates'
+                              : 'MCP Servers'}
+                </span>
+              </motion.button>
+            ))}
+          </div>
+        </div>
+      </motion.nav>
+
       {/* Hero Banner */}
       <section className="relative h-40 overflow-hidden rounded-2xl bg-[url(/marketplace-banner.jpg)] bg-origin-padding bg-cover bg-no-repeat my-5 mx-10">
         <div className="flex flex-col sm:flex-row items-center justify-start py-4 px-8">
@@ -966,119 +1061,40 @@ export default function Marketplace() {
         </div>
       </section>
 
-      {/* Mobile/Tablet Search - Only for home tab */}
-      {activeTab === 'home' && (
-        <div className="lg:hidden border-b border-border px-4 py-3 transition-colors duration-200">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 size-4" />
-            <Input
-              placeholder="Search marketplace..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 w-full bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600"
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Navigation
-			<motion.nav
-				initial={{ opacity: 0 }}
-				animate={{ opacity: 1 }}
-				className="border-b backdrop-blur-md border-border sticky top-16 sm:top-16 z-30 transition-colors duration-200"
-			>
-				<div className="w-full xl:max-w-7xl mx-auto px-4 lg:px-0">
-					<div className="flex overflow-x-auto scrollbar-hide">
-						{[
-							{ id: "home", label: "Home", icon: Home },
-							{
-								id: "workflows",
-								label: "Workflows",
-								icon: N8NIcon,
-							},
-							{
-								id: "assistants",
-								label: "Assistants",
-								icon: Users,
-							},
-							{
-								id: "ai-models",
-								label: "Models Providers",
-								icon: Brain,
-							},
-							{
-								id: "mcp-servers",
-								label: "MCP Servers",
-								icon: MCPIcon,
-							},
-							{
-								id: "softwares",
-								label: "Softwares",
-								icon: PackageOpen,
-							},
-							{
-								id: "templates",
-								label: "Templates",
-								icon: FileText,
-							},
-						].map((tab) => (
-							<motion.button
-								key={tab.id}
-								onClick={() => setActiveTab(tab.id as TabType)}
-								className={`flex items-center gap-2 p-4 sm:px-6 text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap ${
-									activeTab === tab.id
-										? "border-purple-500 text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20"
-										: "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800"
-								}`}
-								whileHover={{ scale: 1.02 }}
-								whileTap={{ scale: 0.98 }}
-							>
-								<tab.icon className="size-4" />
-								<span className="hidden sm:inline">{tab.label}</span>
-								<span className="sm:hidden">
-									{tab.id === "home"
-										? "Home"
-										: tab.id === "workflows"
-											? "Workflows"
-											: tab.id === "assistants"
-												? "Assistants"
-												: tab.id === "ai-models"
-													? "AI Models"
-													: tab.id === "softwares"
-														? "Softwares"
-														: tab.id === "templates"
-															? "Templates"
-															: "MCP Servers"}
-								</span>
-							</motion.button>
-						))}
-					</div>
-				</div>
-			</motion.nav> */}
-
       {/* Content */}
       <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
         <div className="">
           <AnimatePresence mode="wait">
-            {/* Show loading only for core sections, not workflows */}
-            {/* {(isLoading || aiModelsLoading) && activeTab === 'home' && (
-              <div className="py-16 flex justify-center items-center">
-                <LoaderThree />
-              </div>
-            )} */}
-            {/* Show workflow loading indicator only when no cached data */}
-            {workflowsLoading && !allWorkflowsData && activeTab === 'home' && (
-              <div className="py-16 flex justify-center items-center">
-                <LoaderThree />
-              </div>
-            )}
-            {(error || aiModelsError) && (
-              <div className="py-16 text-center text-red-500">
-                Failed to load marketplace data.
-              </div>
-            )}
+            {/* Show loading only when no data is available */}
+            {activeTab === 'home' &&
+              (!allAssistantsData ||
+                !allAiModelsData ||
+                !allMcpServersData ||
+                !allWorkflowsData) &&
+              (isLoading ||
+                aiModelsLoading ||
+                mcpIsLoading ||
+                workflowsLoading ||
+                allAssistantsLoading ||
+                allAiModelsLoading ||
+                allMcpServersLoading ||
+                allWorkflowsLoading) && (
+                <div className="py-16 flex justify-center items-center">
+                  <LoaderThree />
+                </div>
+              )}
+            {activeTab === 'home' &&
+              (error || aiModelsError || mcpError || workflowsError) &&
+              !allAssistantsData &&
+              !allAiModelsData &&
+              !allMcpServersData &&
+              !allWorkflowsData && (
+                <div className="py-16 text-center text-red-500">
+                  Failed to load marketplace data.
+                </div>
+              )}
 
-            {activeTab === 'home' && !isLoading && !aiModelsLoading && (
+            {activeTab === 'home' && (
               <motion.div
                 key="home"
                 initial={{ opacity: 0, y: 20 }}
@@ -1135,14 +1151,9 @@ export default function Marketplace() {
                 {/* Featured Items with Filter */}
                 <section>
                   <FeaturedMarketplaceSection
-                    assistants={allAssistants}
-                    aiModels={allAiModels}
-                    mcpServers={allMcpServers}
                     workflows={allWorkflows}
                     onItemClick={handleItemClick}
                     onDownload={handleWorkflowDownload}
-                    software={softwareTools}
-                    templates={siteTemplates}
                     title="Featured Items"
                     defaultShowAssistantsAndWorkflows={true}
                   />
@@ -1491,7 +1502,7 @@ export default function Marketplace() {
                     </div>
                   ) : (
                     <>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                         {paginatedMcpServers.map((server, index) => (
                           <motion.div
                             key={`${server.name}-${index}`}
@@ -1566,13 +1577,16 @@ export default function Marketplace() {
 
                 {/* Main Content */}
                 <div className="flex-1 space-y-6">
-                  {workflowsLoading && !workflowsData ? (
+                  {/* Show loading indicator with cached data if available */}
+                  {(workflowsLoading || workflowsValidating) &&
+                  paginatedWorkflows.length === 0 &&
+                  !workflowsError ? (
                     <div className="text-center py-16">
                       <div className="text-gray-400 dark:text-gray-500 text-lg mb-2">
                         Loading workflows...
                       </div>
                     </div>
-                  ) : workflowsError && !workflowsData ? (
+                  ) : workflowsError && paginatedWorkflows.length === 0 ? (
                     <div className="text-center py-16">
                       <div className="text-red-400 dark:text-red-500 text-lg mb-2">
                         Failed to load workflows
@@ -1592,6 +1606,7 @@ export default function Marketplace() {
                     </div>
                   ) : (
                     <>
+                      {/* Show cached data immediately while loading */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                         {paginatedWorkflows.map((workflow, index) => (
                           <motion.div
