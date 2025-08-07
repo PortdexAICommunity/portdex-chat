@@ -106,15 +106,15 @@ export function FeaturedMarketplaceSection({
         Math.max(expandedItems['ai-model'], 6),
         'ai-model',
       ),
-      'mcp-server': getRandomItems(
-        mcpServers,
-        Math.max(expandedItems['mcp-server'], 6),
-        'mcp-server',
-      ),
       workflow: getRandomItems(
         workflows,
         Math.max(expandedItems.workflow, 6),
         'workflow',
+      ),
+      'mcp-server': getRandomItems(
+        mcpServers,
+        Math.max(expandedItems['mcp-server'], 6),
+        'mcp-server',
       ),
       software: getRandomItems(
         software,
@@ -344,7 +344,7 @@ export function FeaturedMarketplaceSection({
                     <span className="font-medium truncate">All</span>
                   </div>
                   <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts.all > 50 ? '500+' : counts.all}
+                    {counts.all > 1000 ? '1k+' : counts.all}
                   </Badge>
                 </button>
 
@@ -368,7 +368,31 @@ export function FeaturedMarketplaceSection({
                     <span className="text-left truncate">Assistants</span>
                   </div>
                   <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts.assistant > 50 ? '50+' : counts.assistant}
+                    {counts.assistant > 500 ? '1k+' : counts.assistant}
+                  </Badge>
+                </button>
+
+                {/* Workflows */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedFilter('workflow');
+                    scrollToSection();
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
+                    selectedFilter === 'workflow'
+                      ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
+                    <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center shrink-0">
+                      <span className="text-xs text-white font-medium">W</span>
+                    </div>
+                    <span className="text-left truncate">Workflows</span>
+                  </div>
+                  <Badge variant="secondary" className="text-xs shrink-0 ml-2">
+                    {counts.workflow > 500 ? '1k+' : counts.workflow}
                   </Badge>
                 </button>
 
@@ -417,30 +441,6 @@ export function FeaturedMarketplaceSection({
                   </div>
                   <Badge variant="secondary" className="text-xs shrink-0 ml-2">
                     {counts['mcp-server'] > 50 ? '50+' : counts['mcp-server']}
-                  </Badge>
-                </button>
-
-                {/* Workflows */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedFilter('workflow');
-                    scrollToSection();
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
-                    selectedFilter === 'workflow'
-                      ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                  }`}
-                >
-                  <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
-                    <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center shrink-0">
-                      <span className="text-xs text-white font-medium">W</span>
-                    </div>
-                    <span className="text-left truncate">Workflows</span>
-                  </div>
-                  <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts.workflow > 50 ? '50+' : counts.workflow}
                   </Badge>
                 </button>
 
@@ -536,6 +536,11 @@ export function FeaturedMarketplaceSection({
                               assistant={item}
                               onClick={() => onItemClick(item, section.type)}
                             />
+                          ) : section.type === 'workflow' ? (
+                            <WorkflowCard
+                              workflow={item as WorkflowType}
+                              onClick={() => onItemClick(item, section.type)}
+                            />
                           ) : section.type === 'ai-model' ? (
                             <AIModelCard
                               aiModel={item}
@@ -556,11 +561,6 @@ export function FeaturedMarketplaceSection({
                                 scope: item.scope,
                                 operating_systems: item.operating_systems,
                               }}
-                              onClick={() => onItemClick(item, section.type)}
-                            />
-                          ) : section.type === 'workflow' ? (
-                            <WorkflowCard
-                              workflow={item as WorkflowType}
                               onClick={() => onItemClick(item, section.type)}
                             />
                           ) : section.type === 'software' ? (

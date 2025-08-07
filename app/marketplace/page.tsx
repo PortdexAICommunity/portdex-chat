@@ -77,6 +77,13 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel';
 
 // Configure SWR to reduce API calls
 const swrConfig = {
@@ -928,8 +935,8 @@ export default function Marketplace() {
       </motion.header>
 
       {/* Hero Banner */}
-      <section className="relative overflow-hidden rounded-2xl bg-[url(/marketplace-banner.jpg)] bg-origin-padding bg-cover bg-no-repeat my-5 mx-10">
-        <div className="flex flex-col sm:flex-row items-center justify-between p-4 sm:p-6 md:p-8">
+      <section className="relative h-40 overflow-hidden rounded-2xl bg-[url(/marketplace-banner.jpg)] bg-origin-padding bg-cover bg-no-repeat my-5 mx-10">
+        <div className="flex flex-col sm:flex-row items-center justify-start py-4 px-8">
           <div className="z-10 max-w-2xl w-full text-left">
             <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 sm:mb-3 font-serif">
               Add AI Agents to your assistant in minutes
@@ -940,12 +947,6 @@ export default function Marketplace() {
               alike, designed to enhance productivity, reduce operational
               hurdles, and propel your investments into the fast lane.
             </p>
-            <Button
-              className="bg-white hover:bg-white/90 text-purple-700 hover:text-purple-800 font-medium px-4 sm:px-6 py-1 sm:py-2 text-sm"
-              onClick={() => setActiveTab('assistants')}
-            >
-              Explore AI agent solutions
-            </Button>
           </div>
         </div>
       </section>
@@ -1041,7 +1042,7 @@ export default function Marketplace() {
 			</motion.nav> */}
 
       {/* Content */}
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
         <div className="">
           <AnimatePresence mode="wait">
             {/* Show loading only for core sections, not workflows */}
@@ -1065,34 +1066,49 @@ export default function Marketplace() {
                 className="space-y-4 sm:space-y-6"
               >
                 <section className="flex flex-col justify-start items-start gap-5">
-                  <h2 className="text-primary text-2xl font-bold">Featured*</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {featuredItem.map((item: any) => (
-                      <Card
-                        key={item.id}
-                        className="hover:shadow-lg hover:scale-[1.02] transition-all duration-200 cursor-pointer"
-                        onClick={() => handleFeaturedItemClick(item)}
-                      >
-                        <CardContent className="p-4">
-                          <div className="flex flex-col gap-3">
-                            {/* Icon and Title together */}
-                            <div className="flex items-center gap-3">
-                              <div className="shrink-0 size-10 bg-gradient-to-br from-blue-100 to-purple-200 dark:from-blue-900/30 dark:to-purple-800/30 rounded-lg flex items-center justify-center text-xl shadow-sm border border-blue-200 dark:border-blue-700/50">
-                                {item.icon || '🔧'}
+                  <h2 className="text-2xl font-bold bg-gradient-to-tr from-purple-300 to-purple-600 bg-clip-text text-transparent">
+                    Featured Agents
+                  </h2>
+                  <Carousel
+                    opts={{
+                      align: 'start',
+                    }}
+                    className="w-full"
+                  >
+                    <CarouselContent className="-ml-4">
+                      {featuredItem.map((item: any) => (
+                        <CarouselItem
+                          key={item.id}
+                          className="pl-4 md:basis-1/2 lg:basis-1/3"
+                        >
+                          <Card
+                            className="hover:shadow-lg hover:border-purple-400 transition-all duration-200 cursor-pointer h-full"
+                            onClick={() => handleFeaturedItemClick(item)}
+                          >
+                            <CardContent className="p-4 flex flex-col h-full">
+                              <div className="flex flex-col gap-3 grow">
+                                {/* Icon and Title together */}
+                                <div className="flex items-center gap-3">
+                                  <div className="shrink-0 size-10 bg-gradient-to-br from-blue-100 to-purple-200 dark:from-blue-900/30 dark:to-purple-800/30 rounded-lg flex items-center justify-center text-xl shadow-sm border border-blue-200 dark:border-blue-700/50">
+                                    {item.icon || '🔧'}
+                                  </div>
+                                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-2">
+                                    {item.title}
+                                  </h4>
+                                </div>
+                                {/* Description below */}
+                                <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3 leading-relaxed">
+                                  {item.description}
+                                </p>
                               </div>
-                              <h4 className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-2">
-                                {item.title}
-                              </h4>
-                            </div>
-                            {/* Description below */}
-                            <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3 leading-relaxed">
-                              {item.description}
-                            </p>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
+                            </CardContent>
+                          </Card>
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2" />
+                    <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2" />
+                  </Carousel>
                 </section>
 
                 {/* Featured Items with Filter */}

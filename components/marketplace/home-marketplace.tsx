@@ -12,12 +12,12 @@ import {
 import {
   homeMarketplaceItems,
   marketplaceFAQs,
-  marketplaceItems,
+  // marketplaceItems,
 } from '@/lib/constants';
 import type { HomeMarketplaceItem } from '@/lib/types';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, Calendar, Download, Sparkles, User } from 'lucide-react';
-import Link from 'next/link';
+import { Calendar, Download, Sparkles, User } from 'lucide-react';
+// import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, startTransition, useEffect } from 'react';
 import { saveChatModelAsCookie } from '@/app/(chat)/actions';
