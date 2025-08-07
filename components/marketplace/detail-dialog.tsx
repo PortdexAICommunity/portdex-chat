@@ -32,7 +32,14 @@ import { toast } from 'sonner';
 interface DetailDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  item: Assistant | Plugin | DataTypes | MCPServerType | WorkflowType | null;
+  item:
+    | Assistant
+    | Plugin
+    | DataTypes
+    | MCPServerType
+    | WorkflowType
+    | any
+    | null;
   type:
     | 'assistant'
     | 'plugin'
@@ -40,7 +47,8 @@ interface DetailDialogProps {
     | 'ai-model'
     | 'software'
     | 'template'
-    | 'workflow';
+    | 'workflow'
+    | 'llm-app';
 }
 
 export function DetailDialog({
@@ -58,11 +66,14 @@ export function DetailDialog({
   const isWorkflow = type === 'workflow';
   const isSoftware = type === 'software';
   const isTemplate = type === 'template';
+  const isLLMApp =
+    item && 'title' in item && 'description' in item && 'category' in item;
 
   const assistant = isAssistant ? (item as Assistant) : null;
   const plugin = isPlugin ? (item as Plugin) : null;
   const mcpServer = isMcpServer ? (item as MCPServerType) : null;
   const aiModel = isAIModel ? (item as DataTypes) : null;
+  const llmApp = isLLMApp ? item : null;
 
   const handleUseAssistant = () => {
     if (isMcpServer && mcpServer) {
@@ -81,6 +92,12 @@ export function DetailDialog({
       toast.info(
         'Workflow download functionality - please use the download button on the card.',
       );
+    } else if (isLLMApp && llmApp) {
+      window.open(
+        `https://github.com/Shubhamsaboo/awesome-llm-apps/tree/main/mcp_ai_agents/${llmApp.title}`,
+        '_blank',
+      );
+      console.log('llmApp', llmApp);
     } else {
       console.log(`Using ${item.name}`);
     }
@@ -95,11 +112,12 @@ export function DetailDialog({
     if (isSoftware) return 'Download Software';
     if (isTemplate) return 'Download Template';
     if (isWorkflow) return 'View Details';
+    if (isLLMApp) return 'View on GitHub';
     return 'Use';
   };
 
   const getButtonIcon = () => {
-    if (isMcpServer || isAssistant)
+    if (isMcpServer || isAssistant || isLLMApp)
       return <ExternalLink className="size-4 mr-2" />;
     return <Download className="size-4 mr-2" />;
   };
@@ -116,7 +134,7 @@ export function DetailDialog({
           <DialogHeader className="pb-6 pr-10">
             <div className="space-y-3">
               <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white leading-tight">
-                {item.name}
+                {isLLMApp ? item.title : item.name}
               </DialogTitle>
               <Badge
                 variant="secondary"
@@ -127,19 +145,50 @@ export function DetailDialog({
                       ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
                       : isAIModel
                         ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300'
-                        : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+                        : isLLMApp
+                          ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
+                          : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
                 } w-fit`}
               >
                 {isMcpServer
                   ? 'MCP Server'
                   : isWorkflow
                     ? 'Workflow'
-                    : item.category}
+                    : isLLMApp
+                      ? item.category
+                      : item.category}
               </Badge>
             </div>
           </DialogHeader>
 
           <div className="space-y-6">
+            {/* Visual Header for LLM App */}
+            {llmApp && (
+              <Card className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900/30 dark:to-gray-800/30 border-gray-200 dark:border-gray-800/50">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-4">
+                    <div className="size-16 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 rounded-2xl flex items-center justify-center text-3xl shadow-sm border border-blue-200 dark:border-blue-700/50">
+                      🤖
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-1">
+                        {llmApp.title}
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">
+                        {llmApp.category}
+                      </p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <Sparkles className="size-4 text-blue-600 dark:text-blue-400" />
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                          {llmApp.difficulty} • {llmApp.type?.join(', ')}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Visual Header for Assistant */}
             {assistant && (
               <Card className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900/30 dark:to-gray-800/30 border-gray-200 dark:border-gray-800/50">
@@ -269,16 +318,38 @@ export function DetailDialog({
                   ? 'About this MCP Server'
                   : isAIModel
                     ? 'About this AI Model'
-                    : 'Description'}
+                    : isLLMApp
+                      ? 'About this AI Agent'
+                      : 'Description'}
               </h4>
               <Card className="bg-gray-50 dark:bg-gray-950/50 border-gray-200 dark:border-gray-800/50">
                 <CardContent className="p-4">
                   <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                    {item.description}
+                    {isLLMApp ? item.description : item.description}
                   </p>
                 </CardContent>
               </Card>
             </div>
+
+            {/* Tags for LLM App */}
+            {llmApp?.tags && llmApp.tags.length > 0 && (
+              <div>
+                <h4 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">
+                  Tags
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {llmApp.tags.map((tag: string, index: number) => (
+                    <Badge
+                      key={index}
+                      variant="outline"
+                      className="bg-blue-100 dark:bg-blue-900/30 text-blue-900 dark:text-blue-100"
+                    >
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Features (for plugins) */}
             {plugin && (
@@ -400,7 +471,11 @@ export function DetailDialog({
                       ? 'bg-orange-600 hover:bg-orange-700'
                       : 'bg-purple-600 hover:bg-purple-700'
                 } text-white shadow-lg hover:shadow-xl transition-all duration-200`}
-                onClick={handleUseAssistant}
+                onClick={() =>
+                  llmApp
+                    ? window.open(llmApp.repo_url, '_blank')
+                    : handleUseAssistant
+                }
               >
                 {getButtonIcon()}
                 {getButtonText()}
