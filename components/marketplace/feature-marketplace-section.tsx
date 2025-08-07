@@ -368,7 +368,7 @@ export function FeaturedMarketplaceSection({
                     <span className="text-left truncate">Assistants</span>
                   </div>
                   <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts.assistant > 50 ? '50+' : counts.assistant}
+                    {counts.assistant > 500 ? '1K+' : counts.assistant}
                   </Badge>
                 </button>
 
@@ -440,7 +440,7 @@ export function FeaturedMarketplaceSection({
                     <span className="text-left truncate">Workflows</span>
                   </div>
                   <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts.workflow > 50 ? '50+' : counts.workflow}
+                    {counts.workflow > 500 ? '1K+' : counts.workflow}
                   </Badge>
                 </button>
 
