@@ -26,39 +26,49 @@ import {
 } from '@/lib/constants';
 import type {
   DataTypes,
-  HomeMarketplaceItem,
+  // HomeMarketplaceItem,
   MCPDataTypes,
   MCPServerType,
   WorkflowType,
 } from '@/lib/types';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  BitcoinIcon,
-  Brain,
-  ChartBarIcon,
-  FileText,
-  Home,
-  PackageOpen,
+  // BitcoinIcon,
+  // Brain,
+  // ChartBarIcon,
+  // FileText,
+  // Home,
+  // PackageOpen,
   Search,
-  TowerControlIcon,
-  Users,
+  // TowerControlIcon,
+  // Users,
+  User,
+  Calendar,
+  Sparkles,
+  Download,
 } from 'lucide-react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  memo,
+  startTransition,
+} from 'react';
 import useSWR from 'swr';
-import { BlockchainIcon, MCPIcon, N8NIcon } from '@/components/icons';
+// import { BlockchainIcon, MCPIcon, N8NIcon } from "@/components/icons";
 import { useMarketplaceStore } from '@/store/marketplace-store';
-import { FAQSection } from '@/components/faq';
+// import { FAQSection } from "@/components/faq";
 import { LoaderThree } from '@/components/animation/loader';
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
-  CardTitle,
+  // CardDescription,
+  // CardFooter,
+  // CardTitle,
 } from '@/components/ui/card';
-import { MarketplaceItemCard } from '@/components/marketplace/marketplace-item-card';
+// import { MarketplaceItemCard } from "@/components/marketplace/marketplace-item-card";
 import { useRouter } from 'next/navigation';
-import { startTransition } from 'react';
 import { saveChatModelAsCookie } from '@/app/(chat)/actions';
 import {
   Dialog,
@@ -67,8 +77,13 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { User, Calendar, Sparkles, Download } from 'lucide-react';
-import { memo } from 'react';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel';
 
 // Configure SWR to reduce API calls
 const swrConfig = {
@@ -81,40 +96,16 @@ const swrConfig = {
   focusThrottleInterval: 300000, // 5 minutes focus throttle
 };
 
-// Marketplace FAQs
-const marketplaceFAQs = [
-  {
-    question: 'What is an AI agent?',
-    answer:
-      'An AI agent is a LLM-powered intelligence that has access to capabilities/tools and uses them to accomplish specific tasks. Our marketplace offers a variety of AI agents designed for crypto and financial applications that can help automate tasks, provide insights, and enhance your workflow.',
-  },
-  {
-    question: 'What is the difference between a plugin and a connector?',
-    answer:
-      'A plugin is a capability of an AI agent that contains everything needed to execute a specific task or business process. A connector is a reusable component that primarily handles authentication and integration with your business system, allowing AI agents to securely access your data.',
-  },
-  {
-    question: 'How do I install an AI Agent?',
-    answer:
-      'You can install AI Agents directly from our Marketplace to your AI Assistant with just a few clicks. Browse the available agents, select the one you need, and follow the simple installation process. Our system will handle the integration automatically.',
-  },
-  {
-    question:
-      "I have an idea for an AI agent, but it's not in the marketplace yet. How can I get it added?",
-    answer:
-      "You can submit your idea for a new AI agent through our submission process. We recommend sharing your concept with us so we can better understand your requirements and help bring your idea to life. When you're ready, you can submit it for review and potential inclusion in our marketplace.",
-  },
-  {
-    question: 'Where do I build AI agents?',
-    answer:
-      'You can build AI Agents in our Plugin Workspace, which is part of our Agent Studio platform. This provides all the tools and resources you need to create, test, and deploy your own custom AI agents for crypto and financial applications.',
-  },
-  {
-    question: 'What are the different types of plugins available?',
-    answer:
-      'We offer several types of plugins: Built-In capabilities supported out-of-the-box, Idea plugins that are conceptually possible but not yet validated, Validated plugins that have been verified through API research, Guided plugins with step-by-step development documentation, Template pre-built plugins that can be installed in minutes, and Polling Required plugins that connect to event APIs for proactive functionality.',
-  },
-];
+// SWR config for workflows with optimistic caching
+const workflowSwrConfig = {
+  ...swrConfig,
+  // Keep data in cache for longer
+  dedupingInterval: 600000, // 10 minutes deduping
+  // Revalidate in background without blocking UI
+  revalidateOnMount: true,
+  // Don't revalidate on focus to prevent unnecessary requests
+  revalidateIfStale: false,
+};
 
 // Infer agent type from API - using DataTypes for consistency
 
@@ -508,6 +499,7 @@ export default function Marketplace() {
     data: workflowsData,
     isLoading: workflowsLoading,
     error: workflowsError,
+    isValidating: workflowsValidating,
   } = useSWR(
     activeTab === 'workflows' || activeTab === 'home'
       ? `marketplace/api/workflows?page=${workflowsCurrentPage}&pageSize=${workflowsPageSize}${
@@ -523,7 +515,7 @@ export default function Marketplace() {
         }`
       : null,
     workflowsFetcher,
-    swrConfig,
+    workflowSwrConfig,
   );
 
   // Fetch all data without pagination or filtering for FeaturedMarketplaceSection
@@ -555,7 +547,7 @@ export default function Marketplace() {
       ? 'marketplace/api/workflows?page=1&pageSize=1000'
       : null,
     workflowsFetcher,
-    swrConfig,
+    workflowSwrConfig,
   );
 
   const assistants = useMemo(() => aiAgentsData?.agents ?? [], [aiAgentsData]);
@@ -595,18 +587,13 @@ export default function Marketplace() {
   // Update total items count in persistent store
   useEffect(() => {
     const totalCount =
-      allAssistants.length +
-      allAiModels.length +
-      allMcpServers.length +
-      allWorkflows.length +
-      softwareTools.length +
-      siteTemplates.length;
+      assistantsTotal + aiModels.length + mcpServers.length + workflows.length;
     setTotalItems(totalCount);
   }, [
-    allAssistants.length,
-    allAiModels.length,
-    allMcpServers.length,
-    allWorkflows.length,
+    assistantsTotal,
+    aiModels.length,
+    mcpServers.length,
+    workflows.length,
     setTotalItems,
   ]);
 
@@ -939,7 +926,7 @@ export default function Marketplace() {
               </h1>
 
               {/* Search - Only show for home tab */}
-              {activeTab === 'home' && (
+              {/* {activeTab === 'home' && (
                 <div className="hidden lg:block relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 size-4" />
                   <Input
@@ -949,19 +936,22 @@ export default function Marketplace() {
                     className="pl-10 w-64 xl:w-80 bg-white dark:bg-white/10 border-gray-200 dark:border-gray-700"
                   />
                 </div>
-              )}
+              )} */}
             </div>
 
             <div className="flex items-center justify-end space-x-2">
-              <MarketplaceItemCount />
+              {/* <MarketplaceItemCount /> */}
+              <Badge variant="secondary" className="text-xs">
+                1500+ items
+              </Badge>
             </div>
           </div>
         </div>
       </motion.header>
 
       {/* Hero Banner */}
-      <section className="relative overflow-hidden rounded-2xl bg-[url(/marketplace-banner.jpg)] bg-origin-padding bg-cover bg-no-repeat my-5 mx-10">
-        <div className="flex flex-col sm:flex-row items-center justify-between p-4 sm:p-6 md:p-8">
+      <section className="relative h-40 overflow-hidden rounded-2xl bg-[url(/marketplace-banner.jpg)] bg-origin-padding bg-cover bg-no-repeat my-5 mx-10">
+        <div className="flex flex-col sm:flex-row items-center justify-start py-4 px-8">
           <div className="z-10 max-w-2xl w-full text-left">
             <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 sm:mb-3 font-serif">
               Add AI Agents to your assistant in minutes
@@ -972,12 +962,6 @@ export default function Marketplace() {
               alike, designed to enhance productivity, reduce operational
               hurdles, and propel your investments into the fast lane.
             </p>
-            <Button
-              className="bg-white hover:bg-white/90 text-purple-700 hover:text-purple-800 font-medium px-4 sm:px-6 py-1 sm:py-2 text-sm"
-              onClick={() => setActiveTab('assistants')}
-            >
-              Explore AI agent solutions
-            </Button>
           </div>
         </div>
       </section>
@@ -1073,11 +1057,17 @@ export default function Marketplace() {
 			</motion.nav> */}
 
       {/* Content */}
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
         <div className="">
           <AnimatePresence mode="wait">
             {/* Show loading only for core sections, not workflows */}
-            {(isLoading || aiModelsLoading) && activeTab === 'home' && (
+            {/* {(isLoading || aiModelsLoading) && activeTab === 'home' && (
+              <div className="py-16 flex justify-center items-center">
+                <LoaderThree />
+              </div>
+            )} */}
+            {/* Show workflow loading indicator only when no cached data */}
+            {workflowsLoading && !allWorkflowsData && activeTab === 'home' && (
               <div className="py-16 flex justify-center items-center">
                 <LoaderThree />
               </div>
@@ -1097,34 +1087,49 @@ export default function Marketplace() {
                 className="space-y-4 sm:space-y-6"
               >
                 <section className="flex flex-col justify-start items-start gap-5">
-                  <h2 className="text-primary text-2xl font-bold">Featured*</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {featuredItem.map((item: any) => (
-                      <Card
-                        key={item.id}
-                        className="hover:shadow-lg hover:scale-[1.02] transition-all duration-200 cursor-pointer"
-                        onClick={() => handleFeaturedItemClick(item)}
-                      >
-                        <CardContent className="p-4">
-                          <div className="flex flex-col gap-3">
-                            {/* Icon and Title together */}
-                            <div className="flex items-center gap-3">
-                              <div className="shrink-0 size-10 bg-gradient-to-br from-blue-100 to-purple-200 dark:from-blue-900/30 dark:to-purple-800/30 rounded-lg flex items-center justify-center text-xl shadow-sm border border-blue-200 dark:border-blue-700/50">
-                                {item.icon || '🔧'}
+                  <h2 className="text-2xl font-bold bg-gradient-to-tr from-purple-300 to-purple-600 bg-clip-text text-transparent">
+                    Featured Agents
+                  </h2>
+                  <Carousel
+                    opts={{
+                      align: 'start',
+                    }}
+                    className="w-full"
+                  >
+                    <CarouselContent className="-ml-4">
+                      {featuredItem.map((item: any) => (
+                        <CarouselItem
+                          key={item.id}
+                          className="pl-4 md:basis-1/2 lg:basis-1/3"
+                        >
+                          <Card
+                            className="hover:shadow-lg hover:border-purple-400 transition-all duration-200 cursor-pointer h-full"
+                            onClick={() => handleFeaturedItemClick(item)}
+                          >
+                            <CardContent className="p-4 flex flex-col h-full">
+                              <div className="flex flex-col gap-3 grow">
+                                {/* Icon and Title together */}
+                                <div className="flex items-center gap-3">
+                                  <div className="shrink-0 size-10 bg-gradient-to-br from-blue-100 to-purple-200 dark:from-blue-900/30 dark:to-purple-800/30 rounded-lg flex items-center justify-center text-xl shadow-sm border border-blue-200 dark:border-blue-700/50">
+                                    {item.icon || '🔧'}
+                                  </div>
+                                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-2">
+                                    {item.title}
+                                  </h4>
+                                </div>
+                                {/* Description below */}
+                                <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3 leading-relaxed">
+                                  {item.description}
+                                </p>
                               </div>
-                              <h4 className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-2">
-                                {item.title}
-                              </h4>
-                            </div>
-                            {/* Description below */}
-                            <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3 leading-relaxed">
-                              {item.description}
-                            </p>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
+                            </CardContent>
+                          </Card>
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2" />
+                    <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2" />
+                  </Carousel>
                 </section>
 
                 {/* Featured Items with Filter */}
@@ -1135,6 +1140,7 @@ export default function Marketplace() {
                     mcpServers={allMcpServers}
                     workflows={allWorkflows}
                     onItemClick={handleItemClick}
+                    onDownload={handleWorkflowDownload}
                     software={softwareTools}
                     templates={siteTemplates}
                     title="Featured Items"
@@ -1560,13 +1566,13 @@ export default function Marketplace() {
 
                 {/* Main Content */}
                 <div className="flex-1 space-y-6">
-                  {workflowsLoading ? (
+                  {workflowsLoading && !workflowsData ? (
                     <div className="text-center py-16">
                       <div className="text-gray-400 dark:text-gray-500 text-lg mb-2">
                         Loading workflows...
                       </div>
                     </div>
-                  ) : workflowsError ? (
+                  ) : workflowsError && !workflowsData ? (
                     <div className="text-center py-16">
                       <div className="text-red-400 dark:text-red-500 text-lg mb-2">
                         Failed to load workflows
@@ -1600,7 +1606,6 @@ export default function Marketplace() {
                                 handleItemClick(workflow, 'workflow')
                               }
                               onDownload={handleWorkflowDownload}
-                              onLoginRequired={handleLoginRequired}
                             />
                           </motion.div>
                         ))}

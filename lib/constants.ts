@@ -787,7 +787,7 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 		icon: "🔬",
 		gradient:
 			"linear-gradient(135deg, var(--blue-500) 0%, var(--blue-700) 100%)",
-		date: "2025-01-20",
+		date: "2025-02-20",
 		type: "plugin",
 		creator: "aaronjmars",
 		useCases: ["Research", "Search", "Analyze", "Summarize", "Trends"],
@@ -804,7 +804,7 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 		icon: "🔮",
 		gradient:
 			"linear-gradient(135deg, var(--violet-500) 0%, var(--purple-700) 100%)",
-		date: "2025-01-20",
+		date: "2025-03-20",
 		type: "plugin",
 		creator: "yongkangc",
 		mcp_url:
@@ -821,7 +821,7 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 		icon: "💹",
 		gradient:
 			"linear-gradient(135deg, var(--yellow-500) 0%, var(--yellow-700) 100%)",
-		date: "2025-01-20",
+		date: "2025-04-20",
 		type: "plugin",
 		creator: "snjyor",
 		useCases: ["Live Prices", "Trends", "Order Book", "Volume", "Charts"],
@@ -838,7 +838,7 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 		icon: "🏦",
 		gradient:
 			"linear-gradient(135deg, var(--green-500) 0%, var(--green-700) 100%)",
-		date: "2025-01-20",
+		date: "2025-05-20",
 		type: "plugin",
 		creator: "doggybee",
 		mcp_url:
@@ -930,5 +930,39 @@ export const homeMarketplaceItems: HomeMarketplaceItem[] = [
 			"https://server.smithery.ai/@SiliconValleyInsight/amazon-product-search/mcp?api_key=ac388943-d4dc-49f3-bf9a-cbfc2895168a&profile=voiceless-bug-rDbLmA",
 		systemPrompt: `Use this to search Amazon products and gather detailed product information. You can search by keywords, get product details, prices, ratings, and reviews. Present results as organized product listings with key details like price, rating, and availability for easy comparison.`,
 		useCases: ["Search", "Compare", "Ratings", "Reviews", "Research"],
+	},
+];
+
+export const marketplaceFAQs = [
+	{
+		question: "What is an AI agent?",
+		answer:
+			"An AI agent is a LLM-powered intelligence that has access to capabilities/tools and uses them to accomplish specific tasks. Our marketplace offers a variety of AI agents designed for crypto and financial applications that can help automate tasks, provide insights, and enhance your workflow.",
+	},
+	{
+		question: "What is the difference between a plugin and a connector?",
+		answer:
+			"A plugin is a capability of an AI agent that contains everything needed to execute a specific task or business process. A connector is a reusable component that primarily handles authentication and integration with your business system, allowing AI agents to securely access your data.",
+	},
+	{
+		question: "How do I install an AI Agent?",
+		answer:
+			"You can install AI Agents directly from our Marketplace to your AI Assistant with just a few clicks. Browse the available agents, select the one you need, and follow the simple installation process. Our system will handle the integration automatically.",
+	},
+	{
+		question:
+			"I have an idea for an AI agent, but it's not in the marketplace yet. How can I get it added?",
+		answer:
+			"You can submit your idea for a new AI agent through our submission process. We recommend sharing your concept with us so we can better understand your requirements and help bring your idea to life. When you're ready, you can submit it for review and potential inclusion in our marketplace.",
+	},
+	{
+		question: "Where do I build AI agents?",
+		answer:
+			"You can build AI Agents in our Plugin Workspace, which is part of our Agent Studio platform. This provides all the tools and resources you need to create, test, and deploy your own custom AI agents for crypto and financial applications.",
+	},
+	{
+		question: "What are the different types of plugins available?",
+		answer:
+			"We offer several types of plugins: Built-In capabilities supported out-of-the-box, Idea plugins that are conceptually possible but not yet validated, Validated plugins that have been verified through API research, Guided plugins with step-by-step development documentation, Template pre-built plugins that can be installed in minutes, and Polling Required plugins that connect to event APIs for proactive functionality.",
 	},
 ];

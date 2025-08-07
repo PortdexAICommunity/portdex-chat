@@ -5,6 +5,11 @@ import {
 	ListObjectsV2Command,
 	GetObjectCommand,
 } from "@aws-sdk/client-s3";
+import { unstable_cache } from "next/cache";
+
+// Cache configuration
+const CACHE_TAGS = ["marketplace", "workflows"];
+const CACHE_REVALIDATION_TIME = 300; // 5 minutes
 
 // Initialize S3 client with environment variables
 const s3Client = new S3Client({
@@ -262,6 +267,72 @@ async function transformN8nWorkflowToWorkflowType(
 	}
 }
 
+// Cached function for fetching all workflows
+const getCachedWorkflows = unstable_cache(
+	async () => {
+		try {
+			// List objects in S3 bucket (files are in root, not workflows/ folder)
+			const command = new ListObjectsV2Command({
+				Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
+				MaxKeys: 1000,
+			});
+
+			const response = await s3Client.send(command);
+
+			if (!response.Contents || response.Contents.length === 0) {
+				return [];
+			}
+
+			// Filter JSON files only
+			const jsonFiles = response.Contents.filter(
+				(obj) =>
+					obj.Key &&
+					!obj.Key.endsWith("/") &&
+					obj.Key.toLowerCase().endsWith(".json")
+			);
+
+			// Fetch and parse each workflow file
+			const workflowPromises = jsonFiles.map(async (file) => {
+				try {
+					const getObjectCommand = new GetObjectCommand({
+						Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
+						Key: file.Key,
+					});
+
+					const objectResponse = await s3Client.send(getObjectCommand);
+
+					if (!objectResponse.Body) {
+						return null;
+					}
+
+					const bodyBytes = await objectResponse.Body.transformToByteArray();
+					const fileContent = new TextDecoder().decode(bodyBytes);
+
+					// Transform to WorkflowType
+					const workflow = await transformN8nWorkflowToWorkflowType(
+						file,
+						fileContent
+					);
+
+					return workflow;
+				} catch (error: any) {
+					return null;
+				}
+			});
+
+			const allWorkflows = await Promise.all(workflowPromises);
+
+			// Filter out failed conversions
+			return allWorkflows.filter((w): w is WorkflowType => w !== null);
+		} catch (error) {
+			console.error("❌ Error fetching workflows from S3:", error);
+			return [];
+		}
+	},
+	CACHE_TAGS,
+	{ revalidate: CACHE_REVALIDATION_TIME }
+);
+
 export async function GET(req: NextRequest) {
 	const { searchParams } = req.nextUrl;
 	const page = Number(searchParams.get("page") || 1);
@@ -295,64 +366,8 @@ export async function GET(req: NextRequest) {
 	}
 
 	try {
-		// List objects in S3 bucket (files are in root, not workflows/ folder)
-		const command = new ListObjectsV2Command({
-			Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
-			MaxKeys: 1000,
-		});
-
-		const response = await s3Client.send(command);
-
-		if (!response.Contents || response.Contents.length === 0) {
-			return NextResponse.json({
-				workflows: [],
-				total: 0,
-				page,
-				pageSize,
-			});
-		}
-
-		// Filter JSON files only
-		const jsonFiles = response.Contents.filter(
-			(obj) =>
-				obj.Key &&
-				!obj.Key.endsWith("/") &&
-				obj.Key.toLowerCase().endsWith(".json")
-		);
-
-		// Fetch and parse each workflow file
-		const workflowPromises = jsonFiles.map(async (file) => {
-			try {
-				const getObjectCommand = new GetObjectCommand({
-					Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
-					Key: file.Key,
-				});
-
-				const objectResponse = await s3Client.send(getObjectCommand);
-
-				if (!objectResponse.Body) {
-					return null;
-				}
-
-				const bodyBytes = await objectResponse.Body.transformToByteArray();
-				const fileContent = new TextDecoder().decode(bodyBytes);
-
-				// Transform to WorkflowType
-				const workflow = await transformN8nWorkflowToWorkflowType(
-					file,
-					fileContent
-				);
-
-				return workflow;
-			} catch (error: any) {
-				return null;
-			}
-		});
-
-		const allWorkflows = await Promise.all(workflowPromises);
-
-		// Filter out failed conversions
-		let workflows = allWorkflows.filter((w): w is WorkflowType => w !== null);
+		// Fetch workflows from cache
+		let workflows = await getCachedWorkflows();
 
 		// Apply filters
 		if (category) {
@@ -387,7 +402,7 @@ export async function GET(req: NextRequest) {
 	} catch (error: any) {
 		return NextResponse.json(
 			{
-				error: "Failed to fetch workflows from S3",
+				error: "Failed to fetch workflows",
 				workflows: [],
 			},
 			{ status: 500 }
