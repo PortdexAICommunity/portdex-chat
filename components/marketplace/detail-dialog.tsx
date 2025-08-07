@@ -474,7 +474,7 @@ export function DetailDialog({
                 onClick={() =>
                   llmApp
                     ? window.open(llmApp.repo_url, '_blank')
-                    : handleUseAssistant
+                    : handleUseAssistant()
                 }
               >
                 {getButtonIcon()}
