@@ -68,7 +68,9 @@ export function DetailDialog({
     if (isMcpServer && mcpServer) {
       window.open(mcpServer.url, '_blank');
     } else if (isAssistant && assistant) {
-      window.open(assistant.creator, '_blank');
+      assistant.creator !== 'n8n Community'
+        ? window.open(assistant.creator, '_blank')
+        : toast.info('No creator found');
     } else if (isAIModel && aiModel) {
       toast.info('Different Model support is coming soon. Stay tuned!');
     } else if (isSoftware) {

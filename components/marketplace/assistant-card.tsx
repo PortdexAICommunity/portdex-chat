@@ -13,7 +13,7 @@ import { motion } from 'framer-motion';
 // 	UnlinkIcon,
 // } from "lucide-react";
 import Image from 'next/image';
-import Link from 'next/link';
+// import Link from 'next/link';
 import { useState } from 'react';
 // import { EyeIcon, GlobeIcon } from "../icons";
 import { GitHubLogoIcon } from '@radix-ui/react-icons';

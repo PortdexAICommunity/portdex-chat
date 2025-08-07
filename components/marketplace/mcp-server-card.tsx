@@ -170,12 +170,12 @@ export function MCPServerCard({ server, onClick }: MCPServerCardProps) {
                   )}
 
                   {/* Category */}
-                  <Badge
+                  {/* <Badge
                     variant="outline"
                     className="text-xs px-2 py-0.5 bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-800/50 dark:text-gray-400 dark:border-gray-600 truncate max-w-24"
                   >
                     {server.category}
-                  </Badge>
+                  </Badge> */}
                 </div>
 
                 {/* External Link */}

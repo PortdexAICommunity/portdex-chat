@@ -96,6 +96,17 @@ const swrConfig = {
   focusThrottleInterval: 300000, // 5 minutes focus throttle
 };
 
+// SWR config for workflows with optimistic caching
+const workflowSwrConfig = {
+  ...swrConfig,
+  // Keep data in cache for longer
+  dedupingInterval: 600000, // 10 minutes deduping
+  // Revalidate in background without blocking UI
+  revalidateOnMount: true,
+  // Don't revalidate on focus to prevent unnecessary requests
+  revalidateIfStale: false,
+};
+
 // Infer agent type from API - using DataTypes for consistency
 
 type TabType =
@@ -488,6 +499,7 @@ export default function Marketplace() {
     data: workflowsData,
     isLoading: workflowsLoading,
     error: workflowsError,
+    isValidating: workflowsValidating,
   } = useSWR(
     activeTab === 'workflows' || activeTab === 'home'
       ? `marketplace/api/workflows?page=${workflowsCurrentPage}&pageSize=${workflowsPageSize}${
@@ -503,7 +515,7 @@ export default function Marketplace() {
         }`
       : null,
     workflowsFetcher,
-    swrConfig,
+    workflowSwrConfig,
   );
 
   // Fetch all data without pagination or filtering for FeaturedMarketplaceSection
@@ -535,7 +547,7 @@ export default function Marketplace() {
       ? 'marketplace/api/workflows?page=1&pageSize=1000'
       : null,
     workflowsFetcher,
-    swrConfig,
+    workflowSwrConfig,
   );
 
   const assistants = useMemo(() => aiAgentsData?.agents ?? [], [aiAgentsData]);
@@ -914,7 +926,7 @@ export default function Marketplace() {
               </h1>
 
               {/* Search - Only show for home tab */}
-              {activeTab === 'home' && (
+              {/* {activeTab === 'home' && (
                 <div className="hidden lg:block relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 size-4" />
                   <Input
@@ -924,11 +936,14 @@ export default function Marketplace() {
                     className="pl-10 w-64 xl:w-80 bg-white dark:bg-white/10 border-gray-200 dark:border-gray-700"
                   />
                 </div>
-              )}
+              )} */}
             </div>
 
             <div className="flex items-center justify-end space-x-2">
-              <MarketplaceItemCount />
+              {/* <MarketplaceItemCount /> */}
+              <Badge variant="secondary" className="text-xs">
+                1500+ items
+              </Badge>
             </div>
           </div>
         </div>
@@ -1046,7 +1061,13 @@ export default function Marketplace() {
         <div className="">
           <AnimatePresence mode="wait">
             {/* Show loading only for core sections, not workflows */}
-            {(isLoading || aiModelsLoading) && activeTab === 'home' && (
+            {/* {(isLoading || aiModelsLoading) && activeTab === 'home' && (
+              <div className="py-16 flex justify-center items-center">
+                <LoaderThree />
+              </div>
+            )} */}
+            {/* Show workflow loading indicator only when no cached data */}
+            {workflowsLoading && !allWorkflowsData && activeTab === 'home' && (
               <div className="py-16 flex justify-center items-center">
                 <LoaderThree />
               </div>
@@ -1119,6 +1140,7 @@ export default function Marketplace() {
                     mcpServers={allMcpServers}
                     workflows={allWorkflows}
                     onItemClick={handleItemClick}
+                    onDownload={handleWorkflowDownload}
                     software={softwareTools}
                     templates={siteTemplates}
                     title="Featured Items"
@@ -1544,13 +1566,13 @@ export default function Marketplace() {
 
                 {/* Main Content */}
                 <div className="flex-1 space-y-6">
-                  {workflowsLoading ? (
+                  {workflowsLoading && !workflowsData ? (
                     <div className="text-center py-16">
                       <div className="text-gray-400 dark:text-gray-500 text-lg mb-2">
                         Loading workflows...
                       </div>
                     </div>
-                  ) : workflowsError ? (
+                  ) : workflowsError && !workflowsData ? (
                     <div className="text-center py-16">
                       <div className="text-red-400 dark:text-red-500 text-lg mb-2">
                         Failed to load workflows
@@ -1584,7 +1606,6 @@ export default function Marketplace() {
                                 handleItemClick(workflow, 'workflow')
                               }
                               onDownload={handleWorkflowDownload}
-                              onLoginRequired={handleLoginRequired}
                             />
                           </motion.div>
                         ))}

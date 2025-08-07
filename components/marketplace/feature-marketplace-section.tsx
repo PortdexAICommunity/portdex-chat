@@ -43,6 +43,7 @@ interface FeaturedItemsProps {
       | 'software'
       | 'template',
   ) => void;
+  onDownload?: (workflow: WorkflowType) => void;
   title?: string;
   defaultShowAssistantsAndWorkflows?: boolean;
 }
@@ -55,6 +56,7 @@ export function FeaturedMarketplaceSection({
   software,
   templates,
   onItemClick,
+  onDownload,
   title = 'Featured Items',
   defaultShowAssistantsAndWorkflows = false,
 }: FeaturedItemsProps) {
@@ -540,6 +542,7 @@ export function FeaturedMarketplaceSection({
                             <WorkflowCard
                               workflow={item as WorkflowType}
                               onClick={() => onItemClick(item, section.type)}
+                              onDownload={onDownload}
                             />
                           ) : section.type === 'ai-model' ? (
                             <AIModelCard
@@ -711,6 +714,7 @@ export function FeaturedMarketplaceSection({
                         <WorkflowCard
                           workflow={item.item as WorkflowType}
                           onClick={() => onItemClick(item.item, item.type)}
+                          onDownload={onDownload}
                         />
                       ) : item.type === 'software' ? (
                         <Card
