@@ -293,8 +293,8 @@ export function FeaturedMarketplaceSection({
       // Navigate to templates tab for template items
       onNavigateToTab('templates');
     } else if (type === 'models' && onNavigateToTab) {
-      // Navigate to models tab for models
-      onNavigateToTab('models');
+      // Navigate to ai-models tab for models
+      onNavigateToTab('ai-models');
     } else {
       setSelectedFilter(type);
       setExpandedItems((prev) => ({
