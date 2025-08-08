@@ -1,0 +1,887 @@
+[
+  {
+    "name": "GPT-5 nano",
+    "description": "OpenAI’s ultra-light and ultra-fast model, delivers strong capabilities at minimal cost.",
+    "tags": [
+      "OpenAI",
+      "Image and Video Recognition",
+      "Fast Response"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4111.png"
+  },
+  {
+    "name": "GPT-5 mini",
+    "description": "OpenAI’s cost-efficient GPT-5 variant that delivers high performance with lower latency and cost.",
+    "tags": [
+      "OpenAI",
+      "Image and Video Recognition",
+      "Fast Response"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4111.png"
+  },
+  {
+    "name": "GPT-5",
+    "description": "OpenAI's general-purpose model with enhanced reasoning, shorter context length, and stricter grammar checks.",
+    "tags": [
+      "OpenAI",
+      "Image and Video Recognition",
+      "Mathematical Logic"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4111.png"
+  },
+  {
+    "name": "o3",
+    "description": "OpenAI's reasoning model that excels in reasoning, coding, and math.",
+    "tags": [
+      "OpenAI",
+      "Reasoning Model",
+      "Code Programming"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4111.png"
+  },
+  {
+    "name": "Kimi K2",
+    "description": "Moonshot open-source model, cost-effective, excels at coding and math reasoning.",
+    "tags": [
+      "Reasoning Model",
+      "Code Programming",
+      "Mathematical Logic"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4334.png"
+  },
+  {
+    "name": "Grok 4",
+    "description": "An inference model by xAI, founded by Elon Musk, with enhanced reasoning and multimodal abilities.",
+    "tags": [
+      "Reasoning Model",
+      "xAI",
+      "Image and Video Recognition"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4222.png"
+  },
+  {
+    "name": "Wan 2.1 Ultra Fast i2v",
+    "description": "A high-speed image-to-video model from Alibaba for real-time, accurate video creation.",
+    "tags": [
+      "Image-to-Video",
+      "Fast Response",
+      "Alibaba"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/6014.png"
+  },
+  {
+    "name": "Wan 2.1 i2v",
+    "description": "Alibaba's image-to-video model creating dynamic scenes with nuanced, realistic motion.",
+    "tags": [
+      "Image-to-Video",
+      "Alibaba"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/6014.png"
+  },
+  {
+    "name": "Wan 2.1 Ultra Fast t2v",
+    "description": "A fast text-to-video model by Alibaba for quick, coherent content generation.",
+    "tags": [
+      "Alibaba",
+      "Text-to-Video",
+      "Fast Response"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/6014.png"
+  },
+  {
+    "name": "Wan 2.1 t2v",
+    "description": "Alibaba's text-to-video model with physical realism, fine motion, and multilingual support.",
+    "tags": [
+      "Alibaba",
+      "Text-to-Video"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/6014.png"
+  },
+  {
+    "name": "Seedance V1 Lite t2v",
+    "description": "TikTok's text-to-video model offering expressive output with strong semantics and cost efficiency.",
+    "tags": [
+      "Text-to-Video",
+      "Fast Response",
+      "TikTok"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/6010.png"
+  },
+  {
+    "name": "Seedance V1 Pro t2v",
+    "description": "A text-to-video model by TikTok with fast generation, precise control, and cinematic motion for high-end storytelling.",
+    "tags": [
+      "Text-to-Video",
+      "TikTok"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/6010.png"
+  },
+  {
+    "name": "Seedance V1 Lite i2v",
+    "description": "TikTok's image-to-video model balancing animation expressiveness and affordability.",
+    "tags": [
+      "Image-to-Video",
+      "Fast Response",
+      "TikTok"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/6010.png"
+  },
+  {
+    "name": "Seedance V1 Pro i2v",
+    "description": "An image-to-video model by TikTok with high fidelity and professional motion diversity.",
+    "tags": [
+      "Image-to-Video",
+      "TikTok"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/6010.png"
+  },
+  {
+    "name": "Flux.1 Kontext",
+    "description": "Transforms images based on text instructions and generates high-quality, context-aware visuals.",
+    "tags": [
+      "Image-to-Image",
+      "Continuous Editing",
+      "Text Recognition"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4113.png"
+  },
+  {
+    "name": "Kling-v2.1-i2v-standard",
+    "description": "A image-to-video model delivering high-quality video generation with excellent value and professional results.",
+    "tags": [
+      "Image-to-Video",
+      "Fast Response"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/6009.webp"
+  },
+  {
+    "name": "Kling-v2.0-t2v-master",
+    "description": "A powerful text-to-video model from Kling AI family, delivering high-quality video generation with professional results.",
+    "tags": [
+      "Text-to-Video",
+      "Smooth Motion"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/6008.webp"
+  },
+  {
+    "name": "Kling-v2.1-i2v-pro",
+    "description": "An advanced image-to-video model creating professional outputs with enhanced fidelity and precise camera control.",
+    "tags": [
+      "Image-to-Video",
+      "Smooth Motion",
+      "Audio Generation"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/6007.webp"
+  },
+  {
+    "name": "Veo 2-t2v",
+    "description": "Google's text-to-video model with smooth motion and high-definition quality.",
+    "tags": [
+      "Text-to-Video",
+      "Google",
+      "Text Recognition"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/6006.webp"
+  },
+  {
+    "name": "FLUX 1.1 Ultra",
+    "description": "The high-definition version of Runway's creative text-to-image model, offering creative freedom.",
+    "tags": [
+      "Text-to-Image",
+      "Anti-NSFW"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/6005.png"
+  },
+  {
+    "name": "FLUX 1.1 Pro",
+    "description": "The commercial version of Runway's creative text-to-image model, offering creative freedom.",
+    "tags": [
+      "Text-to-Image",
+      "Anti-NSFW"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/6004.webp"
+  },
+  {
+    "name": "Veo 3",
+    "description": "Google's latest text-to-video model with integrated audio effects—premium quality among models.",
+    "tags": [
+      "Text-to-Video",
+      "Google",
+      "Audio Generation"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/6003.webp"
+  },
+  {
+    "name": "Claude Opus 4.1",
+    "description": "Anthropic's latest hybrid model, supports long-running agent workflows and persistent execution of complex tasks.",
+    "tags": [
+      "Hybrid Reasoning Model",
+      "Anthropic",
+      "Mathematical Logic"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4336.png"
+  },
+  {
+    "name": "Claude Sonnet 4",
+    "description": "Anthropic's streamlined hybrid model, autonomously navigates codebases, balancing performance and efficiency. Suitable for various development scenarios.",
+    "tags": [
+      "Hybrid Reasoning Model",
+      "Anthropic",
+      "Code Programming"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4336.png"
+  },
+  {
+    "name": "Claude Opus 4",
+    "description": "Anthropic's latest hybrid model, supports long-running agent workflows and persistent execution of complex tasks.",
+    "tags": [
+      "Hybrid Reasoning Model",
+      "Anthropic",
+      "Mathematical Logic"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4336.png"
+  },
+  {
+    "name": "Qwen VL Max",
+    "description": "An enhanced multimodal model by Alibaba, supporting complex visual tasks.",
+    "tags": [
+      "Reasoning Model",
+      "Alibaba",
+      "Image and Video Recognition"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4229.png"
+  },
+  {
+    "name": "Qwen VL Plus",
+    "description": "Alibaba's enhanced multimodal model, supports ultra-high resolution and excels at detail and text recognition.",
+    "tags": [
+      "Reasoning Model",
+      "Alibaba",
+      "Image and Video Recognition"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4229.png"
+  },
+  {
+    "name": "Qwen2.5 VL 32B Instruct",
+    "description": "Alibaba's enhanced multimodal model, excels at visual analysis and mathematical reasoning.",
+    "tags": [
+      "Reasoning Model",
+      "Alibaba",
+      "Image and Video Recognition"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4229.png"
+  },
+  {
+    "name": "Codestral 2501",
+    "description": "Mistral's professional programming model with low latency and high efficiency, excelling at code completion, correction, and test generation.",
+    "tags": [
+      "European Multilingual",
+      "Financial Quantitative Analysis",
+      "Code Programming"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4330.png"
+  },
+  {
+    "name": "Saba",
+    "description": "A Mistral model designed for the Middle East and Southeast Asia, supporting multiple regional languages and providing culturally relevant and accurate responses.",
+    "tags": [
+      "Middle East and Southeast Asia Multilingual",
+      "Translation",
+      "Financial Quantitative Analysis"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4330.png"
+  },
+  {
+    "name": "Perplexity",
+    "description": "A classic AI search tool that can summarize search content and display sources.",
+    "tags": [
+      "Search Tool"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4116.png"
+  },
+  {
+    "name": "Phi 4 Reasoning Plus",
+    "description": "An enhanced reasoning model by Microsoft, specializing in mathematics, science, and programming.",
+    "tags": [
+      "Reasoning Model",
+      "Microsoft",
+      "Fast Response"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4367.png"
+  },
+  {
+    "name": "GPT-4o Search Preview",
+    "description": "OpenAI's web search model, performs only search queries and connects to the internet in real time.",
+    "tags": [
+      "Search Tool",
+      "OpenAI"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4111.png"
+  },
+  {
+    "name": "GPT-4o-mini Search Preview",
+    "description": "OpenAI's lightweight search model, performs only search queries and connects to the internet in real time.",
+    "tags": [
+      "Search Tool",
+      "OpenAI"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4111.png"
+  },
+  {
+    "name": "WizardLM-2 8x22B",
+    "description": "An open-source model from Microsoft with strong comprehension of complex instructions.",
+    "tags": [
+      "Microsoft",
+      "Fast Response",
+      "Code Programming"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4367.png"
+  },
+  {
+    "name": "Phi 4",
+    "description": "A highly efficient reasoning model by Microsoft, trained on high-quality datasets.",
+    "tags": [
+      "Microsoft",
+      "Fast Response",
+      "Code Programming"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4367.png"
+  },
+  {
+    "name": "Llama Guard 4 12B",
+    "description": "Meta's safety supervision model for auditing text and image content, identifying risks, and labeling violations.",
+    "tags": [
+      "Text Detection",
+      "Meta",
+      "Image and Video Recognition"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4331.png"
+  },
+  {
+    "name": "DeepSeek Prover V2",
+    "description": "A DeepSeek model designed specifically for mathematical logic and scientific computation tasks.",
+    "tags": [
+      "Fast Response",
+      "Mathematical Logic",
+      "Chinese Friendly"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4225.png"
+  },
+  {
+    "name": "Gemini 2.5 Pro",
+    "description": "Google's latest reasoning model, great at programming and science tasks.",
+    "tags": [
+      "Reasoning Model",
+      "Google",
+      "Code Programming"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4110.png"
+  },
+  {
+    "name": "Qwen3 235B A22B",
+    "description": "Alibaba's open-source inference model, a large-scale Mixture of Experts model.",
+    "tags": [
+      "Hybrid Reasoning Model",
+      "Alibaba",
+      "Fast Response"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4229.png"
+  },
+  {
+    "name": "Qwen3 32B",
+    "description": "Alibaba's open-source inference model, excels at complex reasoning.",
+    "tags": [
+      "Hybrid Reasoning Model",
+      "Alibaba",
+      "Code Programming"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4229.png"
+  },
+  {
+    "name": "Qwen3 14B",
+    "description": "Alibaba's open-source inference model, excels in reasoning, programming, and multilingual processing.",
+    "tags": [
+      "Hybrid Reasoning Model",
+      "Alibaba",
+      "Fast Response"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4229.png"
+  },
+  {
+    "name": "Qwen3 30B A3B",
+    "description": "Alibaba's open-source inference model with efficient activated parameters and outstanding inference capability.",
+    "tags": [
+      "Hybrid Reasoning Model",
+      "Alibaba",
+      "Fast Response"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4229.png"
+  },
+  {
+    "name": "Grok 3 mini",
+    "description": "Elon Musk's xAI lightweight reasoning model, with a reduced knowledge base and more precise expression.",
+    "tags": [
+      "Reasoning Model",
+      "xAI",
+      "Code Programming"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4222.png"
+  },
+  {
+    "name": "o4 Mini",
+    "description": "A streamlined reasoning model with more multimodal features, built in a more compact way than o3 mini.",
+    "tags": [
+      "Reasoning Model",
+      "OpenAI",
+      "Image and Video Recognition"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4111.png"
+  },
+  {
+    "name": "o4 Mini High",
+    "description": "Based on o4 mini, with optimized reasoning speed.",
+    "tags": [
+      "Reasoning Model",
+      "OpenAI",
+      "Code Programming"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4111.png"
+  },
+  {
+    "name": "o3 Mini High",
+    "description": "Based on o3 mini, now with added multimodal and online search capabilities.",
+    "tags": [
+      "Reasoning Model",
+      "OpenAI",
+      "Code Programming"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4111.png"
+  },
+  {
+    "name": "GPT-4.1 nano",
+    "description": "OpenAI's lightest intelligent model, low-latency and fast response, ideal for classification and autocomplete tasks.",
+    "tags": [
+      "OpenAI",
+      "Image and Video Recognition",
+      "Long Text Processing"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4111.png"
+  },
+  {
+    "name": "Gemini 2.5 Flash",
+    "description": "A fast version of Google's latest reasoning model, excels at mathematics and coding with quick responses.",
+    "tags": [
+      "Reasoning Model",
+      "Google",
+      "Fast Response"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4110.png"
+  },
+  {
+    "name": "Sora Image",
+    "description": "OpenAI's AI image engine with strong text understanding and high-precision rendering.",
+    "tags": [
+      "Text-to-Image",
+      "Image-to-Image",
+      "OpenAI"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4111.png"
+  },
+  {
+    "name": "AI Detector",
+    "description": "An AI content detection tool that accurately identifies AI-generated content in text, images, audio, and video.",
+    "tags": [
+      "Text Detection"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4350.png"
+  },
+  {
+    "name": "Llama 4 Scout",
+    "description": "Meta's latest lightweight open-source model, focused on data integration and fact-checking.",
+    "tags": [
+      "Meta",
+      "Financial Quantitative Analysis",
+      "Fast Response"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4331.png"
+  },
+  {
+    "name": "Llama 4 Maverick",
+    "description": "Meta's latest open-source model, enhanced with improved multimodal recognition.",
+    "tags": [
+      "Meta",
+      "Financial Quantitative Analysis",
+      "Image and Video Recognition"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4331.png"
+  },
+  {
+    "name": "Grok 3",
+    "description": "A reasoning model from Elon Musk's xAI, enhanced for coding and quantitative finance.",
+    "tags": [
+      "Reasoning Model",
+      "xAI",
+      "Fast Response"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4222.png"
+  },
+  {
+    "name": "GPT-4.1 Mini",
+    "description": "OpenAI's latest lightweight model, improved coding abilities, and fast response speed.",
+    "tags": [
+      "OpenAI",
+      "Image and Video Recognition",
+      "Fast Response"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4111.png"
+  },
+  {
+    "name": "GPT-4.1",
+    "description": "OpenAI's latest general-purpose model, enhanced coding abilities, and expanded context capacity.",
+    "tags": [
+      "OpenAI",
+      "Image and Video Recognition",
+      "Mathematical Logic"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4111.png"
+  },
+  {
+    "name": "OpenManus",
+    "description": "A universal AI Agent that connects thought and action.",
+    "tags": [
+      "All-in-One Assistant"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4344.png"
+  },
+  {
+    "name": "GPT‑4o Image",
+    "description": "OpenAI’s advanced image generator, allowing continuous modifications and detail adjustments.",
+    "tags": [
+      "Text-to-Image",
+      "Image-to-Image",
+      "OpenAI"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4343.png"
+  },
+  {
+    "name": "DeepSeek V3 0324",
+    "description": "A highly cost-effective, fast and affordable conversational model.",
+    "tags": [
+      "Fast Response",
+      "Web Search",
+      "Chinese Friendly"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4225.png"
+  },
+  {
+    "name": "Deep Research",
+    "description": "An advanced self-developed Agent for searching online information, reasoning, verification, and organizing multi-step research explorations.",
+    "tags": [
+      "Reasoning Model",
+      "Search Tool"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4341.png"
+  },
+  {
+    "name": "GPT-4.5 Preview",
+    "description": "OpenAI's experimental research model with an expanded knowledge base and verbose output.",
+    "tags": [
+      "OpenAI",
+      "Web Search",
+      "Image and Video Recognition"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4111.png"
+  },
+  {
+    "name": "o3-mini",
+    "description": "OpenAI’s efficient reasoning model optimized for science, mathematics, and programming.",
+    "tags": [
+      "Reasoning Model",
+      "OpenAI",
+      "Mathematical Logic"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4111.png"
+  },
+  {
+    "name": "o1-mini",
+    "description": "OpenAI's previous-generation reasoning model.",
+    "tags": [
+      "Reasoning Model",
+      "OpenAI",
+      "Web Search"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4111.png"
+  },
+  {
+    "name": "o1",
+    "description": "OpenAI's previous-generation reasoning model.",
+    "tags": [
+      "Reasoning Model",
+      "OpenAI",
+      "Image and Video Recognition"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4111.png"
+  },
+  {
+    "name": "Claude 3.7 Sonnet",
+    "description": "Anthropic's hybrid model that autonomously decides when reasoning is needed, with outstanding coding abilities.",
+    "tags": [
+      "Hybrid Reasoning Model",
+      "Anthropic",
+      "Code Programming"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4336.png"
+  },
+  {
+    "name": "Claude 3.5 Haiku",
+    "description": "Anthropic's lightweight and fast model, excels at code programming.",
+    "tags": [
+      "Anthropic",
+      "Code Programming",
+      "Web Search"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4335.png"
+  },
+  {
+    "name": "Moonshot-v1",
+    "description": "A lightweight and fast model optimized for context caching.",
+    "tags": [
+      "Chinese Friendly",
+      "Long Text Processing"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4334.png"
+  },
+  {
+    "name": "DeepSeek R1",
+    "description": "DeepSeek's classic reasoning model, excels at solving math problems and programming analysis.",
+    "tags": [
+      "Reasoning Model",
+      "Mathematical Logic",
+      "Financial Quantitative Analysis"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4225.png"
+  },
+  {
+    "name": "MiniMax-01",
+    "description": "A model for the companion app talkie, friendly for Chinese and suitable for companionship scenarios.",
+    "tags": [
+      "Chinese Friendly",
+      "Long-form Writing",
+      "Emotional Companionship"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4332.png"
+  },
+  {
+    "name": "Llama 3.3 70B Instruct",
+    "description": "Meta's open-source model skilled in long text reading and writing.",
+    "tags": [
+      "Meta",
+      "Financial Quantitative Analysis",
+      "Web Search"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4331.png"
+  },
+  {
+    "name": "Mistral Large 2411",
+    "description": "A European multilingual translation expert, supporting multiple programming languages.",
+    "tags": [
+      "European Multilingual",
+      "Translation",
+      "Financial Quantitative Analysis"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4330.png"
+  },
+  {
+    "name": "QvQ 72B Preview",
+    "description": "An older version model from Alibaba.",
+    "tags": [
+      "Alibaba",
+      "Chinese Friendly"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4229.png"
+  },
+  {
+    "name": "Runway",
+    "description": "A video generation model known for excellent dynamic control and animation.",
+    "tags": [
+      "Image-to-Video",
+      "Smooth Motion"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4228.png"
+  },
+  {
+    "name": "Gemini 2.0 Flash Thinking Experimental",
+    "description": "Google's fast reasoning model with large context capacity and multimodal-friendly design.",
+    "tags": [
+      "Reasoning Model",
+      "Google",
+      "Financial Quantitative Analysis"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4110.png"
+  },
+  {
+    "name": "Grok-2-vision",
+    "description": "Twitter wit by Elon Musk's xAI with humor and sarcasm, capable of image recognition.",
+    "tags": [
+      "xAI",
+      "Write a Tweet",
+      "Image and Video Recognition"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4222.png"
+  },
+  {
+    "name": "Proofreading AI",
+    "description": "A tool that quickly identifies and corrects spelling and grammar errors in text.",
+    "tags": [
+      "Text Proofreading"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4224.png"
+  },
+  {
+    "name": "Llama 3.1 405B",
+    "description": "Meta's previous-generation model.",
+    "tags": [
+      "Meta",
+      "Financial Quantitative Analysis",
+      "Web Search"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4223.png"
+  },
+  {
+    "name": "Grok-beta",
+    "description": "xAI's Twitter long-text model capable of controversial output, supports web search.",
+    "tags": [
+      "xAI",
+      "Write a Tweet",
+      "Web Search"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4222.png"
+  },
+  {
+    "name": "Luma",
+    "description": "A text-to-video model with precise text recognition and smooth camera movement.",
+    "tags": [
+      "Text-to-Video",
+      "Text Recognition"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4221.png"
+  },
+  {
+    "name": "DALLE·3",
+    "description": "An older version of OpenAI's image model.",
+    "tags": [
+      "Text-to-Image",
+      "OpenAI"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4220.png"
+  },
+  {
+    "name": "Ideogram 2.0 turbo",
+    "description": "A faster and more cost-effective version of Ideogram 2.0.",
+    "tags": [
+      "Text-to-Image",
+      "Text Recognition",
+      "Commercial Design"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4119.png"
+  },
+  {
+    "name": "Ideogram 2.0",
+    "description": "A text-to-image model with strong instruction comprehension, producing accurate and efficient results.",
+    "tags": [
+      "Text-to-Image",
+      "Text Recognition",
+      "Commercial Design"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4119.png"
+  },
+  {
+    "name": "Claude 3 Opus",
+    "description": "Anthropic's previous-generation model.",
+    "tags": [
+      "Anthropic",
+      "Code Programming",
+      "Web Search"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4117.png"
+  },
+  {
+    "name": "Midjourney",
+    "description": "The most popular and classic image model, supporting multiple parameter adjustments.",
+    "tags": [
+      "Text-to-Image",
+      "Image-to-Image",
+      "Continuous Editing"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4115.png"
+  },
+  {
+    "name": "Claude 3.5 Sonnet",
+    "description": "Anthropic's previous-generation reasoning model.",
+    "tags": [
+      "Anthropic",
+      "Code Programming",
+      "Web Search"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4114.png"
+  },
+  {
+    "name": "FLUX.1 Dev",
+    "description": "The open-source version of Runway's creative text-to-image model, offering creative freedom.",
+    "tags": [
+      "Text-to-Image",
+      "Anti-NSFW"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4113.png"
+  },
+  {
+    "name": "GPT-4o mini",
+    "description": "OpenAI's most cost-effective and fast-responding model.",
+    "tags": [
+      "OpenAI",
+      "Image and Video Recognition",
+      "Fast Response"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4112.png"
+  },
+  {
+    "name": "GPT-4",
+    "description": "OpenAI's previous-generation model.",
+    "tags": [
+      "OpenAI",
+      "Web Search",
+      "Fast Response"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4111.png"
+  },
+  {
+    "name": "Gemini 1.5 Pro",
+    "description": "Google's previous-generation model.",
+    "tags": [
+      "Google",
+      "Web Search",
+      "Image and Video Recognition"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4110.png"
+  },
+  {
+    "name": "o1-preview",
+    "description": "OpenAI's previous-generation reasoning model.",
+    "tags": [
+      "Reasoning Model",
+      "OpenAI",
+      "Web Search"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4109.png"
+  },
+  {
+    "name": "GPT-4o",
+    "description": "A well-rounded and classic OpenAI model with strong multimodal understanding.",
+    "tags": [
+      "OpenAI",
+      "Image and Video Recognition",
+      "Web Search"
+    ],
+    "icon": "https://static.glbgpt.com/logo2/4108.png"
+  }
+]

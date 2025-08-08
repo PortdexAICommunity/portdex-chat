@@ -18,12 +18,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 // import { MarketplaceItemCount } from '@/components/marketplace-item-count';
-import { PREDEFINED_ASSISTANT_CATEGORIES } from '@/lib/constant/marketplace-constant';
+import {
+  PREDEFINED_ASSISTANT_CATEGORIES,
+  AI_PLATFORMS,
+} from '@/lib/constant/marketplace-constant';
 import {
   homeMarketplaceItems,
   siteTemplates,
   softwareTools,
 } from '@/lib/constants';
+import modelsData from '@/lib/models.json';
 import type {
   DataTypes,
   // HomeMarketplaceItem,
@@ -387,7 +391,7 @@ export default function Marketplace() {
     searchTerm: '',
   });
   const [aiModelsFilters, setAiModelsFilters] = useState({
-    selectedCreator: null as string | null,
+    selectedTags: [] as string[],
     searchTerm: '',
   });
   const [softwareFilters, setSoftwareFilters] = useState({
@@ -460,20 +464,43 @@ export default function Marketplace() {
     swrConfig,
   );
 
-  // Fetch AI models
-  const {
-    data: aiModelsData,
-    isLoading: aiModelsLoading,
-    error: aiModelsError,
-  } = useSWR<{ models: DataTypes[]; total: number }>(
-    `marketplace/api/ai-models${
-      aiModelsFilters.searchTerm && activeTab === 'ai-models'
-        ? `?search=${encodeURIComponent(aiModelsFilters.searchTerm)}`
-        : ''
-    }`,
-    aiModelsFetcher,
-    swrConfig,
+  // Fetch AI models - COMMENTED OUT: Using models.json instead
+  // const {
+  //   data: aiModelsData,
+  //   isLoading: aiModelsLoading,
+  //   error: aiModelsError,
+  // } = useSWR<{ models: DataTypes[]; total: number }>(
+  //   `marketplace/api/ai-models${
+  //     aiModelsFilters.searchTerm && activeTab === 'ai-models'
+  //       ? `?search=${encodeURIComponent(aiModelsFilters.searchTerm)}`
+  //       : ''
+  //   }`,
+  //   aiModelsFetcher,
+  //   swrConfig,
+  // );
+
+  // Use models.json data instead of API
+  const transformedModelsData = useMemo(() => {
+    return modelsData.map((model, index) => ({
+      id: `model-${index}`,
+      name: model.name,
+      creator: 'AI Model Provider',
+      description: model.description,
+      category: 'AI Models',
+      icon: model.icon || '🤖',
+      tags: model.tags,
+    })) as DataTypes[];
+  }, []);
+
+  const aiModelsData = useMemo(
+    () => ({
+      models: transformedModelsData,
+      total: transformedModelsData.length,
+    }),
+    [transformedModelsData],
   );
+  const aiModelsLoading = false;
+  const aiModelsError = null;
 
   // Fetch MCP servers
   const {
@@ -532,14 +559,24 @@ export default function Marketplace() {
     swrConfig,
   );
 
-  const { data: allAiModelsData, isLoading: allAiModelsLoading } = useSWR<{
-    models: DataTypes[];
-    total: number;
-  }>(
-    activeTab === 'home' ? 'marketplace/api/ai-models' : null,
-    aiModelsFetcher,
-    swrConfig,
+  // const { data: allAiModelsData, isLoading: allAiModelsLoading } = useSWR<{
+  //   models: DataTypes[];
+  //   total: number;
+  // }>(
+  //   activeTab === 'home' ? 'marketplace/api/ai-models' : null,
+  //   aiModelsFetcher,
+  //   swrConfig,
+  // );
+
+  // Use transformed models data instead of API
+  const allAiModelsData = useMemo(
+    () => ({
+      models: transformedModelsData,
+      total: transformedModelsData.length,
+    }),
+    [transformedModelsData],
   );
+  const allAiModelsLoading = false;
 
   const { data: allMcpServersData, isLoading: allMcpServersLoading } = useSWR(
     activeTab === 'home'
@@ -657,6 +694,24 @@ export default function Marketplace() {
       })),
     [],
   );
+  // Get all unique tags from AI models (only remaining tags, not in AI_PLATFORMS)
+  const aiModelTags = useMemo(() => {
+    const tagMap = new Map<string, number>();
+    aiModels.forEach((model) => {
+      if (model.tags) {
+        model.tags.forEach((tag) => {
+          // Only include tags that are not in AI_PLATFORMS
+          if (!AI_PLATFORMS.includes(tag)) {
+            tagMap.set(tag, (tagMap.get(tag) || 0) + 1);
+          }
+        });
+      }
+    });
+    return Array.from(tagMap.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [aiModels]);
+
   const aiModelCreators = useMemo(
     () => getCreatorsWithCounts(aiModels),
     [aiModels, getCreatorsWithCounts],
@@ -774,28 +829,27 @@ export default function Marketplace() {
     [],
   );
 
-  // Filter function specifically for AI models (by creator)
+  // Filter function specifically for AI models (by tags)
   const getFilteredAIModels = useCallback(
     (
       items: DataTypes[],
-      filters: { selectedCreator: string | null; searchTerm: string },
+      filters: { selectedTags: string[]; searchTerm: string },
     ) => {
       return items.filter((item) => {
-        const matchesCreator =
-          !filters.selectedCreator || item.creator === filters.selectedCreator;
+        const matchesTags =
+          filters.selectedTags.length === 0 ||
+          (item.tags &&
+            filters.selectedTags.some((tag) => item.tags?.includes(tag)));
         const matchesSearch =
           !filters.searchTerm ||
           item.name.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
           item.description
             .toLowerCase()
             .includes(filters.searchTerm.toLowerCase()) ||
-          item.creator
-            .toLowerCase()
-            .includes(filters.searchTerm.toLowerCase()) ||
-          item.category
-            ?.toLowerCase()
-            .includes(filters.searchTerm.toLowerCase());
-        return matchesCreator && matchesSearch;
+          item.tags?.some((tag) =>
+            tag.toLowerCase().includes(filters.searchTerm.toLowerCase()),
+          );
+        return matchesTags && matchesSearch;
       });
     },
     [],
@@ -1051,12 +1105,12 @@ export default function Marketplace() {
 
       {/* Hero Banner */}
       <section className="relative h-32 overflow-hidden rounded-2xl bg-[url(/marketplace-banner.jpg)] bg-origin-padding bg-cover bg-no-repeat my-5 mx-10">
-        <div className="flex flex-col items-start justify-between py-2 px-8">
+        <div className="flex flex-col items-start justify-between space-y-4 px-8 py-4">
           <div className="z-10 max-w-2xl w-full text-left">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 sm:mb-3 font-serif">
+            <h1 className="text-xl md:text-[26px] font-light text-white pb-2">
               Add AI Agents to your assistant in minutes
             </h1>
-            <p className="text-white/80 text-xs sm:text-sm mb-4">
+            <p className="text-white/80 text-xs md:text-sm">
               Transform your financial landscape with the AI Marketplace, the
               ultimate hub for crypto enthusiasts and finance professionals
               alike, designed to enhance productivity, reduce operational
@@ -1109,34 +1163,50 @@ export default function Marketplace() {
               >
                 <section className="flex flex-col justify-start items-start gap-5">
                   <h2 className="text-2xl font-bold bg-gradient-to-tr from-purple-300 to-purple-600 bg-clip-text text-transparent">
-                    Featured Agents
+                    Featured
                   </h2>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {featuredItem.map((item: any) => (
-                      <Card
-                        key={item.id}
-                        className="hover:shadow-lg hover:border-purple-400 transition-all duration-200 cursor-pointer h-full"
-                        onClick={() => handleFeaturedItemClick(item)}
-                      >
-                        <CardContent className="p-4 flex flex-col h-full">
-                          <div className="flex flex-col gap-3 grow">
-                            {/* Icon and Title together */}
-                            <div className="flex items-center gap-3">
-                              <div className="shrink-0 size-10 bg-gradient-to-br from-blue-100 to-purple-200 dark:from-blue-900/30 dark:to-purple-800/30 rounded-lg flex items-center justify-center text-xl shadow-sm border border-blue-200 dark:border-blue-700/50">
-                                {item.icon || '🔧'}
-                              </div>
-                              <h4 className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-2">
-                                {item.title}
-                              </h4>
-                            </div>
-                            {/* Description below */}
-                            <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-1 leading-relaxed">
-                              {item.description}
-                            </p>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                  <div className="w-full">
+                    <Carousel
+                      opts={{
+                        align: 'start',
+                        loop: true,
+                      }}
+                      className="w-full group"
+                    >
+                      <CarouselContent className="-ml-2 md:-ml-4">
+                        {featuredItem.map((item: any, index: number) => (
+                          <CarouselItem
+                            key={item.id}
+                            className="pl-2 md:pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5"
+                          >
+                            <Card
+                              className="hover:shadow-lg hover:border-purple-400 transition-all duration-200 cursor-pointer h-full"
+                              onClick={() => handleFeaturedItemClick(item)}
+                            >
+                              <CardContent className="p-4 flex flex-col h-full">
+                                <div className="flex flex-col gap-3 grow">
+                                  {/* Icon and Title together */}
+                                  <div className="flex items-center gap-3">
+                                    <div className="shrink-0 size-10 bg-gradient-to-br from-blue-100 to-purple-200 dark:from-blue-900/30 dark:to-purple-800/30 rounded-lg flex items-center justify-center text-xl shadow-sm border border-blue-200 dark:border-blue-700/50">
+                                      {item.icon || '🔧'}
+                                    </div>
+                                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-2">
+                                      {item.title}
+                                    </h4>
+                                  </div>
+                                  {/* Description below */}
+                                  <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-1 leading-relaxed">
+                                    {item.description}
+                                  </p>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                      <CarouselPrevious className="left-2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <CarouselNext className="right-2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </Carousel>
                   </div>
                 </section>
 
@@ -1148,6 +1218,10 @@ export default function Marketplace() {
                     onDownload={handleWorkflowDownload}
                     title="Featured Items"
                     defaultShowAssistantsAndWorkflows={true}
+                    onNavigateToTab={(tab) => {
+                      setActiveTab(tab as TabType);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
                   />
                 </section>
 
@@ -1238,14 +1312,18 @@ export default function Marketplace() {
               >
                 {/* Sidebar Filter */}
                 <MarketplaceFilter
-                  categories={aiModelCreators}
-                  selectedCategory={aiModelsFilters.selectedCreator}
+                  categories={aiModelTags}
+                  selectedCategory={
+                    aiModelsFilters.selectedTags.length > 0
+                      ? aiModelsFilters.selectedTags[0]
+                      : null
+                  }
                   searchTerm={aiModelsFilters.searchTerm}
                   totalItems={filteredAIModels.length}
-                  onCategoryChange={(creator) =>
+                  onCategoryChange={(tag) =>
                     setAiModelsFilters((prev) => ({
                       ...prev,
-                      selectedCreator: creator,
+                      selectedTags: tag ? [tag] : [],
                     }))
                   }
                   onSearchChange={(search) =>
@@ -1256,18 +1334,26 @@ export default function Marketplace() {
                   }
                   onClearFilters={() =>
                     setAiModelsFilters({
-                      selectedCreator: null,
+                      selectedTags: [],
                       searchTerm: '',
                     })
                   }
                   title="AI Models List"
                   placeholder="Search AI models..."
-                  isCreatorBased={true}
+                  isCreatorBased={false}
                 />
 
                 {/* Main Content */}
                 <div className="flex flex-col gap-4">
-                  <Tags />
+                  <Tags
+                    selectedTags={aiModelsFilters.selectedTags}
+                    onTagsChange={(tags) =>
+                      setAiModelsFilters((prev) => ({
+                        ...prev,
+                        selectedTags: tags,
+                      }))
+                    }
+                  />
                   <div className="flex-1 space-y-6">
                     <MarketplaceSection
                       title=""

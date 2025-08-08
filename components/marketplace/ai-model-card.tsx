@@ -16,6 +16,8 @@ interface AIModelCardProps {
 export function AIModelCard({ aiModel, onClick }: AIModelCardProps) {
   const [imageError, setImageError] = useState(false);
 
+  console.log('model', aiModel);
+
   return (
     <motion.div
       whileHover={{ y: -5, scale: 1.02 }}
