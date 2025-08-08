@@ -220,13 +220,13 @@ export function DetailDialog({
               <Card className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900/30 dark:to-gray-800/30 border-gray-200 dark:border-gray-800/50">
                 <CardContent className="p-6">
                   <div
-                    className={`h-24 w-full bg-gradient-to-r ${aiModel.gradient} rounded-xl relative overflow-hidden mb-4`}
+                    className={`h-24 w-full bg-gradient-to-r ${aiModel.gradient || 'from-orange-100 to-orange-200 dark:from-orange-900/30 dark:to-orange-800/30'} rounded-xl relative overflow-hidden mb-4`}
                   >
                     <div className="absolute inset-0 bg-black/10" />
                     <div className="absolute -bottom-3 -right-3 size-16 bg-white dark:bg-gray-900 rounded-2xl flex items-center justify-center shadow-lg border-4 border-white dark:border-gray-700/50 p-2">
                       {typeof aiModel.icon === 'string' &&
                       aiModel.icon.startsWith('http') ? (
-                        <Image
+                        <img
                           src={aiModel.icon}
                           alt={aiModel.name}
                           width={48}
@@ -249,7 +249,7 @@ export function DetailDialog({
                     </div>
                     <div className="flex items-center gap-1">
                       <Calendar className="size-4" />
-                      <span>{aiModel.date}</span>
+                      <span>{aiModel.date || 'AI Model'}</span>
                     </div>
                   </div>
                 </CardContent>
