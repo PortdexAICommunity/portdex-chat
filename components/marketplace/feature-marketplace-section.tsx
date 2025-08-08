@@ -9,18 +9,16 @@ import type { WorkflowType } from '@/lib/types';
 
 // Import llm-apps data
 import llmAppsData from '@/lib/llm-apps.json';
+import { AIAgentIcon, GitHubIcon } from '../icons';
 
 type FilterType =
   | 'all'
-  | 'Starter AI Agents'
-  | 'Advanced AI Agents'
-  | 'Game Playing Agents'
-  | 'Multi-agent Teams'
-  | 'Voice AI Agents'
-  | 'MCP AI Agents'
-  | 'RAG Tutorials'
-  | 'Memory Tutorials'
-  | 'Chat Tutorials'
+  | 'Single Agent'
+  | 'Multi-agent'
+  | 'General'
+  | 'RAG'
+  | 'Voice Agent'
+  | 'MCP'
   | 'workflow';
 
 interface FeaturedItemsProps {
@@ -48,6 +46,15 @@ export function FeaturedMarketplaceSection({
   defaultShowAssistantsAndWorkflows = false,
 }: FeaturedItemsProps) {
   const [selectedFilter, setSelectedFilter] = useState<FilterType>('all');
+  const [selectedTags, setSelectedTags] = useState<Record<string, string[]>>({
+    'Single Agent': [],
+    'Multi-agent': [],
+    General: [],
+    RAG: [],
+    'Voice Agent': [],
+    MCP: [],
+    workflow: [],
+  });
   const sectionRef = useRef<HTMLDivElement>(null);
 
   const scrollToSection = () => {
@@ -59,15 +66,12 @@ export function FeaturedMarketplaceSection({
 
   // State for managing random items and load more functionality
   const [expandedItems, setExpandedItems] = useState<Record<string, number>>({
-    'Starter AI Agents': 6,
-    'Advanced AI Agents': 6,
-    'Game Playing Agents': 6,
-    'Multi-agent Teams': 6,
-    'Voice AI Agents': 6,
-    'MCP AI Agents': 6,
-    'RAG Tutorials': 6,
-    'Memory Tutorials': 6,
-    'Chat Tutorials': 6,
+    'Single Agent': 6,
+    'Multi-agent': 6,
+    General: 6,
+    RAG: 6,
+    'Voice Agent': 6,
+    MCP: 6,
     workflow: 6,
   });
 
@@ -90,53 +94,95 @@ export function FeaturedMarketplaceSection({
   const categories = llmAppsData.metadata.categories;
   const categoryItems = llmAppsData.categories;
 
-  // Memoized random items for each category
+  // Function to get the primary type from an item (prefer the first type if multiple)
+  const getPrimaryType = (item: any): string => {
+    if (!item.type || !Array.isArray(item.type) || item.type.length === 0) {
+      return 'General';
+    }
+    return item.type[0]; // Always prefer the first type
+  };
+
+  // Organize items by type
+  const itemsByType = useMemo(() => {
+    const organized: Record<string, any[]> = {
+      'Single Agent': [],
+      'Multi-agent': [],
+      General: [],
+      RAG: [],
+      'Voice Agent': [],
+      MCP: [],
+    };
+
+    // Process all items from categories
+    Object.values(categoryItems)
+      .flat()
+      .forEach((item) => {
+        const primaryType = getPrimaryType(item);
+        if (organized[primaryType]) {
+          organized[primaryType].push(item);
+        } else {
+          organized.General.push(item);
+        }
+      });
+
+    return organized;
+  }, [categoryItems]);
+
+  // Get all unique tags from items
+  const allTags = useMemo(() => {
+    const tags = new Set<string>();
+    Object.values(categoryItems)
+      .flat()
+      .forEach((item) => {
+        if (item.tags && Array.isArray(item.tags)) {
+          item.tags.forEach((tag: string) => tags.add(tag));
+        }
+      });
+    return Array.from(tags).sort();
+  }, [categoryItems]);
+
+  // Filter items by selected tags for a specific section
+  const filterItemsByTags = (items: any[], sectionType: string) => {
+    const sectionTags = selectedTags[sectionType] || [];
+    if (sectionTags.length === 0) return items;
+    return items.filter((item) => {
+      if (!item.tags || !Array.isArray(item.tags)) return false;
+      return sectionTags.some((tag) => item.tags.includes(tag));
+    });
+  };
+
+  // Memoized random items for each type
   const randomItems = useMemo(
     () => ({
-      'Starter AI Agents': getRandomItems(
-        categoryItems['Starter AI Agents'] || [],
-        Math.max(expandedItems['Starter AI Agents'], 6),
-        'Starter AI Agents',
+      'Single Agent': getRandomItems(
+        filterItemsByTags(itemsByType['Single Agent'] || [], 'Single Agent'),
+        Math.max(expandedItems['Single Agent'], 6),
+        'Single Agent',
       ),
-      'Advanced AI Agents': getRandomItems(
-        categoryItems['Advanced AI Agents'] || [],
-        Math.max(expandedItems['Advanced AI Agents'], 6),
-        'Advanced AI Agents',
+      'Multi-agent': getRandomItems(
+        filterItemsByTags(itemsByType['Multi-agent'] || [], 'Multi-agent'),
+        Math.max(expandedItems['Multi-agent'], 6),
+        'Multi-agent',
       ),
-      'Game Playing Agents': getRandomItems(
-        categoryItems['Game Playing Agents'] || [],
-        Math.max(expandedItems['Game Playing Agents'], 6),
-        'Game Playing Agents',
+      General: getRandomItems(
+        filterItemsByTags(itemsByType.General || [], 'General'),
+        Math.max(expandedItems.General, 6),
+        'General',
       ),
-      'Multi-agent Teams': getRandomItems(
-        categoryItems['Multi-agent Teams'] || [],
-        Math.max(expandedItems['Multi-agent Teams'], 6),
-        'Multi-agent Teams',
+      RAG: getRandomItems(
+        filterItemsByTags(itemsByType.RAG || [], 'RAG'),
+        Math.max(expandedItems.RAG, 6),
+        'RAG',
       ),
-      'Voice AI Agents': getRandomItems(
-        categoryItems['Voice AI Agents'] || [],
-        Math.max(expandedItems['Voice AI Agents'], 6),
-        'Voice AI Agents',
+      'Voice Agent': getRandomItems(
+        filterItemsByTags(itemsByType['Voice Agent'] || [], 'Voice Agent'),
+        Math.max(expandedItems['Voice Agent'], 6),
+        'Voice Agent',
       ),
-      'MCP AI Agents': getRandomItems(
-        categoryItems['MCP AI Agents'] || [],
-        Math.max(expandedItems['MCP AI Agents'], 6),
-        'MCP AI Agents',
-      ),
-      'RAG Tutorials': getRandomItems(
-        categoryItems['RAG Tutorials'] || [],
-        Math.max(expandedItems['RAG Tutorials'], 6),
-        'RAG Tutorials',
-      ),
-      'Memory Tutorials': getRandomItems(
-        categoryItems['Memory Tutorials'] || [],
-        Math.max(expandedItems['Memory Tutorials'], 6),
-        'Memory Tutorials',
-      ),
-      'Chat Tutorials': getRandomItems(
-        categoryItems['Chat Tutorials'] || [],
-        Math.max(expandedItems['Chat Tutorials'], 6),
-        'Chat Tutorials',
+      MCP: getRandomItems(
+        filterItemsByTags(itemsByType.MCP || [], 'MCP'),
+        Math.max(expandedItems.MCP, 6),
+        'MCP',
       ),
       workflow: getRandomItems(
         workflows,
@@ -144,7 +190,7 @@ export function FeaturedMarketplaceSection({
         'workflow',
       ),
     }),
-    [categoryItems, workflows, expandedItems],
+    [itemsByType, workflows, expandedItems, selectedTags],
   );
 
   // Function to handle load more for a specific type
@@ -165,78 +211,92 @@ export function FeaturedMarketplaceSection({
     scrollToSection();
   };
 
-  // Count items for each category
+  // Function to handle tag selection for a specific section
+  const handleTagClick = (tag: string, sectionType: string) => {
+    setSelectedTags((prev) => {
+      const currentSectionTags = prev[sectionType] || [];
+      const newSectionTags = currentSectionTags.includes(tag)
+        ? currentSectionTags.filter((t) => t !== tag)
+        : [...currentSectionTags, tag];
+
+      return {
+        ...prev,
+        [sectionType]: newSectionTags,
+      };
+    });
+  };
+
+  // Count items for each type
   const counts = {
     all: defaultShowAssistantsAndWorkflows
       ? workflows.length +
-        Object.values(categoryItems).reduce(
-          (acc, items) => acc + items.length,
-          0,
-        )
+        Object.values(itemsByType).reduce((acc, items) => acc + items.length, 0)
       : workflows.length +
-        Object.values(categoryItems).reduce(
+        Object.values(itemsByType).reduce(
           (acc, items) => acc + items.length,
           0,
         ),
-    'Starter AI Agents': categoryItems['Starter AI Agents']?.length || 0,
-    'Advanced AI Agents': categoryItems['Advanced AI Agents']?.length || 0,
-    'Game Playing Agents': categoryItems['Game Playing Agents']?.length || 0,
-    'Multi-agent Teams': categoryItems['Multi-agent Teams']?.length || 0,
-    'Voice AI Agents': categoryItems['Voice AI Agents']?.length || 0,
-    'MCP AI Agents': categoryItems['MCP AI Agents']?.length || 0,
-    'RAG Tutorials': categoryItems['RAG Tutorials']?.length || 0,
-    'Memory Tutorials': categoryItems['Memory Tutorials']?.length || 0,
-    'Chat Tutorials': categoryItems['Chat Tutorials']?.length || 0,
+    'Single Agent': filterItemsByTags(
+      itemsByType['Single Agent'] || [],
+      'Single Agent',
+    ).length,
+    'Multi-agent': filterItemsByTags(
+      itemsByType['Multi-agent'] || [],
+      'Multi-agent',
+    ).length,
+    General: filterItemsByTags(itemsByType.General || [], 'General').length,
+    RAG: filterItemsByTags(itemsByType.RAG || [], 'RAG').length,
+    'Voice Agent': filterItemsByTags(
+      itemsByType['Voice Agent'] || [],
+      'Voice Agent',
+    ).length,
+    MCP: filterItemsByTags(itemsByType.MCP || [], 'MCP').length,
     workflow: workflows.length,
   };
 
   // Filter items based on selected filter
   const getFilteredItems = () => {
     switch (selectedFilter) {
-      case 'Starter AI Agents':
-        return (categoryItems['Starter AI Agents'] || []).map((item) => ({
+      case 'Single Agent':
+        return filterItemsByTags(
+          itemsByType['Single Agent'] || [],
+          'Single Agent',
+        ).map((item) => ({
           item,
           type: 'assistant' as const,
         }));
-      case 'Advanced AI Agents':
-        return (categoryItems['Advanced AI Agents'] || []).map((item) => ({
+      case 'Multi-agent':
+        return filterItemsByTags(
+          itemsByType['Multi-agent'] || [],
+          'Multi-agent',
+        ).map((item) => ({
           item,
           type: 'assistant' as const,
         }));
-      case 'Game Playing Agents':
-        return (categoryItems['Game Playing Agents'] || []).map((item) => ({
+      case 'General':
+        return filterItemsByTags(itemsByType.General || [], 'General').map(
+          (item) => ({
+            item,
+            type: 'assistant' as const,
+          }),
+        );
+      case 'RAG':
+        return filterItemsByTags(itemsByType.RAG || [], 'RAG').map((item) => ({
           item,
           type: 'assistant' as const,
         }));
-      case 'Multi-agent Teams':
-        return (categoryItems['Multi-agent Teams'] || []).map((item) => ({
+      case 'Voice Agent':
+        return filterItemsByTags(
+          itemsByType['Voice Agent'] || [],
+          'Voice Agent',
+        ).map((item) => ({
           item,
           type: 'assistant' as const,
         }));
-      case 'Voice AI Agents':
-        return (categoryItems['Voice AI Agents'] || []).map((item) => ({
-          item,
-          type: 'assistant' as const,
-        }));
-      case 'MCP AI Agents':
-        return (categoryItems['MCP AI Agents'] || []).map((item) => ({
+      case 'MCP':
+        return filterItemsByTags(itemsByType.MCP || [], 'MCP').map((item) => ({
           item,
           type: 'mcp-server' as const,
-        }));
-      case 'RAG Tutorials':
-        return (categoryItems['RAG Tutorials'] || []).map((item) => ({
-          item,
-          type: 'assistant' as const,
-        }));
-      case 'Memory Tutorials':
-        return (categoryItems['Memory Tutorials'] || []).map((item) => ({
-          item,
-          type: 'assistant' as const,
-        }));
-      case 'Chat Tutorials':
-        return (categoryItems['Chat Tutorials'] || []).map((item) => ({
-          item,
-          type: 'assistant' as const,
         }));
       case 'workflow':
         return workflows.map((item) => ({
@@ -250,94 +310,55 @@ export function FeaturedMarketplaceSection({
             type: 'all-sections' as const,
             sections: [
               {
-                type: 'Starter AI Agents' as const,
-                title: 'Starter AI Agents',
-                items: randomItems['Starter AI Agents'].slice(
+                type: 'Single Agent' as const,
+                title: 'Single Agent',
+                items: randomItems['Single Agent'].slice(
                   0,
-                  expandedItems['Starter AI Agents'],
+                  expandedItems['Single Agent'],
                 ),
-                total: counts['Starter AI Agents'],
-                expanded: expandedItems['Starter AI Agents'],
+                total: counts['Single Agent'],
+                expanded: expandedItems['Single Agent'],
               },
               {
-                type: 'Advanced AI Agents' as const,
-                title: 'Advanced AI Agents',
-                items: randomItems['Advanced AI Agents'].slice(
+                type: 'Multi-agent' as const,
+                title: 'Multi-agent',
+                items: randomItems['Multi-agent'].slice(
                   0,
-                  expandedItems['Advanced AI Agents'],
+                  expandedItems['Multi-agent'],
                 ),
-                total: counts['Advanced AI Agents'],
-                expanded: expandedItems['Advanced AI Agents'],
+                total: counts['Multi-agent'],
+                expanded: expandedItems['Multi-agent'],
               },
               {
-                type: 'Game Playing Agents' as const,
-                title: 'Game Playing Agents',
-                items: randomItems['Game Playing Agents'].slice(
-                  0,
-                  expandedItems['Game Playing Agents'],
-                ),
-                total: counts['Game Playing Agents'],
-                expanded: expandedItems['Game Playing Agents'],
+                type: 'General' as const,
+                title: 'General',
+                items: randomItems.General.slice(0, expandedItems.General),
+                total: counts.General,
+                expanded: expandedItems.General,
               },
               {
-                type: 'Multi-agent Teams' as const,
-                title: 'Multi-agent Teams',
-                items: randomItems['Multi-agent Teams'].slice(
-                  0,
-                  expandedItems['Multi-agent Teams'],
-                ),
-                total: counts['Multi-agent Teams'],
-                expanded: expandedItems['Multi-agent Teams'],
+                type: 'RAG' as const,
+                title: 'RAG',
+                items: randomItems.RAG.slice(0, expandedItems.RAG),
+                total: counts.RAG,
+                expanded: expandedItems.RAG,
               },
               {
-                type: 'Voice AI Agents' as const,
-                title: 'Voice AI Agents',
-                items: randomItems['Voice AI Agents'].slice(
+                type: 'Voice Agent' as const,
+                title: 'Voice Agent',
+                items: randomItems['Voice Agent'].slice(
                   0,
-                  expandedItems['Voice AI Agents'],
+                  expandedItems['Voice Agent'],
                 ),
-                total: counts['Voice AI Agents'],
-                expanded: expandedItems['Voice AI Agents'],
+                total: counts['Voice Agent'],
+                expanded: expandedItems['Voice Agent'],
               },
               {
-                type: 'MCP AI Agents' as const,
-                title: 'MCP AI Agents',
-                items: randomItems['MCP AI Agents'].slice(
-                  0,
-                  expandedItems['MCP AI Agents'],
-                ),
-                total: counts['MCP AI Agents'],
-                expanded: expandedItems['MCP AI Agents'],
-              },
-              {
-                type: 'RAG Tutorials' as const,
-                title: 'RAG Tutorials',
-                items: randomItems['RAG Tutorials'].slice(
-                  0,
-                  expandedItems['RAG Tutorials'],
-                ),
-                total: counts['RAG Tutorials'],
-                expanded: expandedItems['RAG Tutorials'],
-              },
-              {
-                type: 'Memory Tutorials' as const,
-                title: 'Memory Tutorials',
-                items: randomItems['Memory Tutorials'].slice(
-                  0,
-                  expandedItems['Memory Tutorials'],
-                ),
-                total: counts['Memory Tutorials'],
-                expanded: expandedItems['Memory Tutorials'],
-              },
-              {
-                type: 'Chat Tutorials' as const,
-                title: 'Chat Tutorials',
-                items: randomItems['Chat Tutorials'].slice(
-                  0,
-                  expandedItems['Chat Tutorials'],
-                ),
-                total: counts['Chat Tutorials'],
-                expanded: expandedItems['Chat Tutorials'],
+                type: 'MCP' as const,
+                title: 'MCP',
+                items: randomItems.MCP.slice(0, expandedItems.MCP),
+                total: counts.MCP,
+                expanded: expandedItems.MCP,
               },
               {
                 type: 'workflow' as const,
@@ -361,7 +382,7 @@ export function FeaturedMarketplaceSection({
         }
         // Otherwise combine all items
         return [
-          ...Object.values(categoryItems)
+          ...Object.values(itemsByType)
             .flat()
             .map((item) => ({
               item,
@@ -379,16 +400,16 @@ export function FeaturedMarketplaceSection({
 
   return (
     <div ref={sectionRef} className="w-full">
-      <div className="flex gap-6 lg:gap-8">
+      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 xl:gap-8">
         {/* Left sidebar with filters */}
-        <div className="w-72 shrink-0 space-y-4 lg:space-y-6 sticky top-32 z-40 h-[calc(100vh-9rem)] overflow-y-auto bg-background">
+        <div className="w-full lg:w-72 lg:shrink-0 space-y-4 lg:space-y-6 lg:sticky lg:top-32 z-40 lg:h-[calc(100vh-9rem)] lg:overflow-y-auto bg-background border-b lg:border-b-0 border-gray-200 dark:border-gray-700 pb-4 lg:pb-0">
           {/* Filter Categories */}
           <div className="space-y-2 lg:space-y-3 pt-2">
             <h3 className="text-sm font-medium text-gray-900 dark:text-white uppercase tracking-wide">
-              Filter By
+              Types
             </h3>
 
-            <div className="h-auto max-h-[300px] w-full">
+            <div className="h-auto max-h-[300px] w-full overflow-y-auto lg:overflow-y-visible">
               <div className="space-y-1 pr-3 lg:pr-6 w-full">
                 {/* All Items */}
                 <button
@@ -438,15 +459,15 @@ export function FeaturedMarketplaceSection({
                   </Badge>
                 </button>
 
-                {/* Starter AI Agents */}
+                {/* Single Agent */}
                 <button
                   type="button"
                   onClick={() => {
-                    setSelectedFilter('Starter AI Agents');
+                    setSelectedFilter('Single Agent');
                     scrollToSection();
                   }}
                   className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
-                    selectedFilter === 'Starter AI Agents'
+                    selectedFilter === 'Single Agent'
                       ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                   }`}
@@ -455,54 +476,48 @@ export function FeaturedMarketplaceSection({
                     <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shrink-0">
                       <span className="text-xs text-white font-medium">S</span>
                     </div>
-                    <span className="text-left truncate">
-                      Starter AI Agents
-                    </span>
+                    <span className="text-left truncate">Single Agent</span>
                   </div>
                   <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts['Starter AI Agents'] > 50
+                    {counts['Single Agent'] > 50
                       ? '50+'
-                      : counts['Starter AI Agents']}
+                      : counts['Single Agent']}
                   </Badge>
                 </button>
 
-                {/* Advanced AI Agents */}
+                {/* Multi-agent */}
                 <button
                   type="button"
                   onClick={() => {
-                    setSelectedFilter('Advanced AI Agents');
+                    setSelectedFilter('Multi-agent');
                     scrollToSection();
                   }}
                   className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
-                    selectedFilter === 'Advanced AI Agents'
+                    selectedFilter === 'Multi-agent'
                       ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                   }`}
                 >
                   <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
                     <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shrink-0">
-                      <span className="text-xs text-white font-medium">A</span>
+                      <span className="text-xs text-white font-medium">M</span>
                     </div>
-                    <span className="text-left truncate">
-                      Advanced AI Agents
-                    </span>
+                    <span className="text-left truncate">Multi-agent</span>
                   </div>
                   <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts['Advanced AI Agents'] > 50
-                      ? '50+'
-                      : counts['Advanced AI Agents']}
+                    {counts['Multi-agent'] > 50 ? '50+' : counts['Multi-agent']}
                   </Badge>
                 </button>
 
-                {/* Game Playing Agents */}
+                {/* General */}
                 <button
                   type="button"
                   onClick={() => {
-                    setSelectedFilter('Game Playing Agents');
+                    setSelectedFilter('General');
                     scrollToSection();
                   }}
                   className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
-                    selectedFilter === 'Game Playing Agents'
+                    selectedFilter === 'General'
                       ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                   }`}
@@ -511,106 +526,22 @@ export function FeaturedMarketplaceSection({
                     <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shrink-0">
                       <span className="text-xs text-white font-medium">G</span>
                     </div>
-                    <span className="text-left truncate">
-                      Game Playing Agents
-                    </span>
+                    <span className="text-left truncate">General</span>
                   </div>
                   <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts['Game Playing Agents'] > 50
-                      ? '50+'
-                      : counts['Game Playing Agents']}
+                    {counts.General > 50 ? '50+' : counts.General}
                   </Badge>
                 </button>
 
-                {/* Multi-agent Teams */}
+                {/* RAG */}
                 <button
                   type="button"
                   onClick={() => {
-                    setSelectedFilter('Multi-agent Teams');
+                    setSelectedFilter('RAG');
                     scrollToSection();
                   }}
                   className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
-                    selectedFilter === 'Multi-agent Teams'
-                      ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                  }`}
-                >
-                  <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
-                    <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center shrink-0">
-                      <span className="text-xs text-white font-medium">M</span>
-                    </div>
-                    <span className="text-left truncate">
-                      Multi-agent Teams
-                    </span>
-                  </div>
-                  <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts['Multi-agent Teams'] > 50
-                      ? '50+'
-                      : counts['Multi-agent Teams']}
-                  </Badge>
-                </button>
-
-                {/* Voice AI Agents */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedFilter('Voice AI Agents');
-                    scrollToSection();
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
-                    selectedFilter === 'Voice AI Agents'
-                      ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                  }`}
-                >
-                  <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
-                    <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center shrink-0">
-                      <span className="text-xs text-white font-medium">V</span>
-                    </div>
-                    <span className="text-left truncate">Voice AI Agents</span>
-                  </div>
-                  <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts['Voice AI Agents'] > 50
-                      ? '50+'
-                      : counts['Voice AI Agents']}
-                  </Badge>
-                </button>
-
-                {/* MCP AI Agents */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedFilter('MCP AI Agents');
-                    scrollToSection();
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
-                    selectedFilter === 'MCP AI Agents'
-                      ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                  }`}
-                >
-                  <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
-                    <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center shrink-0">
-                      <span className="text-xs text-white font-medium">M</span>
-                    </div>
-                    <span className="text-left truncate">MCP AI Agents</span>
-                  </div>
-                  <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts['MCP AI Agents'] > 50
-                      ? '50+'
-                      : counts['MCP AI Agents']}
-                  </Badge>
-                </button>
-
-                {/* RAG Tutorials */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedFilter('RAG Tutorials');
-                    scrollToSection();
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
-                    selectedFilter === 'RAG Tutorials'
+                    selectedFilter === 'RAG'
                       ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                   }`}
@@ -619,64 +550,58 @@ export function FeaturedMarketplaceSection({
                     <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center shrink-0">
                       <span className="text-xs text-white font-medium">R</span>
                     </div>
-                    <span className="text-left truncate">RAG Tutorials</span>
+                    <span className="text-left truncate">RAG</span>
                   </div>
                   <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts['RAG Tutorials'] > 50
-                      ? '50+'
-                      : counts['RAG Tutorials']}
+                    {counts.RAG > 50 ? '50+' : counts.RAG}
                   </Badge>
                 </button>
 
-                {/* Memory Tutorials */}
+                {/* Voice Agent */}
                 <button
                   type="button"
                   onClick={() => {
-                    setSelectedFilter('Memory Tutorials');
+                    setSelectedFilter('Voice Agent');
                     scrollToSection();
                   }}
                   className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
-                    selectedFilter === 'Memory Tutorials'
+                    selectedFilter === 'Voice Agent'
                       ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                   }`}
                 >
                   <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
-                    <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center shrink-0">
+                    <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center shrink-0">
+                      <span className="text-xs text-white font-medium">V</span>
+                    </div>
+                    <span className="text-left truncate">Voice Agent</span>
+                  </div>
+                  <Badge variant="secondary" className="text-xs shrink-0 ml-2">
+                    {counts['Voice Agent'] > 50 ? '50+' : counts['Voice Agent']}
+                  </Badge>
+                </button>
+
+                {/* MCP */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedFilter('MCP');
+                    scrollToSection();
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
+                    selectedFilter === 'MCP'
+                      ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
+                    <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center shrink-0">
                       <span className="text-xs text-white font-medium">M</span>
                     </div>
-                    <span className="text-left truncate">Memory Tutorials</span>
+                    <span className="text-left truncate">MCP</span>
                   </div>
                   <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts['Memory Tutorials'] > 50
-                      ? '50+'
-                      : counts['Memory Tutorials']}
-                  </Badge>
-                </button>
-
-                {/* Chat Tutorials */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedFilter('Chat Tutorials');
-                    scrollToSection();
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
-                    selectedFilter === 'Chat Tutorials'
-                      ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                  }`}
-                >
-                  <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
-                    <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center shrink-0">
-                      <span className="text-xs text-white font-medium">C</span>
-                    </div>
-                    <span className="text-left truncate">Chat Tutorials</span>
-                  </div>
-                  <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts['Chat Tutorials'] > 50
-                      ? '50+'
-                      : counts['Chat Tutorials']}
+                    {counts.MCP > 50 ? '50+' : counts.MCP}
                   </Badge>
                 </button>
               </div>
@@ -685,7 +610,7 @@ export function FeaturedMarketplaceSection({
         </div>
 
         {/* Right content grid */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <motion.div
             key={selectedFilter}
             initial={{ opacity: 0, y: 20 }}
@@ -701,17 +626,54 @@ export function FeaturedMarketplaceSection({
                 {filteredItems.sections.map((section, sectionIndex) => (
                   <div key={section.type} className="space-y-4">
                     {/* Section Header */}
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                        {section.title}
-                      </h3>
-                      <Badge variant="secondary" className="text-sm">
-                        {section.items.length} of {section.total}
-                      </Badge>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                      <div className="flex flex-col items-start gap-2">
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                          {section.title}
+                        </h3>
+                        {/* Tags for this section */}
+                        {section.items.length > 0 &&
+                          section.type !== 'workflow' && (
+                            <div className="flex flex-wrap gap-1">
+                              {Array.from(
+                                new Set(
+                                  section.items
+                                    .flatMap((item) => item.tags || [])
+                                    .slice(0, 3),
+                                ),
+                              ).map((tag: string) => (
+                                <Badge
+                                  key={tag}
+                                  variant={
+                                    selectedTags[section.type]?.includes(tag)
+                                      ? 'secondary'
+                                      : 'outline'
+                                  }
+                                  className={`text-sm cursor-pointer transition-colors ${
+                                    selectedTags[section.type]?.includes(tag)
+                                      ? 'bg-purple-300 text-purple-700 capitalize'
+                                      : 'bg-background hover:text-purple-700  hover:bg-purple-300 capitalize'
+                                  }`}
+                                  onClick={() =>
+                                    handleTagClick(tag, section.type)
+                                  }
+                                >
+                                  {tag}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                      </div>
+
+                      <div className="flex items-center gap-2 self-start sm:self-auto">
+                        <Badge variant="secondary" className="text-sm">
+                          {section.items.length} of {section.total}
+                        </Badge>
+                      </div>
                     </div>
 
                     {/* Section Items Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-4 sm:gap-6">
                       {section.items.map((item, index) => (
                         <motion.div
                           key={`${section.type}-${index}`}
@@ -727,50 +689,13 @@ export function FeaturedMarketplaceSection({
                             />
                           ) : (
                             <Card
-                              className="h-full cursor-pointer"
+                              className="h-full cursor-pointer hover:border-purple-300 dark:hover:border-purple-700"
                               onClick={() => onItemClick(item, 'assistant')}
                             >
-                              {/* <CardContent className="p-4">
-                                <div className="flex items-start gap-3 h-full">
-                                  <div className="flex flex-col justify-between gap-2 h-full">
-                                    <div className="flex items-start gap-4">
-                                      <div className="size-10 rounded-lg bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 flex items-center justify-center text-lg shadow-sm border border-blue-200 dark:border-blue-700/50">
-                                        🤖
-                                      </div>
-                                      <div className="flex flex-col justify-start">
-                                        <h3 className="text-gray-900 dark:text-white font-semibold text-base mb-1 line-clamp-1">
-                                          {item.title}
-                                        </h3>
-                                        <p className="text-gray-600 dark:text-gray-400 text-sm font-medium line-clamp-1">
-                                          {item.category}
-                                        </p>
-                                      </div>
-                                    </div>
-                                    <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2 mt-2">
-                                      {item.description}
-                                    </p>
-                                    <div className="flex flex-wrap w-full gap-1 mt-2">
-                                      {item.tags
-                                        ?.slice(0, 3)
-                                        .map(
-                                          (tag: string, tagIndex: number) => (
-                                            <Badge
-                                              key={tagIndex}
-                                              variant="outline"
-                                              className="text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100"
-                                            >
-                                              {tag}
-                                            </Badge>
-                                          ),
-                                        )}
-                                    </div>
-                                  </div>
-                                </div>
-                              </CardContent> */}
                               <CardContent className="p-4 flex flex-col h-full">
                                 <div className="flex items-start gap-3 mb-3">
                                   <div className="size-10 rounded-lg bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 flex items-center justify-center text-lg shadow-sm border border-blue-200 dark:border-blue-700/50 shrink-0">
-                                    🤖
+                                    <AIAgentIcon size={20} />
                                   </div>
                                   <div className="min-w-0 flex-1">
                                     <h3 className="text-gray-900 dark:text-white font-semibold text-base mb-1 line-clamp-1">
@@ -856,63 +781,118 @@ export function FeaturedMarketplaceSection({
               </div>
             ) : (
               /* Handle regular filtered items view */
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {Array.isArray(filteredItems) &&
-                  filteredItems.map((item, index) => (
-                    <motion.div
-                      key={`${item.type}-${index}`}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.02 }}
-                    >
-                      {item.type === 'workflow' ? (
-                        <WorkflowCard
-                          workflow={item.item as WorkflowType}
-                          onClick={() => onItemClick(item.item, item.type)}
-                          onDownload={onDownload}
-                        />
-                      ) : (
-                        <Card
-                          className="h-full cursor-pointer"
-                          onClick={() => onItemClick(item.item, 'assistant')}
-                        >
-                          <CardContent className="p-4">
-                            <div className="flex items-start gap-3">
-                              <div className="shrink-0">
-                                <div className="size-10 rounded-lg bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 flex items-center justify-center text-lg shadow-sm border border-blue-200 dark:border-blue-700/50">
-                                  🤖
-                                </div>
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <h3 className="text-gray-900 dark:text-white font-semibold text-base mb-1 line-clamp-1">
-                                  {item.item.title}
-                                </h3>
-                                <p className="text-gray-600 dark:text-gray-400 text-sm font-medium line-clamp-1">
-                                  {item.item.category}
-                                </p>
-                                <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2 mt-2">
-                                  {item.item.description}
-                                </p>
-                                <div className="flex flex-wrap gap-1 mt-2">
-                                  {item.item.tags
-                                    ?.slice(0, 3)
-                                    .map((tag: string, tagIndex: number) => (
-                                      <Badge
-                                        key={tagIndex}
-                                        variant="outline"
-                                        className="text-xs"
-                                      >
-                                        {tag}
-                                      </Badge>
-                                    ))}
-                                </div>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
+              <div className="space-y-6">
+                {/* Section Header with Tags for individual sections */}
+                {selectedFilter !== 'all' && selectedFilter !== 'workflow' && (
+                  <div className="flex flex-col items-start gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-4">
+                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                        {selectedFilter}
+                      </h2>
+                      <Badge
+                        variant="secondary"
+                        className="text-sm self-start sm:self-auto"
+                      >
+                        {Array.isArray(filteredItems)
+                          ? filteredItems.length
+                          : 0}{' '}
+                        of {counts[selectedFilter]}
+                      </Badge>
+                    </div>
+
+                    {/* Tags for this section */}
+                    {Array.isArray(filteredItems) &&
+                      filteredItems.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {Array.from(
+                            new Set(
+                              filteredItems
+                                .flatMap((item) => item.item.tags || [])
+                                .slice(0, 6),
+                            ),
+                          ).map((tag: string) => (
+                            <Badge
+                              key={tag}
+                              variant={
+                                selectedTags[selectedFilter]?.includes(tag)
+                                  ? 'secondary'
+                                  : 'outline'
+                              }
+                              className={`text-sm cursor-pointer transition-colors ${
+                                selectedTags[selectedFilter]?.includes(tag)
+                                  ? 'bg-purple-300 text-purple-700 capitalize'
+                                  : 'bg-background hover:text-purple-700 hover:bg-purple-300 capitalize'
+                              }`}
+                              onClick={() =>
+                                handleTagClick(tag, selectedFilter)
+                              }
+                            >
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
                       )}
-                    </motion.div>
-                  ))}
+                  </div>
+                )}
+
+                {/* Items Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
+                  {Array.isArray(filteredItems) &&
+                    filteredItems.map((item, index) => (
+                      <motion.div
+                        key={`${item.type}-${index}`}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.02 }}
+                      >
+                        {item.type === 'workflow' ? (
+                          <WorkflowCard
+                            workflow={item.item as WorkflowType}
+                            onClick={() => onItemClick(item.item, item.type)}
+                            onDownload={onDownload}
+                          />
+                        ) : (
+                          <Card
+                            className="h-full cursor-pointer hover:border-purple-300 dark:hover:border-purple-700"
+                            onClick={() => onItemClick(item.item, 'assistant')}
+                          >
+                            <CardContent className="p-4 flex flex-col h-full">
+                              <div className="flex items-start gap-3 mb-3">
+                                <div className="size-10 rounded-lg bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 flex items-center justify-center text-lg shadow-sm border border-blue-200 dark:border-blue-700/50 shrink-0">
+                                  <AIAgentIcon size={20} />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <h3 className="text-gray-900 dark:text-white font-semibold text-base mb-1 line-clamp-1">
+                                    {item.item.title}
+                                  </h3>
+                                  <p className="text-gray-600 dark:text-gray-400 text-sm font-medium line-clamp-1">
+                                    {item.item.category}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-3 mb-3 grow">
+                                {item.item.description}
+                              </p>
+
+                              <div className="flex flex-wrap gap-1 mt-auto">
+                                {item.item.tags
+                                  ?.slice(0, 3)
+                                  .map((tag: string, tagIndex: number) => (
+                                    <Badge
+                                      key={tagIndex}
+                                      className="text-xs bg-purple-300 dark:bg-purple-900 text-purple-800 dark:text-purple-300 border"
+                                    >
+                                      {tag}
+                                    </Badge>
+                                  ))}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        )}
+                      </motion.div>
+                    ))}
+                </div>
               </div>
             )}
 

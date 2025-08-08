@@ -56,7 +56,12 @@ import React, {
   startTransition,
 } from 'react';
 import useSWR from 'swr';
-import { BlockchainIcon, MCPIcon, N8NIcon } from '@/components/icons';
+import {
+  AIAgentIcon,
+  BlockchainIcon,
+  MCPIcon,
+  N8NIcon,
+} from '@/components/icons';
 import { useMarketplaceStore } from '@/store/marketplace-store';
 // import { FAQSection } from "@/components/faq";
 import { LoaderThree } from '@/components/animation/loader';
@@ -984,7 +989,7 @@ export default function Marketplace() {
               {
                 id: 'assistants',
                 label: 'Assistants',
-                icon: Users,
+                icon: AIAgentIcon,
               },
               {
                 id: 'ai-models',
@@ -1045,8 +1050,8 @@ export default function Marketplace() {
       </motion.nav>
 
       {/* Hero Banner */}
-      <section className="relative h-40 overflow-hidden rounded-2xl bg-[url(/marketplace-banner.jpg)] bg-origin-padding bg-cover bg-no-repeat my-5 mx-10">
-        <div className="flex flex-col sm:flex-row items-center justify-start py-4 px-8">
+      <section className="relative h-32 overflow-hidden rounded-2xl bg-[url(/marketplace-banner.jpg)] bg-origin-padding bg-cover bg-no-repeat my-5 mx-10">
+        <div className="flex flex-col items-start justify-between py-2 px-8">
           <div className="z-10 max-w-2xl w-full text-left">
             <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 sm:mb-3 font-serif">
               Add AI Agents to your assistant in minutes
@@ -1062,7 +1067,7 @@ export default function Marketplace() {
       </section>
 
       {/* Content */}
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
+      <div className="w-full px-4 md:px-6 lg:px-8">
         <div className="">
           <AnimatePresence mode="wait">
             {/* Show loading only when no data is available */}
@@ -1106,46 +1111,33 @@ export default function Marketplace() {
                   <h2 className="text-2xl font-bold bg-gradient-to-tr from-purple-300 to-purple-600 bg-clip-text text-transparent">
                     Featured Agents
                   </h2>
-                  <Carousel
-                    opts={{
-                      align: 'start',
-                    }}
-                    className="w-full"
-                  >
-                    <CarouselContent className="-ml-4">
-                      {featuredItem.map((item: any) => (
-                        <CarouselItem
-                          key={item.id}
-                          className="pl-4 md:basis-1/2 lg:basis-1/3"
-                        >
-                          <Card
-                            className="hover:shadow-lg hover:border-purple-400 transition-all duration-200 cursor-pointer h-full"
-                            onClick={() => handleFeaturedItemClick(item)}
-                          >
-                            <CardContent className="p-4 flex flex-col h-full">
-                              <div className="flex flex-col gap-3 grow">
-                                {/* Icon and Title together */}
-                                <div className="flex items-center gap-3">
-                                  <div className="shrink-0 size-10 bg-gradient-to-br from-blue-100 to-purple-200 dark:from-blue-900/30 dark:to-purple-800/30 rounded-lg flex items-center justify-center text-xl shadow-sm border border-blue-200 dark:border-blue-700/50">
-                                    {item.icon || '🔧'}
-                                  </div>
-                                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-2">
-                                    {item.title}
-                                  </h4>
-                                </div>
-                                {/* Description below */}
-                                <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3 leading-relaxed">
-                                  {item.description}
-                                </p>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {featuredItem.map((item: any) => (
+                      <Card
+                        key={item.id}
+                        className="hover:shadow-lg hover:border-purple-400 transition-all duration-200 cursor-pointer h-full"
+                        onClick={() => handleFeaturedItemClick(item)}
+                      >
+                        <CardContent className="p-4 flex flex-col h-full">
+                          <div className="flex flex-col gap-3 grow">
+                            {/* Icon and Title together */}
+                            <div className="flex items-center gap-3">
+                              <div className="shrink-0 size-10 bg-gradient-to-br from-blue-100 to-purple-200 dark:from-blue-900/30 dark:to-purple-800/30 rounded-lg flex items-center justify-center text-xl shadow-sm border border-blue-200 dark:border-blue-700/50">
+                                {item.icon || '🔧'}
                               </div>
-                            </CardContent>
-                          </Card>
-                        </CarouselItem>
-                      ))}
-                    </CarouselContent>
-                    <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2" />
-                    <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2" />
-                  </Carousel>
+                              <h4 className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-2">
+                                {item.title}
+                              </h4>
+                            </div>
+                            {/* Description below */}
+                            <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-1 leading-relaxed">
+                              {item.description}
+                            </p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
                 </section>
 
                 {/* Featured Items with Filter */}
