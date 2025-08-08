@@ -9,17 +9,20 @@ import type { WorkflowType } from '@/lib/types';
 
 // Import llm-apps data
 import llmAppsData from '@/lib/llm-apps.json';
+import { softwareTools, siteTemplates } from '@/lib/constants';
+import modelsData from '@/lib/models.json';
 import { AIAgentIcon, GitHubIcon } from '../icons';
 
 type FilterType =
   | 'all'
-  | 'Single Agent'
-  | 'Multi-agent'
   | 'General'
   | 'RAG'
   | 'Voice Agent'
   | 'MCP'
-  | 'workflow';
+  | 'workflow'
+  | 'software'
+  | 'template'
+  | 'models';
 
 interface FeaturedItemsProps {
   workflows: WorkflowType[];
@@ -36,6 +39,7 @@ interface FeaturedItemsProps {
   onDownload?: (workflow: WorkflowType) => void;
   title?: string;
   defaultShowAssistantsAndWorkflows?: boolean;
+  onNavigateToTab?: (tab: string) => void;
 }
 
 export function FeaturedMarketplaceSection({
@@ -44,16 +48,18 @@ export function FeaturedMarketplaceSection({
   onDownload,
   title = 'Featured Items',
   defaultShowAssistantsAndWorkflows = false,
+  onNavigateToTab,
 }: FeaturedItemsProps) {
   const [selectedFilter, setSelectedFilter] = useState<FilterType>('all');
   const [selectedTags, setSelectedTags] = useState<Record<string, string[]>>({
-    'Single Agent': [],
-    'Multi-agent': [],
     General: [],
     RAG: [],
     'Voice Agent': [],
     MCP: [],
     workflow: [],
+    software: [],
+    template: [],
+    models: [],
   });
   const sectionRef = useRef<HTMLDivElement>(null);
 
@@ -66,13 +72,14 @@ export function FeaturedMarketplaceSection({
 
   // State for managing random items and load more functionality
   const [expandedItems, setExpandedItems] = useState<Record<string, number>>({
-    'Single Agent': 6,
-    'Multi-agent': 6,
     General: 6,
     RAG: 6,
     'Voice Agent': 6,
     MCP: 6,
     workflow: 6,
+    software: 6,
+    template: 6,
+    models: 9,
   });
 
   // Function to get random items from an array (consistent based on array length)
@@ -99,14 +106,17 @@ export function FeaturedMarketplaceSection({
     if (!item.type || !Array.isArray(item.type) || item.type.length === 0) {
       return 'General';
     }
-    return item.type[0]; // Always prefer the first type
+    const type = item.type[0];
+    // Combine Single Agent and Multi-agent into General
+    if (type === 'Single Agent' || type === 'Multi-agent') {
+      return 'General';
+    }
+    return type;
   };
 
   // Organize items by type
   const itemsByType = useMemo(() => {
     const organized: Record<string, any[]> = {
-      'Single Agent': [],
-      'Multi-agent': [],
       General: [],
       RAG: [],
       'Voice Agent': [],
@@ -141,6 +151,28 @@ export function FeaturedMarketplaceSection({
     return Array.from(tags).sort();
   }, [categoryItems]);
 
+  // Get Editor's Choice items - one from each type
+  const editorsChoiceItems = useMemo(() => {
+    const choiceItems: Array<{ item: any; type: string }> = [];
+
+    // Get one item from each type
+    const types = ['General', 'RAG', 'Voice Agent', 'MCP'];
+
+    types.forEach((type) => {
+      const items = itemsByType[type] || [];
+      if (items.length > 0) {
+        // Get a random item from this type
+        const randomIndex = Math.floor(Math.random() * items.length);
+        choiceItems.push({
+          item: items[randomIndex],
+          type: type === 'MCP' ? 'mcp-server' : 'assistant',
+        });
+      }
+    });
+
+    return choiceItems;
+  }, [itemsByType]);
+
   // Filter items by selected tags for a specific section
   const filterItemsByTags = (items: any[], sectionType: string) => {
     const sectionTags = selectedTags[sectionType] || [];
@@ -151,19 +183,41 @@ export function FeaturedMarketplaceSection({
     });
   };
 
+  // Count items for each type
+  const counts = {
+    all: defaultShowAssistantsAndWorkflows
+      ? workflows.length +
+        Object.values(itemsByType).reduce(
+          (acc, items) => acc + items.length,
+          0,
+        ) +
+        softwareTools.length +
+        siteTemplates.length +
+        modelsData.length
+      : workflows.length +
+        Object.values(itemsByType).reduce(
+          (acc, items) => acc + items.length,
+          0,
+        ) +
+        softwareTools.length +
+        siteTemplates.length +
+        modelsData.length,
+    General: filterItemsByTags(itemsByType.General || [], 'General').length,
+    RAG: filterItemsByTags(itemsByType.RAG || [], 'RAG').length,
+    'Voice Agent': filterItemsByTags(
+      itemsByType['Voice Agent'] || [],
+      'Voice Agent',
+    ).length,
+    MCP: filterItemsByTags(itemsByType.MCP || [], 'MCP').length,
+    workflow: workflows.length,
+    software: softwareTools.length,
+    template: siteTemplates.length,
+    models: modelsData.length,
+  };
+
   // Memoized random items for each type
   const randomItems = useMemo(
     () => ({
-      'Single Agent': getRandomItems(
-        filterItemsByTags(itemsByType['Single Agent'] || [], 'Single Agent'),
-        Math.max(expandedItems['Single Agent'], 6),
-        'Single Agent',
-      ),
-      'Multi-agent': getRandomItems(
-        filterItemsByTags(itemsByType['Multi-agent'] || [], 'Multi-agent'),
-        Math.max(expandedItems['Multi-agent'], 6),
-        'Multi-agent',
-      ),
       General: getRandomItems(
         filterItemsByTags(itemsByType.General || [], 'General'),
         Math.max(expandedItems.General, 6),
@@ -189,8 +243,31 @@ export function FeaturedMarketplaceSection({
         Math.max(expandedItems.workflow, 6),
         'workflow',
       ),
+      software: getRandomItems(
+        softwareTools,
+        Math.max(expandedItems.software, 6),
+        'software',
+      ),
+      template: getRandomItems(
+        siteTemplates,
+        Math.max(expandedItems.template, 6),
+        'template',
+      ),
+      models: getRandomItems(
+        modelsData,
+        Math.max(expandedItems.models, 6),
+        'models',
+      ),
     }),
-    [itemsByType, workflows, expandedItems, selectedTags],
+    [
+      itemsByType,
+      workflows,
+      expandedItems,
+      selectedTags,
+      softwareTools,
+      siteTemplates,
+      modelsData,
+    ],
   );
 
   // Function to handle load more for a specific type
@@ -201,14 +278,31 @@ export function FeaturedMarketplaceSection({
     }));
   };
 
-  // Function to handle view more (switch to specific type)
+  // Function to handle view more (switch to specific type or navigate to assistants tab)
   const handleViewMore = (type: FilterType) => {
-    setSelectedFilter(type);
-    setExpandedItems((prev) => ({
-      ...prev,
-      [type]: 6, // Reset to initial count when switching
-    }));
-    scrollToSection();
+    if (type === 'General' && onNavigateToTab) {
+      // Navigate to assistants tab for General items
+      onNavigateToTab('assistants');
+    } else if (type === 'MCP' && onNavigateToTab) {
+      // Navigate to mcp-servers tab for MCP items
+      onNavigateToTab('mcp-servers');
+    } else if (type === 'software' && onNavigateToTab) {
+      // Navigate to softwares tab for software items
+      onNavigateToTab('softwares');
+    } else if (type === 'template' && onNavigateToTab) {
+      // Navigate to templates tab for template items
+      onNavigateToTab('templates');
+    } else if (type === 'models' && onNavigateToTab) {
+      // Navigate to models tab for models
+      onNavigateToTab('models');
+    } else {
+      setSelectedFilter(type);
+      setExpandedItems((prev) => ({
+        ...prev,
+        [type]: 6, // Reset to initial count when switching
+      }));
+      scrollToSection();
+    }
   };
 
   // Function to handle tag selection for a specific section
@@ -226,53 +320,9 @@ export function FeaturedMarketplaceSection({
     });
   };
 
-  // Count items for each type
-  const counts = {
-    all: defaultShowAssistantsAndWorkflows
-      ? workflows.length +
-        Object.values(itemsByType).reduce((acc, items) => acc + items.length, 0)
-      : workflows.length +
-        Object.values(itemsByType).reduce(
-          (acc, items) => acc + items.length,
-          0,
-        ),
-    'Single Agent': filterItemsByTags(
-      itemsByType['Single Agent'] || [],
-      'Single Agent',
-    ).length,
-    'Multi-agent': filterItemsByTags(
-      itemsByType['Multi-agent'] || [],
-      'Multi-agent',
-    ).length,
-    General: filterItemsByTags(itemsByType.General || [], 'General').length,
-    RAG: filterItemsByTags(itemsByType.RAG || [], 'RAG').length,
-    'Voice Agent': filterItemsByTags(
-      itemsByType['Voice Agent'] || [],
-      'Voice Agent',
-    ).length,
-    MCP: filterItemsByTags(itemsByType.MCP || [], 'MCP').length,
-    workflow: workflows.length,
-  };
-
   // Filter items based on selected filter
   const getFilteredItems = () => {
     switch (selectedFilter) {
-      case 'Single Agent':
-        return filterItemsByTags(
-          itemsByType['Single Agent'] || [],
-          'Single Agent',
-        ).map((item) => ({
-          item,
-          type: 'assistant' as const,
-        }));
-      case 'Multi-agent':
-        return filterItemsByTags(
-          itemsByType['Multi-agent'] || [],
-          'Multi-agent',
-        ).map((item) => ({
-          item,
-          type: 'assistant' as const,
-        }));
       case 'General':
         return filterItemsByTags(itemsByType.General || [], 'General').map(
           (item) => ({
@@ -303,6 +353,21 @@ export function FeaturedMarketplaceSection({
           item,
           type: 'workflow' as const,
         }));
+      case 'software':
+        return softwareTools.map((item) => ({
+          item,
+          type: 'software' as const,
+        }));
+      case 'template':
+        return siteTemplates.map((item) => ({
+          item,
+          type: 'template' as const,
+        }));
+      case 'models':
+        return modelsData.map((item) => ({
+          item,
+          type: 'ai-model' as const,
+        }));
       default:
         // When "all" is selected, return sections with random items
         if (selectedFilter === 'all') {
@@ -310,31 +375,18 @@ export function FeaturedMarketplaceSection({
             type: 'all-sections' as const,
             sections: [
               {
-                type: 'Single Agent' as const,
-                title: 'Single Agent',
-                items: randomItems['Single Agent'].slice(
-                  0,
-                  expandedItems['Single Agent'],
-                ),
-                total: counts['Single Agent'],
-                expanded: expandedItems['Single Agent'],
-              },
-              {
-                type: 'Multi-agent' as const,
-                title: 'Multi-agent',
-                items: randomItems['Multi-agent'].slice(
-                  0,
-                  expandedItems['Multi-agent'],
-                ),
-                total: counts['Multi-agent'],
-                expanded: expandedItems['Multi-agent'],
-              },
-              {
                 type: 'General' as const,
                 title: 'General',
                 items: randomItems.General.slice(0, expandedItems.General),
                 total: counts.General,
                 expanded: expandedItems.General,
+              },
+              {
+                type: 'models' as const,
+                title: 'Models',
+                items: randomItems.models.slice(0, 9),
+                total: modelsData.length,
+                expanded: 9,
               },
               {
                 type: 'RAG' as const,
@@ -367,6 +419,20 @@ export function FeaturedMarketplaceSection({
                 total: workflows.length,
                 expanded: expandedItems.workflow,
               },
+              {
+                type: 'software' as const,
+                title: 'Software',
+                items: randomItems.software.slice(0, expandedItems.software),
+                total: softwareTools.length,
+                expanded: expandedItems.software,
+              },
+              {
+                type: 'template' as const,
+                title: 'Templates',
+                items: randomItems.template.slice(0, expandedItems.template),
+                total: siteTemplates.length,
+                expanded: expandedItems.template,
+              },
             ],
           };
         }
@@ -377,6 +443,18 @@ export function FeaturedMarketplaceSection({
             ...workflows.map((item) => ({
               item,
               type: 'workflow' as const,
+            })),
+            ...softwareTools.map((item) => ({
+              item,
+              type: 'software' as const,
+            })),
+            ...siteTemplates.map((item) => ({
+              item,
+              type: 'template' as const,
+            })),
+            ...modelsData.map((item) => ({
+              item,
+              type: 'ai-model' as const,
             })),
           ];
         }
@@ -391,6 +469,18 @@ export function FeaturedMarketplaceSection({
           ...workflows.map((item) => ({
             item,
             type: 'workflow' as const,
+          })),
+          ...softwareTools.map((item) => ({
+            item,
+            type: 'software' as const,
+          })),
+          ...siteTemplates.map((item) => ({
+            item,
+            type: 'template' as const,
+          })),
+          ...modelsData.map((item) => ({
+            item,
+            type: 'ai-model' as const,
           })),
         ];
     }
@@ -431,7 +521,7 @@ export function FeaturedMarketplaceSection({
                     <span className="font-medium truncate">All</span>
                   </div>
                   <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts.all > 1000 ? '1k+' : counts.all}
+                    {counts.all > 1000 ? '2500+' : counts.all}
                   </Badge>
                 </button>
 
@@ -455,57 +545,7 @@ export function FeaturedMarketplaceSection({
                     <span className="text-left truncate">Workflows</span>
                   </div>
                   <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts.workflow > 500 ? '1k+' : counts.workflow}
-                  </Badge>
-                </button>
-
-                {/* Single Agent */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedFilter('Single Agent');
-                    scrollToSection();
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
-                    selectedFilter === 'Single Agent'
-                      ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                  }`}
-                >
-                  <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
-                    <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shrink-0">
-                      <span className="text-xs text-white font-medium">S</span>
-                    </div>
-                    <span className="text-left truncate">Single Agent</span>
-                  </div>
-                  <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts['Single Agent'] > 50
-                      ? '50+'
-                      : counts['Single Agent']}
-                  </Badge>
-                </button>
-
-                {/* Multi-agent */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedFilter('Multi-agent');
-                    scrollToSection();
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
-                    selectedFilter === 'Multi-agent'
-                      ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                  }`}
-                >
-                  <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
-                    <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shrink-0">
-                      <span className="text-xs text-white font-medium">M</span>
-                    </div>
-                    <span className="text-left truncate">Multi-agent</span>
-                  </div>
-                  <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts['Multi-agent'] > 50 ? '50+' : counts['Multi-agent']}
+                    {counts.workflow > 500 ? '1000+' : counts.workflow}
                   </Badge>
                 </button>
 
@@ -523,13 +563,63 @@ export function FeaturedMarketplaceSection({
                   }`}
                 >
                   <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
-                    <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shrink-0">
-                      <span className="text-xs text-white font-medium">G</span>
+                    <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shrink-0">
+                      <span className="text-xs text-white font-medium">A</span>
                     </div>
-                    <span className="text-left truncate">General</span>
+                    <span className="text-left truncate">Assistants</span>
                   </div>
                   <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts.General > 50 ? '50+' : counts.General}
+                    {/* {counts.General > 1000 ? '1500+' : counts.General} */}
+                    1500+
+                  </Badge>
+                </button>
+
+                {/* Models */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedFilter('models');
+                    scrollToSection();
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
+                    selectedFilter === 'models'
+                      ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
+                    <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center shrink-0">
+                      <span className="text-xs text-white font-medium">M</span>
+                    </div>
+                    <span className="text-left truncate">Models</span>
+                  </div>
+                  <Badge variant="secondary" className="text-xs shrink-0 ml-2">
+                    {counts.models > 50 ? '50+' : counts.models}
+                  </Badge>
+                </button>
+
+                {/* MCP */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedFilter('MCP');
+                    scrollToSection();
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
+                    selectedFilter === 'MCP'
+                      ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
+                    <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center shrink-0">
+                      <span className="text-xs text-white font-medium">M</span>
+                    </div>
+                    <span className="text-left truncate">MCP</span>
+                  </div>
+                  <Badge variant="secondary" className="text-xs shrink-0 ml-2">
+                    {/* {counts.MCP > 50 ? '50+' : counts.MCP} */}
+                    20+
                   </Badge>
                 </button>
 
@@ -581,27 +671,51 @@ export function FeaturedMarketplaceSection({
                   </Badge>
                 </button>
 
-                {/* MCP */}
+                {/* Software */}
                 <button
                   type="button"
                   onClick={() => {
-                    setSelectedFilter('MCP');
+                    setSelectedFilter('software');
                     scrollToSection();
                   }}
                   className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
-                    selectedFilter === 'MCP'
+                    selectedFilter === 'software'
                       ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                   }`}
                 >
                   <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
-                    <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center shrink-0">
-                      <span className="text-xs text-white font-medium">M</span>
+                    <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center shrink-0">
+                      <span className="text-xs text-white font-medium">S</span>
                     </div>
-                    <span className="text-left truncate">MCP</span>
+                    <span className="text-left truncate">Software</span>
                   </div>
                   <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts.MCP > 50 ? '50+' : counts.MCP}
+                    {counts.software > 50 ? '50+' : counts.software}
+                  </Badge>
+                </button>
+
+                {/* Templates */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedFilter('template');
+                    scrollToSection();
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
+                    selectedFilter === 'template'
+                      ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
+                    <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center shrink-0">
+                      <span className="text-xs text-white font-medium">T</span>
+                    </div>
+                    <span className="text-left truncate">Templates</span>
+                  </div>
+                  <Badge variant="secondary" className="text-xs shrink-0 ml-2">
+                    {counts.template > 50 ? '50+' : counts.template}
                   </Badge>
                 </button>
               </div>
@@ -623,13 +737,103 @@ export function FeaturedMarketplaceSection({
             typeof filteredItems === 'object' &&
             'sections' in filteredItems ? (
               <div className="space-y-8">
+                {/* Editor's Choice Section */}
+                {editorsChoiceItems.length > 0 && (
+                  <div className="space-y-4">
+                    {/* Editor's Choice Header */}
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                      <div className="flex flex-col items-start gap-2">
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                          Editor&apos;s Pick
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">
+                          Handpicked items from each category
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Editor's Choice Items Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
+                      {editorsChoiceItems.map((choiceItem, index) => (
+                        <motion.div
+                          key={`editors-choice-${index}`}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                        >
+                          {choiceItem.type === 'workflow' ? (
+                            <WorkflowCard
+                              workflow={choiceItem.item as WorkflowType}
+                              onClick={() =>
+                                onItemClick(choiceItem.item, 'workflow')
+                              }
+                              onDownload={onDownload}
+                            />
+                          ) : (
+                            <Card
+                              className="h-full cursor-pointer hover:border-purple-300 dark:hover:border-purple-700 relative overflow-hidden"
+                              onClick={() =>
+                                onItemClick(
+                                  choiceItem.item,
+                                  choiceItem.type as 'assistant' | 'mcp-server',
+                                )
+                              }
+                            >
+                              <CardContent className="p-4 flex flex-col h-full">
+                                <div className="flex items-start gap-3 mb-3">
+                                  <div className="size-10 rounded-lg bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 flex items-center justify-center text-lg shadow-sm border border-blue-200 dark:border-blue-700/50 shrink-0">
+                                    <AIAgentIcon size={20} />
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <h3 className="text-gray-900 dark:text-white font-semibold text-base mb-1 line-clamp-1">
+                                      {choiceItem.item.title}
+                                    </h3>
+                                    <p className="text-gray-600 dark:text-gray-400 text-sm font-medium line-clamp-1">
+                                      {choiceItem.item.category}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-3 mb-3 grow">
+                                  {choiceItem.item.description}
+                                </p>
+
+                                <div className="flex flex-wrap gap-1 mt-auto">
+                                  {choiceItem.item.tags
+                                    ?.slice(0, 3)
+                                    .map((tag: string, tagIndex: number) => (
+                                      <Badge
+                                        key={tagIndex}
+                                        className="text-xs bg-purple-300 dark:bg-purple-900 text-purple-800 dark:text-purple-300 border"
+                                      >
+                                        {tag}
+                                      </Badge>
+                                    ))}
+                                </div>
+                              </CardContent>
+                            </Card>
+                          )}
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {filteredItems.sections.map((section, sectionIndex) => (
                   <div key={section.type} className="space-y-4">
                     {/* Section Header */}
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                       <div className="flex flex-col items-start gap-2">
                         <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                          {section.title}
+                          {section.title === 'General'
+                            ? 'Assistants'
+                            : section.title === 'software'
+                              ? 'Softwares'
+                              : section.title === 'template'
+                                ? 'Templates'
+                                : section.title === 'models'
+                                  ? 'Models'
+                                  : section.title}
                         </h3>
                         {/* Tags for this section */}
                         {section.items.length > 0 &&
@@ -687,10 +891,147 @@ export function FeaturedMarketplaceSection({
                               onClick={() => onItemClick(item, section.type)}
                               onDownload={onDownload}
                             />
+                          ) : section.type === 'software' ? (
+                            <Card
+                              className="h-full cursor-pointer hover:border-purple-300 dark:hover:border-purple-700"
+                              onClick={() => onItemClick(item, 'software')}
+                            >
+                              <CardContent className="p-4 flex flex-col h-full">
+                                <div className="flex items-start gap-3 mb-3">
+                                  <div className="size-10 rounded-lg bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900/30 dark:to-purple-800/30 flex items-center justify-center text-lg shadow-sm border border-purple-200 dark:border-purple-700/50 shrink-0">
+                                    <span className="text-lg">
+                                      {item.icon || '🛠️'}
+                                    </span>
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <h3 className="text-gray-900 dark:text-white font-semibold text-base mb-1 line-clamp-1">
+                                      {item.name}
+                                    </h3>
+                                    <p className="text-gray-600 dark:text-gray-400 text-sm font-medium line-clamp-1">
+                                      {item.category}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-3 mb-3 grow">
+                                  {item.description}
+                                </p>
+
+                                <div className="flex flex-wrap gap-1 mt-auto">
+                                  {item.tags
+                                    ?.slice(0, 3)
+                                    .map((tag: string, tagIndex: number) => (
+                                      <Badge
+                                        key={tagIndex}
+                                        className="text-xs bg-purple-300 dark:bg-purple-900 text-purple-800 dark:text-purple-300 border"
+                                      >
+                                        {tag}
+                                      </Badge>
+                                    ))}
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ) : section.type === 'template' ? (
+                            <Card
+                              className="h-full cursor-pointer hover:border-purple-300 dark:hover:border-purple-700"
+                              onClick={() => onItemClick(item, 'template')}
+                            >
+                              <CardContent className="p-4 flex flex-col h-full">
+                                <div className="flex items-start gap-3 mb-3">
+                                  <div className="size-10 rounded-lg bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900/30 dark:to-purple-800/30 flex items-center justify-center text-lg shadow-sm border border-purple-200 dark:border-purple-700/50 shrink-0">
+                                    <span className="text-lg">
+                                      {item.icon || '🧩'}
+                                    </span>
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <h3 className="text-gray-900 dark:text-white font-semibold text-base mb-1 line-clamp-1">
+                                      {item.name}
+                                    </h3>
+                                    <p className="text-gray-600 dark:text-gray-400 text-sm font-medium line-clamp-1">
+                                      {item.category}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-3 mb-3 grow">
+                                  {item.description}
+                                </p>
+
+                                <div className="flex flex-wrap gap-1 mt-auto">
+                                  {item.tags
+                                    ?.slice(0, 3)
+                                    .map((tag: string, tagIndex: number) => (
+                                      <Badge
+                                        key={tagIndex}
+                                        className="text-xs bg-purple-300 dark:bg-purple-900 text-purple-800 dark:text-purple-300 border"
+                                      >
+                                        {tag}
+                                      </Badge>
+                                    ))}
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ) : section.type === 'models' ? (
+                            <Card
+                              className="h-full cursor-pointer hover:border-purple-300 dark:hover:border-purple-700"
+                              onClick={() => onItemClick(item, 'ai-model')}
+                            >
+                              <CardContent className="p-4 flex flex-col h-full">
+                                <div className="flex items-start gap-3 mb-3">
+                                  <div className="shrink-0">
+                                    {item.icon?.startsWith('http') ? (
+                                      <div className="size-10 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                                        <img
+                                          src={item.icon}
+                                          alt={item.name}
+                                          className="w-full h-full object-cover bg-white"
+                                        />
+                                      </div>
+                                    ) : (
+                                      <div className="size-10 rounded-lg bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900/30 dark:to-purple-800/30 flex items-center justify-center text-lg shadow-sm border border-purple-200 dark:border-purple-700/50">
+                                        <span className="text-lg">🧠</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <h3 className="text-gray-900 dark:text-white font-semibold text-base mb-1 line-clamp-1">
+                                      {item.name}
+                                    </h3>
+                                    <p className="text-gray-600 dark:text-gray-400 text-sm font-medium line-clamp-1">
+                                      AI Model
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-3 mb-3 grow">
+                                  {item.description}
+                                </p>
+
+                                <div className="flex flex-wrap gap-1 mt-auto">
+                                  {item.tags
+                                    ?.slice(0, 3)
+                                    .map((tag: string, tagIndex: number) => (
+                                      <Badge
+                                        key={tagIndex}
+                                        className="text-xs bg-purple-300 dark:bg-purple-900 text-purple-800 dark:text-purple-300 border"
+                                      >
+                                        {tag}
+                                      </Badge>
+                                    ))}
+                                </div>
+                              </CardContent>
+                            </Card>
                           ) : (
                             <Card
                               className="h-full cursor-pointer hover:border-purple-300 dark:hover:border-purple-700"
-                              onClick={() => onItemClick(item, 'assistant')}
+                              onClick={() =>
+                                onItemClick(
+                                  item,
+                                  section.type === 'MCP'
+                                    ? 'mcp-server'
+                                    : 'assistant',
+                                )
+                              }
                             >
                               <CardContent className="p-4 flex flex-col h-full">
                                 <div className="flex items-start gap-3 mb-3">
@@ -732,7 +1073,9 @@ export function FeaturedMarketplaceSection({
 
                     {/* Section Footer */}
                     <div className="flex items-center justify-center pt-4">
-                      {section.expanded >= 26 ? (
+                      {section.expanded >= 26 ||
+                      section.total > section.expanded ||
+                      section.type === 'models' ? (
                         <button
                           type="button"
                           onClick={() => handleViewMore(section.type)}
@@ -753,27 +1096,6 @@ export function FeaturedMarketplaceSection({
                             />
                           </svg>
                         </button>
-                      ) : section.total > section.expanded ? (
-                        <button
-                          type="button"
-                          onClick={() => handleLoadMore(section.type)}
-                          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-                        >
-                          <span>Load More</span>
-                          <svg
-                            className="size-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 9l-7 7-7-7"
-                            />
-                          </svg>
-                        </button>
                       ) : null}
                     </div>
                   </div>
@@ -783,11 +1105,73 @@ export function FeaturedMarketplaceSection({
               /* Handle regular filtered items view */
               <div className="space-y-6">
                 {/* Section Header with Tags for individual sections */}
-                {selectedFilter !== 'all' && selectedFilter !== 'workflow' && (
+                {selectedFilter !== 'all' &&
+                  selectedFilter !== 'workflow' &&
+                  selectedFilter !== 'software' &&
+                  selectedFilter !== 'template' &&
+                  selectedFilter !== 'models' && (
+                    <div className="flex flex-col items-start gap-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-4">
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                          {selectedFilter === 'General'
+                            ? 'Agent'
+                            : selectedFilter}
+                        </h2>
+                        <Badge
+                          variant="secondary"
+                          className="text-sm self-start sm:self-auto"
+                        >
+                          {Array.isArray(filteredItems)
+                            ? filteredItems.length
+                            : 0}{' '}
+                          of {counts[selectedFilter]}
+                        </Badge>
+                      </div>
+
+                      {/* Tags for this section */}
+                      {Array.isArray(filteredItems) &&
+                        filteredItems.length > 0 && (
+                          <div className="flex flex-wrap gap-2">
+                            {Array.from(
+                              new Set(
+                                filteredItems
+                                  .flatMap((item) => item.item.tags || [])
+                                  .slice(0, 6),
+                              ),
+                            ).map((tag: string) => (
+                              <Badge
+                                key={tag}
+                                variant={
+                                  selectedTags[selectedFilter]?.includes(tag)
+                                    ? 'secondary'
+                                    : 'outline'
+                                }
+                                className={`text-sm cursor-pointer transition-colors ${
+                                  selectedTags[selectedFilter]?.includes(tag)
+                                    ? 'bg-purple-300 text-purple-700 capitalize'
+                                    : 'bg-background hover:text-purple-700 hover:bg-purple-300 capitalize'
+                                }`}
+                                onClick={() =>
+                                  handleTagClick(tag, selectedFilter)
+                                }
+                              >
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                    </div>
+                  )}
+
+                {/* Section Header for Software and Templates */}
+                {(selectedFilter === 'software' ||
+                  selectedFilter === 'template') && (
                   <div className="flex flex-col items-start gap-4">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-4">
                       <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                        {selectedFilter}
+                        {selectedFilter === 'software'
+                          ? 'Software'
+                          : 'Templates'}
                       </h2>
                       <Badge
                         variant="secondary"
@@ -799,39 +1183,26 @@ export function FeaturedMarketplaceSection({
                         of {counts[selectedFilter]}
                       </Badge>
                     </div>
+                  </div>
+                )}
 
-                    {/* Tags for this section */}
-                    {Array.isArray(filteredItems) &&
-                      filteredItems.length > 0 && (
-                        <div className="flex flex-wrap gap-2">
-                          {Array.from(
-                            new Set(
-                              filteredItems
-                                .flatMap((item) => item.item.tags || [])
-                                .slice(0, 6),
-                            ),
-                          ).map((tag: string) => (
-                            <Badge
-                              key={tag}
-                              variant={
-                                selectedTags[selectedFilter]?.includes(tag)
-                                  ? 'secondary'
-                                  : 'outline'
-                              }
-                              className={`text-sm cursor-pointer transition-colors ${
-                                selectedTags[selectedFilter]?.includes(tag)
-                                  ? 'bg-purple-300 text-purple-700 capitalize'
-                                  : 'bg-background hover:text-purple-700 hover:bg-purple-300 capitalize'
-                              }`}
-                              onClick={() =>
-                                handleTagClick(tag, selectedFilter)
-                              }
-                            >
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
+                {/* Section Header for Models */}
+                {selectedFilter === 'models' && (
+                  <div className="flex flex-col items-start gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-4">
+                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                        Models
+                      </h2>
+                      <Badge
+                        variant="secondary"
+                        className="text-sm self-start sm:self-auto"
+                      >
+                        {Array.isArray(filteredItems)
+                          ? filteredItems.length
+                          : 0}{' '}
+                        of {counts.models}
+                      </Badge>
+                    </div>
                   </div>
                 )}
 
@@ -851,10 +1222,147 @@ export function FeaturedMarketplaceSection({
                             onClick={() => onItemClick(item.item, item.type)}
                             onDownload={onDownload}
                           />
+                        ) : item.type === 'software' ? (
+                          <Card
+                            className="h-full cursor-pointer hover:border-purple-300 dark:hover:border-purple-700"
+                            onClick={() => onItemClick(item.item, 'software')}
+                          >
+                            <CardContent className="p-4 flex flex-col h-full">
+                              <div className="flex items-start gap-3 mb-3">
+                                <div className="size-10 rounded-lg bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900/30 dark:to-green-800/30 flex items-center justify-center text-lg shadow-sm border border-green-200 dark:border-green-700/50 shrink-0">
+                                  <span className="text-lg">
+                                    {item.item.icon || '🛠️'}
+                                  </span>
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <h3 className="text-gray-900 dark:text-white font-semibold text-base mb-1 line-clamp-1">
+                                    {item.item.name}
+                                  </h3>
+                                  <p className="text-gray-600 dark:text-gray-400 text-sm font-medium line-clamp-1">
+                                    {item.item.category}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-3 mb-3 grow">
+                                {item.item.description}
+                              </p>
+
+                              <div className="flex flex-wrap gap-1 mt-auto">
+                                {item.item.tags
+                                  ?.slice(0, 3)
+                                  .map((tag: string, tagIndex: number) => (
+                                    <Badge
+                                      key={tagIndex}
+                                      className="text-xs bg-purple-300 dark:bg-purple-900 text-purple-800 dark:text-purple-300 border"
+                                    >
+                                      {tag}
+                                    </Badge>
+                                  ))}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ) : item.type === 'template' ? (
+                          <Card
+                            className="h-full cursor-pointer hover:border-purple-300 dark:hover:border-purple-700"
+                            onClick={() => onItemClick(item.item, 'template')}
+                          >
+                            <CardContent className="p-4 flex flex-col h-full">
+                              <div className="flex items-start gap-3 mb-3">
+                                <div className="size-10 rounded-lg bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900/30 dark:to-purple-800/30 flex items-center justify-center text-lg shadow-sm border border-purple-200 dark:border-purple-700/50 shrink-0">
+                                  <span className="text-lg">
+                                    {item.item.icon || '🧩'}
+                                  </span>
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <h3 className="text-gray-900 dark:text-white font-semibold text-base mb-1 line-clamp-1">
+                                    {item.item.name}
+                                  </h3>
+                                  <p className="text-gray-600 dark:text-gray-400 text-sm font-medium line-clamp-1">
+                                    {item.item.category}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-3 mb-3 grow">
+                                {item.item.description}
+                              </p>
+
+                              <div className="flex flex-wrap gap-1 mt-auto">
+                                {item.item.tags
+                                  ?.slice(0, 3)
+                                  .map((tag: string, tagIndex: number) => (
+                                    <Badge
+                                      key={tagIndex}
+                                      className="text-xs bg-purple-300 dark:bg-purple-900 text-purple-800 dark:text-purple-300 border"
+                                    >
+                                      {tag}
+                                    </Badge>
+                                  ))}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ) : item.type === 'ai-model' ? (
+                          <Card
+                            className="h-full cursor-pointer hover:border-purple-300 dark:hover:border-purple-700"
+                            onClick={() => onItemClick(item.item, 'ai-model')}
+                          >
+                            <CardContent className="p-4 flex flex-col h-full">
+                              <div className="flex items-start gap-3 mb-3">
+                                <div className="shrink-0">
+                                  {item.item.icon?.startsWith('http') ? (
+                                    <div className="size-10 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                                      <img
+                                        src={item.item.icon}
+                                        alt={item.item.name}
+                                        className="w-full h-full object-cover bg-white"
+                                      />
+                                    </div>
+                                  ) : (
+                                    <div className="size-10 rounded-lg bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900/30 dark:to-purple-800/30 flex items-center justify-center text-lg shadow-sm border border-purple-200 dark:border-purple-700/50">
+                                      <span className="text-lg">🧠</span>
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <h3 className="text-gray-900 dark:text-white font-semibold text-base mb-1 line-clamp-1">
+                                    {item.item.name}
+                                  </h3>
+                                  <p className="text-gray-600 dark:text-gray-400 text-sm font-medium line-clamp-1">
+                                    AI Model
+                                  </p>
+                                </div>
+                              </div>
+
+                              <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-3 mb-3 grow">
+                                {item.item.description}
+                              </p>
+
+                              <div className="flex flex-wrap gap-1 mt-auto">
+                                {item.item.tags
+                                  ?.slice(0, 3)
+                                  .map((tag: string, tagIndex: number) => (
+                                    <Badge
+                                      key={tagIndex}
+                                      className="text-xs bg-purple-300 dark:bg-purple-900 text-purple-800 dark:text-purple-300 border"
+                                    >
+                                      {tag}
+                                    </Badge>
+                                  ))}
+                              </div>
+                            </CardContent>
+                          </Card>
                         ) : (
                           <Card
                             className="h-full cursor-pointer hover:border-purple-300 dark:hover:border-purple-700"
-                            onClick={() => onItemClick(item.item, 'assistant')}
+                            onClick={() =>
+                              onItemClick(
+                                item.item,
+                                item.type === 'mcp-server'
+                                  ? 'mcp-server'
+                                  : 'assistant',
+                              )
+                            }
                           >
                             <CardContent className="p-4 flex flex-col h-full">
                               <div className="flex items-start gap-3 mb-3">
