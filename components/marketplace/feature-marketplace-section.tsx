@@ -2,37 +2,27 @@
 
 import { useState, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { AIModelCard } from './ai-model-card';
-import { AssistantCard } from './assistant-card';
-import { MCPServerCard } from './mcp-server-card';
 import { WorkflowCard } from './workflow-card';
 import { Badge } from '../ui/badge';
 import { Card, CardContent } from '../ui/card';
-import { ScrollArea } from '../ui/scroll-area';
-import type {
-  DataTypes,
-  MCPServerType,
-  SoftwareType,
-  TemplateType,
-  WorkflowType,
-} from '@/lib/types';
+import type { WorkflowType } from '@/lib/types';
+
+// Import llm-apps data
+import llmAppsData from '@/lib/llm-apps.json';
+import { AIAgentIcon, GitHubIcon } from '../icons';
 
 type FilterType =
   | 'all'
-  | 'assistant'
-  | 'ai-model'
-  | 'mcp-server'
-  | 'workflow'
-  | 'software'
-  | 'template';
+  | 'Single Agent'
+  | 'Multi-agent'
+  | 'General'
+  | 'RAG'
+  | 'Voice Agent'
+  | 'MCP'
+  | 'workflow';
 
 interface FeaturedItemsProps {
-  assistants: DataTypes[];
-  aiModels: DataTypes[];
-  mcpServers: MCPServerType[];
   workflows: WorkflowType[];
-  software: SoftwareType[];
-  templates: TemplateType[];
   onItemClick: (
     item: any,
     type:
@@ -43,22 +33,28 @@ interface FeaturedItemsProps {
       | 'software'
       | 'template',
   ) => void;
+  onDownload?: (workflow: WorkflowType) => void;
   title?: string;
   defaultShowAssistantsAndWorkflows?: boolean;
 }
 
 export function FeaturedMarketplaceSection({
-  assistants,
-  aiModels,
-  mcpServers,
   workflows,
-  software,
-  templates,
   onItemClick,
+  onDownload,
   title = 'Featured Items',
   defaultShowAssistantsAndWorkflows = false,
 }: FeaturedItemsProps) {
   const [selectedFilter, setSelectedFilter] = useState<FilterType>('all');
+  const [selectedTags, setSelectedTags] = useState<Record<string, string[]>>({
+    'Single Agent': [],
+    'Multi-agent': [],
+    General: [],
+    RAG: [],
+    'Voice Agent': [],
+    MCP: [],
+    workflow: [],
+  });
   const sectionRef = useRef<HTMLDivElement>(null);
 
   const scrollToSection = () => {
@@ -70,12 +66,13 @@ export function FeaturedMarketplaceSection({
 
   // State for managing random items and load more functionality
   const [expandedItems, setExpandedItems] = useState<Record<string, number>>({
-    assistant: 6,
-    'ai-model': 6,
-    'mcp-server': 6,
+    'Single Agent': 6,
+    'Multi-agent': 6,
+    General: 6,
+    RAG: 6,
+    'Voice Agent': 6,
+    MCP: 6,
     workflow: 6,
-    software: 6,
-    template: 6,
   });
 
   // Function to get random items from an array (consistent based on array length)
@@ -86,56 +83,114 @@ export function FeaturedMarketplaceSection({
     // Use a simple hash for consistent randomness
     const hash = seed || items.length.toString();
     const shuffled = [...items].sort((a, b) => {
-      const aHash = hash + a.id + a.name;
-      const bHash = hash + b.id + b.name;
+      const aHash = hash + a.title + a.description;
+      const bHash = hash + b.title + b.description;
       return aHash.localeCompare(bHash);
     });
     return shuffled.slice(0, count);
   };
 
+  // Get categories and items from llm-apps.json
+  const categories = llmAppsData.metadata.categories;
+  const categoryItems = llmAppsData.categories;
+
+  // Function to get the primary type from an item (prefer the first type if multiple)
+  const getPrimaryType = (item: any): string => {
+    if (!item.type || !Array.isArray(item.type) || item.type.length === 0) {
+      return 'General';
+    }
+    return item.type[0]; // Always prefer the first type
+  };
+
+  // Organize items by type
+  const itemsByType = useMemo(() => {
+    const organized: Record<string, any[]> = {
+      'Single Agent': [],
+      'Multi-agent': [],
+      General: [],
+      RAG: [],
+      'Voice Agent': [],
+      MCP: [],
+    };
+
+    // Process all items from categories
+    Object.values(categoryItems)
+      .flat()
+      .forEach((item) => {
+        const primaryType = getPrimaryType(item);
+        if (organized[primaryType]) {
+          organized[primaryType].push(item);
+        } else {
+          organized.General.push(item);
+        }
+      });
+
+    return organized;
+  }, [categoryItems]);
+
+  // Get all unique tags from items
+  const allTags = useMemo(() => {
+    const tags = new Set<string>();
+    Object.values(categoryItems)
+      .flat()
+      .forEach((item) => {
+        if (item.tags && Array.isArray(item.tags)) {
+          item.tags.forEach((tag: string) => tags.add(tag));
+        }
+      });
+    return Array.from(tags).sort();
+  }, [categoryItems]);
+
+  // Filter items by selected tags for a specific section
+  const filterItemsByTags = (items: any[], sectionType: string) => {
+    const sectionTags = selectedTags[sectionType] || [];
+    if (sectionTags.length === 0) return items;
+    return items.filter((item) => {
+      if (!item.tags || !Array.isArray(item.tags)) return false;
+      return sectionTags.some((tag) => item.tags.includes(tag));
+    });
+  };
+
   // Memoized random items for each type
   const randomItems = useMemo(
     () => ({
-      assistant: getRandomItems(
-        assistants,
-        Math.max(expandedItems.assistant, 6),
-        'assistant',
+      'Single Agent': getRandomItems(
+        filterItemsByTags(itemsByType['Single Agent'] || [], 'Single Agent'),
+        Math.max(expandedItems['Single Agent'], 6),
+        'Single Agent',
       ),
-      'ai-model': getRandomItems(
-        aiModels,
-        Math.max(expandedItems['ai-model'], 6),
-        'ai-model',
+      'Multi-agent': getRandomItems(
+        filterItemsByTags(itemsByType['Multi-agent'] || [], 'Multi-agent'),
+        Math.max(expandedItems['Multi-agent'], 6),
+        'Multi-agent',
       ),
-      'mcp-server': getRandomItems(
-        mcpServers,
-        Math.max(expandedItems['mcp-server'], 6),
-        'mcp-server',
+      General: getRandomItems(
+        filterItemsByTags(itemsByType.General || [], 'General'),
+        Math.max(expandedItems.General, 6),
+        'General',
+      ),
+      RAG: getRandomItems(
+        filterItemsByTags(itemsByType.RAG || [], 'RAG'),
+        Math.max(expandedItems.RAG, 6),
+        'RAG',
+      ),
+      'Voice Agent': getRandomItems(
+        filterItemsByTags(itemsByType['Voice Agent'] || [], 'Voice Agent'),
+        Math.max(expandedItems['Voice Agent'], 6),
+        'Voice Agent',
+      ),
+      MCP: getRandomItems(
+        filterItemsByTags(itemsByType.MCP || [], 'MCP'),
+        Math.max(expandedItems.MCP, 6),
+        'MCP',
       ),
       workflow: getRandomItems(
         workflows,
         Math.max(expandedItems.workflow, 6),
         'workflow',
       ),
-      software: getRandomItems(
-        software,
-        Math.max(expandedItems.software, 6),
-        'software',
-      ),
-      template: getRandomItems(
-        templates,
-        Math.max(expandedItems.template, 6),
-        'template',
-      ),
     }),
-    [
-      assistants,
-      aiModels,
-      mcpServers,
-      workflows,
-      software,
-      templates,
-      expandedItems,
-    ],
+    [itemsByType, workflows, expandedItems, selectedTags],
   );
 
   // Function to handle load more for a specific type
@@ -154,42 +209,92 @@ export function FeaturedMarketplaceSection({
       [type]: 6, // Reset to initial count when switching
     }));
     scrollToSection();
-    // window.scrollTo({ top: 20, behavior: 'smooth' });
   };
 
-  // Count items for each category
+  // Function to handle tag selection for a specific section
+  const handleTagClick = (tag: string, sectionType: string) => {
+    setSelectedTags((prev) => {
+      const currentSectionTags = prev[sectionType] || [];
+      const newSectionTags = currentSectionTags.includes(tag)
+        ? currentSectionTags.filter((t) => t !== tag)
+        : [...currentSectionTags, tag];
+
+      return {
+        ...prev,
+        [sectionType]: newSectionTags,
+      };
+    });
+  };
+
+  // Count items for each type
   const counts = {
     all: defaultShowAssistantsAndWorkflows
-      ? assistants.length + workflows.length
-      : assistants.length +
-        aiModels.length +
-        mcpServers.length +
-        workflows.length +
-        software.length +
-        templates.length,
-    assistant: assistants.length,
-    'ai-model': aiModels.length,
-    'mcp-server': mcpServers.length,
+      ? workflows.length +
+        Object.values(itemsByType).reduce((acc, items) => acc + items.length, 0)
+      : workflows.length +
+        Object.values(itemsByType).reduce(
+          (acc, items) => acc + items.length,
+          0,
+        ),
+    'Single Agent': filterItemsByTags(
+      itemsByType['Single Agent'] || [],
+      'Single Agent',
+    ).length,
+    'Multi-agent': filterItemsByTags(
+      itemsByType['Multi-agent'] || [],
+      'Multi-agent',
+    ).length,
+    General: filterItemsByTags(itemsByType.General || [], 'General').length,
+    RAG: filterItemsByTags(itemsByType.RAG || [], 'RAG').length,
+    'Voice Agent': filterItemsByTags(
+      itemsByType['Voice Agent'] || [],
+      'Voice Agent',
+    ).length,
+    MCP: filterItemsByTags(itemsByType.MCP || [], 'MCP').length,
     workflow: workflows.length,
-    software: software.length,
-    template: templates.length,
   };
 
   // Filter items based on selected filter
   const getFilteredItems = () => {
     switch (selectedFilter) {
-      case 'assistant':
-        return assistants.map((item) => ({
+      case 'Single Agent':
+        return filterItemsByTags(
+          itemsByType['Single Agent'] || [],
+          'Single Agent',
+        ).map((item) => ({
           item,
           type: 'assistant' as const,
         }));
-      case 'ai-model':
-        return aiModels.map((item) => ({
+      case 'Multi-agent':
+        return filterItemsByTags(
+          itemsByType['Multi-agent'] || [],
+          'Multi-agent',
+        ).map((item) => ({
           item,
-          type: 'ai-model' as const,
+          type: 'assistant' as const,
         }));
-      case 'mcp-server':
-        return mcpServers.map((item) => ({
+      case 'General':
+        return filterItemsByTags(itemsByType.General || [], 'General').map(
+          (item) => ({
+            item,
+            type: 'assistant' as const,
+          }),
+        );
+      case 'RAG':
+        return filterItemsByTags(itemsByType.RAG || [], 'RAG').map((item) => ({
+          item,
+          type: 'assistant' as const,
+        }));
+      case 'Voice Agent':
+        return filterItemsByTags(
+          itemsByType['Voice Agent'] || [],
+          'Voice Agent',
+        ).map((item) => ({
+          item,
+          type: 'assistant' as const,
+        }));
+      case 'MCP':
+        return filterItemsByTags(itemsByType.MCP || [], 'MCP').map((item) => ({
           item,
           type: 'mcp-server' as const,
         }));
@@ -198,16 +303,6 @@ export function FeaturedMarketplaceSection({
           item,
           type: 'workflow' as const,
         }));
-      case 'software':
-        return software.map((item) => ({
-          item,
-          type: 'software' as const,
-        }));
-      case 'template':
-        return templates.map((item) => ({
-          item,
-          type: 'template' as const,
-        }));
       default:
         // When "all" is selected, return sections with random items
         if (selectedFilter === 'all') {
@@ -215,31 +310,55 @@ export function FeaturedMarketplaceSection({
             type: 'all-sections' as const,
             sections: [
               {
-                type: 'assistant' as const,
-                title: 'Assistants',
-                items: randomItems.assistant.slice(0, expandedItems.assistant),
-                total: assistants.length,
-                expanded: expandedItems.assistant,
+                type: 'Single Agent' as const,
+                title: 'Single Agent',
+                items: randomItems['Single Agent'].slice(
+                  0,
+                  expandedItems['Single Agent'],
+                ),
+                total: counts['Single Agent'],
+                expanded: expandedItems['Single Agent'],
               },
               {
-                type: 'ai-model' as const,
-                title: 'AI Models',
-                items: randomItems['ai-model'].slice(
+                type: 'Multi-agent' as const,
+                title: 'Multi-agent',
+                items: randomItems['Multi-agent'].slice(
                   0,
-                  expandedItems['ai-model'],
+                  expandedItems['Multi-agent'],
                 ),
-                total: aiModels.length,
-                expanded: expandedItems['ai-model'],
+                total: counts['Multi-agent'],
+                expanded: expandedItems['Multi-agent'],
               },
               {
-                type: 'mcp-server' as const,
-                title: 'MCP Servers',
-                items: randomItems['mcp-server'].slice(
+                type: 'General' as const,
+                title: 'General',
+                items: randomItems.General.slice(0, expandedItems.General),
+                total: counts.General,
+                expanded: expandedItems.General,
+              },
+              {
+                type: 'RAG' as const,
+                title: 'RAG',
+                items: randomItems.RAG.slice(0, expandedItems.RAG),
+                total: counts.RAG,
+                expanded: expandedItems.RAG,
+              },
+              {
+                type: 'Voice Agent' as const,
+                title: 'Voice Agent',
+                items: randomItems['Voice Agent'].slice(
                   0,
-                  expandedItems['mcp-server'],
+                  expandedItems['Voice Agent'],
                 ),
-                total: mcpServers.length,
-                expanded: expandedItems['mcp-server'],
+                total: counts['Voice Agent'],
+                expanded: expandedItems['Voice Agent'],
+              },
+              {
+                type: 'MCP' as const,
+                title: 'MCP',
+                items: randomItems.MCP.slice(0, expandedItems.MCP),
+                total: counts.MCP,
+                expanded: expandedItems.MCP,
               },
               {
                 type: 'workflow' as const,
@@ -248,31 +367,13 @@ export function FeaturedMarketplaceSection({
                 total: workflows.length,
                 expanded: expandedItems.workflow,
               },
-              {
-                type: 'software' as const,
-                title: 'Software',
-                items: randomItems.software.slice(0, expandedItems.software),
-                total: software.length,
-                expanded: expandedItems.software,
-              },
-              {
-                type: 'template' as const,
-                title: 'Templates',
-                items: randomItems.template.slice(0, expandedItems.template),
-                total: templates.length,
-                expanded: expandedItems.template,
-              },
             ],
           };
         }
 
-        // When defaultShowAssistantsAndWorkflows is true, only show assistants and workflows in the "all" view
+        // When defaultShowAssistantsAndWorkflows is true, only show workflows in the "all" view
         if (defaultShowAssistantsAndWorkflows) {
           return [
-            ...assistants.map((item) => ({
-              item,
-              type: 'assistant' as const,
-            })),
             ...workflows.map((item) => ({
               item,
               type: 'workflow' as const,
@@ -281,29 +382,15 @@ export function FeaturedMarketplaceSection({
         }
         // Otherwise combine all items
         return [
-          ...assistants.map((item) => ({
-            item,
-            type: 'assistant' as const,
-          })),
-          ...aiModels.map((item) => ({
-            item,
-            type: 'ai-model' as const,
-          })),
-          ...mcpServers.map((item) => ({
-            item,
-            type: 'mcp-server' as const,
-          })),
+          ...Object.values(itemsByType)
+            .flat()
+            .map((item) => ({
+              item,
+              type: 'assistant' as const,
+            })),
           ...workflows.map((item) => ({
             item,
             type: 'workflow' as const,
-          })),
-          ...software.map((item) => ({
-            item,
-            type: 'software' as const,
-          })),
-          ...templates.map((item) => ({
-            item,
-            type: 'template' as const,
           })),
         ];
     }
@@ -313,16 +400,16 @@ export function FeaturedMarketplaceSection({
 
   return (
     <div ref={sectionRef} className="w-full">
-      <div className="flex gap-6 lg:gap-8">
+      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 xl:gap-8">
         {/* Left sidebar with filters */}
-        <div className="w-72 shrink-0 space-y-4 lg:space-y-6 sticky top-20 z-40 h-[calc(100vh-7rem)] overflow-y-auto bg-background">
+        <div className="w-full lg:w-72 lg:shrink-0 space-y-4 lg:space-y-6 lg:sticky lg:top-32 z-40 lg:h-[calc(100vh-9rem)] lg:overflow-y-auto bg-background border-b lg:border-b-0 border-gray-200 dark:border-gray-700 pb-4 lg:pb-0">
           {/* Filter Categories */}
           <div className="space-y-2 lg:space-y-3 pt-2">
             <h3 className="text-sm font-medium text-gray-900 dark:text-white uppercase tracking-wide">
-              Filter By
+              Types
             </h3>
 
-            <div className="h-auto max-h-[300px] w-full">
+            <div className="h-auto max-h-[300px] w-full overflow-y-auto lg:overflow-y-visible">
               <div className="space-y-1 pr-3 lg:pr-6 w-full">
                 {/* All Items */}
                 <button
@@ -344,79 +431,7 @@ export function FeaturedMarketplaceSection({
                     <span className="font-medium truncate">All</span>
                   </div>
                   <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts.all > 50 ? '500+' : counts.all}
-                  </Badge>
-                </button>
-
-                {/* Assistants */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedFilter('assistant');
-                    scrollToSection();
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
-                    selectedFilter === 'assistant'
-                      ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                  }`}
-                >
-                  <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
-                    <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shrink-0">
-                      <span className="text-xs text-white font-medium">A</span>
-                    </div>
-                    <span className="text-left truncate">Assistants</span>
-                  </div>
-                  <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts.assistant > 500 ? '1K+' : counts.assistant}
-                  </Badge>
-                </button>
-
-                {/* AI Models */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedFilter('ai-model');
-                    scrollToSection();
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
-                    selectedFilter === 'ai-model'
-                      ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                  }`}
-                >
-                  <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
-                    <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shrink-0">
-                      <span className="text-xs text-white font-medium">M</span>
-                    </div>
-                    <span className="text-left truncate">AI Models</span>
-                  </div>
-                  <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts['ai-model'] > 50 ? '50+' : counts['ai-model']}
-                  </Badge>
-                </button>
-
-                {/* MCP Servers */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedFilter('mcp-server');
-                    scrollToSection();
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
-                    selectedFilter === 'mcp-server'
-                      ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                  }`}
-                >
-                  <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
-                    <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center shrink-0">
-                      <span className="text-xs text-white font-medium">S</span>
-                    </div>
-                    <span className="text-left truncate">MCP Servers</span>
-                  </div>
-                  <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts['mcp-server'] > 50 ? '50+' : counts['mcp-server']}
+                    {counts.all > 1000 ? '1k+' : counts.all}
                   </Badge>
                 </button>
 
@@ -440,55 +455,153 @@ export function FeaturedMarketplaceSection({
                     <span className="text-left truncate">Workflows</span>
                   </div>
                   <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts.workflow > 500 ? '1K+' : counts.workflow}
+                    {counts.workflow > 500 ? '1k+' : counts.workflow}
                   </Badge>
                 </button>
 
-                {/* Software */}
+                {/* Single Agent */}
                 <button
                   type="button"
                   onClick={() => {
-                    setSelectedFilter('software');
+                    setSelectedFilter('Single Agent');
                     scrollToSection();
                   }}
                   className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
-                    selectedFilter === 'software'
+                    selectedFilter === 'Single Agent'
+                      ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
+                    <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shrink-0">
+                      <span className="text-xs text-white font-medium">S</span>
+                    </div>
+                    <span className="text-left truncate">Single Agent</span>
+                  </div>
+                  <Badge variant="secondary" className="text-xs shrink-0 ml-2">
+                    {counts['Single Agent'] > 50
+                      ? '50+'
+                      : counts['Single Agent']}
+                  </Badge>
+                </button>
+
+                {/* Multi-agent */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedFilter('Multi-agent');
+                    scrollToSection();
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
+                    selectedFilter === 'Multi-agent'
+                      ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
+                    <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shrink-0">
+                      <span className="text-xs text-white font-medium">M</span>
+                    </div>
+                    <span className="text-left truncate">Multi-agent</span>
+                  </div>
+                  <Badge variant="secondary" className="text-xs shrink-0 ml-2">
+                    {counts['Multi-agent'] > 50 ? '50+' : counts['Multi-agent']}
+                  </Badge>
+                </button>
+
+                {/* General */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedFilter('General');
+                    scrollToSection();
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
+                    selectedFilter === 'General'
+                      ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
+                    <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shrink-0">
+                      <span className="text-xs text-white font-medium">G</span>
+                    </div>
+                    <span className="text-left truncate">General</span>
+                  </div>
+                  <Badge variant="secondary" className="text-xs shrink-0 ml-2">
+                    {counts.General > 50 ? '50+' : counts.General}
+                  </Badge>
+                </button>
+
+                {/* RAG */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedFilter('RAG');
+                    scrollToSection();
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
+                    selectedFilter === 'RAG'
                       ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                   }`}
                 >
                   <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
                     <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center shrink-0">
-                      <span className="text-xs text-white font-medium">S</span>
+                      <span className="text-xs text-white font-medium">R</span>
                     </div>
-                    <span className="text-left truncate">Software</span>
+                    <span className="text-left truncate">RAG</span>
                   </div>
                   <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts.software > 50 ? '50+' : counts.software}
+                    {counts.RAG > 50 ? '50+' : counts.RAG}
                   </Badge>
                 </button>
 
-                {/* Templates */}
+                {/* Voice Agent */}
                 <button
                   type="button"
                   onClick={() => {
-                    setSelectedFilter('template');
+                    setSelectedFilter('Voice Agent');
                     scrollToSection();
                   }}
                   className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
-                    selectedFilter === 'template'
+                    selectedFilter === 'Voice Agent'
                       ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                   }`}
                 >
                   <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
-                    <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center shrink-0">
-                      <span className="text-xs text-white font-medium">T</span>
+                    <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center shrink-0">
+                      <span className="text-xs text-white font-medium">V</span>
                     </div>
-                    <span className="text-left truncate">Templates</span>
+                    <span className="text-left truncate">Voice Agent</span>
                   </div>
                   <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts.template > 50 ? '50+' : counts.template}
+                    {counts['Voice Agent'] > 50 ? '50+' : counts['Voice Agent']}
+                  </Badge>
+                </button>
+
+                {/* MCP */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedFilter('MCP');
+                    scrollToSection();
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2 lg:py-3 text-sm rounded-lg transition-colors ${
+                    selectedFilter === 'MCP'
+                      ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-medium'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
+                    <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center shrink-0">
+                      <span className="text-xs text-white font-medium">M</span>
+                    </div>
+                    <span className="text-left truncate">MCP</span>
+                  </div>
+                  <Badge variant="secondary" className="text-xs shrink-0 ml-2">
+                    {counts.MCP > 50 ? '50+' : counts.MCP}
                   </Badge>
                 </button>
               </div>
@@ -497,7 +610,7 @@ export function FeaturedMarketplaceSection({
         </div>
 
         {/* Right content grid */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <motion.div
             key={selectedFilter}
             initial={{ opacity: 0, y: 20 }}
@@ -513,17 +626,54 @@ export function FeaturedMarketplaceSection({
                 {filteredItems.sections.map((section, sectionIndex) => (
                   <div key={section.type} className="space-y-4">
                     {/* Section Header */}
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                        {section.title}
-                      </h3>
-                      <Badge variant="secondary" className="text-sm">
-                        {section.items.length} of {section.total}
-                      </Badge>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                      <div className="flex flex-col items-start gap-2">
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                          {section.title}
+                        </h3>
+                        {/* Tags for this section */}
+                        {section.items.length > 0 &&
+                          section.type !== 'workflow' && (
+                            <div className="flex flex-wrap gap-1">
+                              {Array.from(
+                                new Set(
+                                  section.items
+                                    .flatMap((item) => item.tags || [])
+                                    .slice(0, 3),
+                                ),
+                              ).map((tag: string) => (
+                                <Badge
+                                  key={tag}
+                                  variant={
+                                    selectedTags[section.type]?.includes(tag)
+                                      ? 'secondary'
+                                      : 'outline'
+                                  }
+                                  className={`text-sm cursor-pointer transition-colors ${
+                                    selectedTags[section.type]?.includes(tag)
+                                      ? 'bg-purple-300 text-purple-700 capitalize'
+                                      : 'bg-background hover:text-purple-700  hover:bg-purple-300 capitalize'
+                                  }`}
+                                  onClick={() =>
+                                    handleTagClick(tag, section.type)
+                                  }
+                                >
+                                  {tag}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                      </div>
+
+                      <div className="flex items-center gap-2 self-start sm:self-auto">
+                        <Badge variant="secondary" className="text-sm">
+                          {section.items.length} of {section.total}
+                        </Badge>
+                      </div>
                     </div>
 
                     {/* Section Items Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-4 sm:gap-6">
                       {section.items.map((item, index) => (
                         <motion.div
                           key={`${section.type}-${index}`}
@@ -531,91 +681,51 @@ export function FeaturedMarketplaceSection({
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.02 }}
                         >
-                          {section.type === 'assistant' ? (
-                            <AssistantCard
-                              assistant={item}
-                              onClick={() => onItemClick(item, section.type)}
-                            />
-                          ) : section.type === 'ai-model' ? (
-                            <AIModelCard
-                              aiModel={item}
-                              onClick={() => onItemClick(item, section.type)}
-                            />
-                          ) : section.type === 'mcp-server' ? (
-                            <MCPServerCard
-                              server={{
-                                id: item.name || String(index),
-                                name: item.name,
-                                creator: 'Admin',
-                                description: item.description,
-                                category: item.category,
-                                icon: '',
-                                url: item.url,
-                                official: item.official,
-                                languages: item.languages,
-                                scope: item.scope,
-                                operating_systems: item.operating_systems,
-                              }}
-                              onClick={() => onItemClick(item, section.type)}
-                            />
-                          ) : section.type === 'workflow' ? (
+                          {section.type === 'workflow' ? (
                             <WorkflowCard
                               workflow={item as WorkflowType}
                               onClick={() => onItemClick(item, section.type)}
+                              onDownload={onDownload}
                             />
-                          ) : section.type === 'software' ? (
+                          ) : (
                             <Card
-                              className="h-full cursor-pointer"
-                              onClick={() => onItemClick(item, section.type)}
+                              className="h-full cursor-pointer hover:border-purple-300 dark:hover:border-purple-700"
+                              onClick={() => onItemClick(item, 'assistant')}
                             >
-                              <CardContent className="p-4">
-                                <div className="flex items-start gap-3">
-                                  <div className="shrink-0">
-                                    <div className="size-10 rounded-lg bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900/30 dark:to-red-800/30 flex items-center justify-center text-lg shadow-sm border border-red-200 dark:border-red-700/50">
-                                      {item.icon || '💻'}
-                                    </div>
+                              <CardContent className="p-4 flex flex-col h-full">
+                                <div className="flex items-start gap-3 mb-3">
+                                  <div className="size-10 rounded-lg bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 flex items-center justify-center text-lg shadow-sm border border-blue-200 dark:border-blue-700/50 shrink-0">
+                                    <AIAgentIcon size={20} />
                                   </div>
-                                  <div className="flex-1 min-w-0">
+                                  <div className="min-w-0 flex-1">
                                     <h3 className="text-gray-900 dark:text-white font-semibold text-base mb-1 line-clamp-1">
-                                      {item.name}
+                                      {item.title}
                                     </h3>
                                     <p className="text-gray-600 dark:text-gray-400 text-sm font-medium line-clamp-1">
-                                      @{item.creator}
-                                    </p>
-                                    <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2 mt-2">
-                                      {item.description}
+                                      {item.category}
                                     </p>
                                   </div>
                                 </div>
-                              </CardContent>
-                            </Card>
-                          ) : section.type === 'template' ? (
-                            <Card
-                              className="h-full cursor-pointer"
-                              onClick={() => onItemClick(item, section.type)}
-                            >
-                              <CardContent className="p-4">
-                                <div className="flex items-start gap-3">
-                                  <div className="shrink-0">
-                                    <div className="size-10 rounded-lg bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900/30 dark:to-purple-800/30 flex items-center justify-center text-lg shadow-sm border border-purple-200 dark:border-purple-700/50">
-                                      {item.icon || '🎨'}
-                                    </div>
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <h3 className="text-gray-900 dark:text-white font-semibold text-base mb-1 line-clamp-1">
-                                      {item.name}
-                                    </h3>
-                                    <p className="text-gray-600 dark:text-gray-400 text-sm font-medium line-clamp-1">
-                                      @{item.creator}
-                                    </p>
-                                    <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2 mt-2">
-                                      {item.description}
-                                    </p>
-                                  </div>
+
+                                <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-3 mb-3 grow">
+                                  {item.description}
+                                </p>
+
+                                <div className="flex flex-wrap gap-1 mt-auto">
+                                  {item.tags
+                                    ?.slice(0, 3)
+                                    .map((tag: string, tagIndex: number) => (
+                                      <Badge
+                                        key={tagIndex}
+                                        className="text-xs bg-purple-300 dark:bg-purple-900 text-purple-800 dark:text-purple-300 border"
+                                      >
+                                        {tag}
+                                      </Badge>
+                                    ))}
                                 </div>
                               </CardContent>
                             </Card>
-                          ) : null}
+                          )}
                         </motion.div>
                       ))}
                     </div>
@@ -671,102 +781,118 @@ export function FeaturedMarketplaceSection({
               </div>
             ) : (
               /* Handle regular filtered items view */
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {Array.isArray(filteredItems) &&
-                  filteredItems.map((item, index) => (
-                    <motion.div
-                      key={`${item.type}-${index}`}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.02 }}
-                    >
-                      {item.type === 'assistant' ? (
-                        <AssistantCard
-                          assistant={item.item}
-                          onClick={() => onItemClick(item.item, item.type)}
-                        />
-                      ) : item.type === 'ai-model' ? (
-                        <AIModelCard
-                          aiModel={item.item}
-                          onClick={() => onItemClick(item.item, item.type)}
-                        />
-                      ) : item.type === 'mcp-server' ? (
-                        <MCPServerCard
-                          server={{
-                            id: item.item.name || String(index),
-                            name: item.item.name,
-                            creator: 'Admin',
-                            description: item.item.description,
-                            category: item.item.category,
-                            icon: '',
-                            url: item.item.url,
-                            official: item.item.official,
-                            languages: item.item.languages,
-                            scope: item.item.scope,
-                            operating_systems: item.item.operating_systems,
-                          }}
-                          onClick={() => onItemClick(item.item, item.type)}
-                        />
-                      ) : item.type === 'workflow' ? (
-                        <WorkflowCard
-                          workflow={item.item as WorkflowType}
-                          onClick={() => onItemClick(item.item, item.type)}
-                        />
-                      ) : item.type === 'software' ? (
-                        <Card
-                          className="h-full cursor-pointer"
-                          onClick={() => onItemClick(item.item, item.type)}
-                        >
-                          <CardContent className="p-4">
-                            <div className="flex items-start gap-3">
-                              <div className="shrink-0">
-                                <div className="size-10 rounded-lg bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900/30 dark:to-red-800/30 flex items-center justify-center text-lg shadow-sm border border-red-200 dark:border-red-700/50">
-                                  {item.item.icon || '💻'}
+              <div className="space-y-6">
+                {/* Section Header with Tags for individual sections */}
+                {selectedFilter !== 'all' && selectedFilter !== 'workflow' && (
+                  <div className="flex flex-col items-start gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-4">
+                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                        {selectedFilter}
+                      </h2>
+                      <Badge
+                        variant="secondary"
+                        className="text-sm self-start sm:self-auto"
+                      >
+                        {Array.isArray(filteredItems)
+                          ? filteredItems.length
+                          : 0}{' '}
+                        of {counts[selectedFilter]}
+                      </Badge>
+                    </div>
+
+                    {/* Tags for this section */}
+                    {Array.isArray(filteredItems) &&
+                      filteredItems.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {Array.from(
+                            new Set(
+                              filteredItems
+                                .flatMap((item) => item.item.tags || [])
+                                .slice(0, 6),
+                            ),
+                          ).map((tag: string) => (
+                            <Badge
+                              key={tag}
+                              variant={
+                                selectedTags[selectedFilter]?.includes(tag)
+                                  ? 'secondary'
+                                  : 'outline'
+                              }
+                              className={`text-sm cursor-pointer transition-colors ${
+                                selectedTags[selectedFilter]?.includes(tag)
+                                  ? 'bg-purple-300 text-purple-700 capitalize'
+                                  : 'bg-background hover:text-purple-700 hover:bg-purple-300 capitalize'
+                              }`}
+                              onClick={() =>
+                                handleTagClick(tag, selectedFilter)
+                              }
+                            >
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                  </div>
+                )}
+
+                {/* Items Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
+                  {Array.isArray(filteredItems) &&
+                    filteredItems.map((item, index) => (
+                      <motion.div
+                        key={`${item.type}-${index}`}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.02 }}
+                      >
+                        {item.type === 'workflow' ? (
+                          <WorkflowCard
+                            workflow={item.item as WorkflowType}
+                            onClick={() => onItemClick(item.item, item.type)}
+                            onDownload={onDownload}
+                          />
+                        ) : (
+                          <Card
+                            className="h-full cursor-pointer hover:border-purple-300 dark:hover:border-purple-700"
+                            onClick={() => onItemClick(item.item, 'assistant')}
+                          >
+                            <CardContent className="p-4 flex flex-col h-full">
+                              <div className="flex items-start gap-3 mb-3">
+                                <div className="size-10 rounded-lg bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 flex items-center justify-center text-lg shadow-sm border border-blue-200 dark:border-blue-700/50 shrink-0">
+                                  <AIAgentIcon size={20} />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <h3 className="text-gray-900 dark:text-white font-semibold text-base mb-1 line-clamp-1">
+                                    {item.item.title}
+                                  </h3>
+                                  <p className="text-gray-600 dark:text-gray-400 text-sm font-medium line-clamp-1">
+                                    {item.item.category}
+                                  </p>
                                 </div>
                               </div>
-                              <div className="flex-1 min-w-0">
-                                <h3 className="text-gray-900 dark:text-white font-semibold text-base mb-1 line-clamp-1">
-                                  {item.item.name}
-                                </h3>
-                                <p className="text-gray-600 dark:text-gray-400 text-sm font-medium line-clamp-1">
-                                  @{item.item.creator}
-                                </p>
-                                <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2 mt-2">
-                                  {item.item.description}
-                                </p>
+
+                              <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-3 mb-3 grow">
+                                {item.item.description}
+                              </p>
+
+                              <div className="flex flex-wrap gap-1 mt-auto">
+                                {item.item.tags
+                                  ?.slice(0, 3)
+                                  .map((tag: string, tagIndex: number) => (
+                                    <Badge
+                                      key={tagIndex}
+                                      className="text-xs bg-purple-300 dark:bg-purple-900 text-purple-800 dark:text-purple-300 border"
+                                    >
+                                      {tag}
+                                    </Badge>
+                                  ))}
                               </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ) : item.type === 'template' ? (
-                        <Card
-                          className="h-full cursor-pointer"
-                          onClick={() => onItemClick(item.item, item.type)}
-                        >
-                          <CardContent className="p-4">
-                            <div className="flex items-start gap-3">
-                              <div className="shrink-0">
-                                <div className="size-10 rounded-lg bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900/30 dark:to-purple-800/30 flex items-center justify-center text-lg shadow-sm border border-purple-200 dark:border-purple-700/50">
-                                  {item.item.icon || '🎨'}
-                                </div>
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <h3 className="text-gray-900 dark:text-white font-semibold text-base mb-1 line-clamp-1">
-                                  {item.item.name}
-                                </h3>
-                                <p className="text-gray-600 dark:text-gray-400 text-sm font-medium line-clamp-1">
-                                  @{item.item.creator}
-                                </p>
-                                <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2 mt-2">
-                                  {item.item.description}
-                                </p>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ) : null}
-                    </motion.div>
-                  ))}
+                            </CardContent>
+                          </Card>
+                        )}
+                      </motion.div>
+                    ))}
+                </div>
               </div>
             )}
 
