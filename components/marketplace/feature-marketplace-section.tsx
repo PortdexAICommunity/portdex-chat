@@ -499,7 +499,7 @@ export function FeaturedMarketplaceSection({
 
   return (
     <div ref={sectionRef} className="w-full">
-      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 xl:gap-8">
+      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 xl:gap-8 xl:max-w-7xl mx-auto">
         {/* Left sidebar with filters */}
         <div className="w-full lg:w-72 lg:shrink-0 space-y-4 lg:space-y-6 lg:sticky lg:top-32 z-40 lg:h-[calc(100vh-9rem)] lg:overflow-y-auto bg-background border-b lg:border-b-0 border-gray-200 dark:border-gray-700 pb-4 lg:pb-0">
           {/* Filter Categories */}
@@ -762,7 +762,7 @@ export function FeaturedMarketplaceSection({
                     </div>
 
                     {/* Editor's Choice Items Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                       {editorsChoiceItems.map((choiceItem, index) => (
                         <motion.div
                           key={`editors-choice-${index}`}
@@ -888,7 +888,7 @@ export function FeaturedMarketplaceSection({
                     </div>
 
                     {/* Section Items Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 gap-4 sm:gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                       {section.items.map((item, index) => (
                         <motion.div
                           key={`${section.type}-${index}`}
