@@ -72,14 +72,14 @@ export function FeaturedMarketplaceSection({
 
   // State for managing random items and load more functionality
   const [expandedItems, setExpandedItems] = useState<Record<string, number>>({
-    General: 6,
-    RAG: 6,
-    'Voice Agent': 6,
-    MCP: 6,
-    workflow: 6,
-    software: 6,
-    template: 6,
-    models: 9,
+    General: 8,
+    RAG: 4,
+    'Voice Agent': 4,
+    MCP: 4,
+    workflow: 8,
+    software: 4,
+    template: 4,
+    models: 8,
   });
 
   // Function to get random items from an array (consistent based on array length)
@@ -283,9 +283,18 @@ export function FeaturedMarketplaceSection({
     if (type === 'General' && onNavigateToTab) {
       // Navigate to assistants tab for General items
       onNavigateToTab('assistants');
+    } else if (type === 'RAG' && onNavigateToTab) {
+      // Navigate to assistants tab for RAG items (they are assistants)
+      onNavigateToTab('assistants');
+    } else if (type === 'Voice Agent' && onNavigateToTab) {
+      // Navigate to assistants tab for Voice Agent items (they are assistants)
+      onNavigateToTab('assistants');
     } else if (type === 'MCP' && onNavigateToTab) {
       // Navigate to mcp-servers tab for MCP items
       onNavigateToTab('mcp-servers');
+    } else if (type === 'workflow' && onNavigateToTab) {
+      // Navigate to workflows tab for workflow items
+      onNavigateToTab('workflows');
     } else if (type === 'software' && onNavigateToTab) {
       // Navigate to softwares tab for software items
       onNavigateToTab('softwares');
@@ -375,18 +384,25 @@ export function FeaturedMarketplaceSection({
             type: 'all-sections' as const,
             sections: [
               {
-                type: 'General' as const,
-                title: 'General',
-                items: randomItems.General.slice(0, expandedItems.General),
-                total: counts.General,
-                expanded: expandedItems.General,
+                type: 'workflow' as const,
+                title: 'Workflows',
+                items: randomItems.workflow.slice(0, expandedItems.workflow),
+                total: workflows.length,
+                expanded: expandedItems.workflow,
               },
               {
                 type: 'models' as const,
                 title: 'Models',
-                items: randomItems.models.slice(0, 9),
+                items: randomItems.models.slice(0, 8),
                 total: modelsData.length,
-                expanded: 9,
+                expanded: 8,
+              },
+              {
+                type: 'General' as const,
+                title: 'Assistants',
+                items: randomItems.General.slice(0, expandedItems.General),
+                total: counts.General,
+                expanded: expandedItems.General,
               },
               {
                 type: 'RAG' as const,
@@ -411,13 +427,6 @@ export function FeaturedMarketplaceSection({
                 items: randomItems.MCP.slice(0, expandedItems.MCP),
                 total: counts.MCP,
                 expanded: expandedItems.MCP,
-              },
-              {
-                type: 'workflow' as const,
-                title: 'Workflows',
-                items: randomItems.workflow.slice(0, expandedItems.workflow),
-                total: workflows.length,
-                expanded: expandedItems.workflow,
               },
               {
                 type: 'software' as const,
@@ -490,7 +499,7 @@ export function FeaturedMarketplaceSection({
 
   return (
     <div ref={sectionRef} className="w-full">
-      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 xl:gap-8">
+      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 xl:gap-8 xl:max-w-7xl mx-auto">
         {/* Left sidebar with filters */}
         <div className="w-full lg:w-72 lg:shrink-0 space-y-4 lg:space-y-6 lg:sticky lg:top-32 z-40 lg:h-[calc(100vh-9rem)] lg:overflow-y-auto bg-background border-b lg:border-b-0 border-gray-200 dark:border-gray-700 pb-4 lg:pb-0">
           {/* Filter Categories */}
@@ -753,7 +762,7 @@ export function FeaturedMarketplaceSection({
                     </div>
 
                     {/* Editor's Choice Items Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                       {editorsChoiceItems.map((choiceItem, index) => (
                         <motion.div
                           key={`editors-choice-${index}`}
@@ -871,13 +880,15 @@ export function FeaturedMarketplaceSection({
 
                       <div className="flex items-center gap-2 self-start sm:self-auto">
                         <Badge variant="secondary" className="text-sm">
-                          {section.items.length} of {section.total}
+                          {section.title === 'General'
+                            ? `8 of 1000+`
+                            : `${section.items.length} of ${section.total}`}
                         </Badge>
                       </div>
                     </div>
 
                     {/* Section Items Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-4 sm:gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                       {section.items.map((item, index) => (
                         <motion.div
                           key={`${section.type}-${index}`}
@@ -1073,9 +1084,7 @@ export function FeaturedMarketplaceSection({
 
                     {/* Section Footer */}
                     <div className="flex items-center justify-center pt-4">
-                      {section.expanded >= 26 ||
-                      section.total > section.expanded ||
-                      section.type === 'models' ? (
+                      {section.total > section.expanded ? (
                         <button
                           type="button"
                           onClick={() => handleViewMore(section.type)}
