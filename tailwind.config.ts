@@ -16,6 +16,13 @@ const config: Config = {
 			},
 			screens: {
 				"toast-mobile": "600px",
+				"3xl": "1920px", // Full HD
+				"4xl": "2560px", // 2K / 1440p ultrawide
+				"5xl": "2843px",
+				"6xl": "3212px",
+				"7xl": "3581px",
+				"8xl": "3950px",
+				"9xl": "4319px",
 			},
 			borderRadius: {
 				lg: "var(--radius)",
