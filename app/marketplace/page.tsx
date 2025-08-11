@@ -45,7 +45,7 @@ import {
   PackageOpen,
   Search,
   // TowerControlIcon,
-  Users,
+  // Users,
   User,
   Calendar,
   Sparkles,
@@ -62,7 +62,7 @@ import React, {
 import useSWR from 'swr';
 import {
   AIAgentIcon,
-  BlockchainIcon,
+  // BlockchainIcon,
   MCPIcon,
   N8NIcon,
 } from '@/components/icons';
@@ -86,13 +86,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from '@/components/ui/carousel';
 import { InfiniteMovingCards } from '@/components/animation/infinite-moving-cards';
 
 // Configure SWR to reduce API calls
@@ -1162,10 +1155,24 @@ export default function Marketplace() {
                 exit={{ opacity: 0, y: -20 }}
                 className="space-y-4 sm:space-y-6"
               >
-                <section className="flex flex-col justify-start items-start gap-5 pt-5">
-                  <h2 className="text-2xl font-bold bg-gradient-to-tr from-purple-300 to-purple-600 bg-clip-text text-transparent">
-                    Featured
-                  </h2>
+                <section className="flex flex-col justify-start items-start gap-5 pt-5 max-w-7xl mx-auto">
+                  <div className="flex justify-between items-center w-full">
+                    <h2 className="text-2xl font-bold bg-gradient-to-tr from-purple-300 to-purple-600 bg-clip-text text-transparent">
+                      Featured
+                    </h2>
+                    {/* CTA BUTTON */}
+                    <div>
+                      <button
+                        type="button"
+                        className="relative inline-flex h-8 overflow-hidden rounded-full p-px focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50"
+                      >
+                        <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
+                        <span className="inline-flex size-full cursor-pointer items-center justify-center rounded-full bg-background px-3 py-1 text-sm font-medium text-white backdrop-blur-3xl">
+                          Try Now
+                        </span>
+                      </button>
+                    </div>
+                  </div>
                   <div className="w-full">
                     <InfiniteMovingCards
                       items={featuredItem}

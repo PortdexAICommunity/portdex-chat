@@ -375,11 +375,11 @@ export function FeaturedMarketplaceSection({
             type: 'all-sections' as const,
             sections: [
               {
-                type: 'General' as const,
-                title: 'General',
-                items: randomItems.General.slice(0, expandedItems.General),
-                total: counts.General,
-                expanded: expandedItems.General,
+                type: 'workflow' as const,
+                title: 'Workflows',
+                items: randomItems.workflow.slice(0, expandedItems.workflow),
+                total: workflows.length,
+                expanded: expandedItems.workflow,
               },
               {
                 type: 'models' as const,
@@ -387,6 +387,13 @@ export function FeaturedMarketplaceSection({
                 items: randomItems.models.slice(0, 9),
                 total: modelsData.length,
                 expanded: 9,
+              },
+              {
+                type: 'General' as const,
+                title: 'Assistants',
+                items: randomItems.General.slice(0, expandedItems.General),
+                total: counts.General,
+                expanded: expandedItems.General,
               },
               {
                 type: 'RAG' as const,
@@ -411,13 +418,6 @@ export function FeaturedMarketplaceSection({
                 items: randomItems.MCP.slice(0, expandedItems.MCP),
                 total: counts.MCP,
                 expanded: expandedItems.MCP,
-              },
-              {
-                type: 'workflow' as const,
-                title: 'Workflows',
-                items: randomItems.workflow.slice(0, expandedItems.workflow),
-                total: workflows.length,
-                expanded: expandedItems.workflow,
               },
               {
                 type: 'software' as const,
@@ -877,7 +877,7 @@ export function FeaturedMarketplaceSection({
                     </div>
 
                     {/* Section Items Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 gap-4 sm:gap-6">
                       {section.items.map((item, index) => (
                         <motion.div
                           key={`${section.type}-${index}`}
