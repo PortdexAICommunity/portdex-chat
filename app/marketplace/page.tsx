@@ -93,6 +93,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
+import { InfiniteMovingCards } from '@/components/animation/infinite-moving-cards';
 
 // Configure SWR to reduce API calls
 const swrConfig = {
@@ -1003,7 +1004,7 @@ export default function Marketplace() {
             <div className="flex items-center justify-end space-x-2">
               {/* <MarketplaceItemCount /> */}
               <Badge variant="secondary" className="text-xs">
-                1500+ items
+                2500+ items
               </Badge>
             </div>
           </div>
@@ -1104,9 +1105,9 @@ export default function Marketplace() {
       </motion.nav>
 
       {/* Hero Banner */}
-      <section className="relative h-32 overflow-hidden rounded-2xl bg-[url(/marketplace-banner.jpg)] bg-origin-padding bg-cover bg-no-repeat my-5 mx-10">
+      {/* <section className="relative h-28 overflow-hidden rounded-2xl bg-[url(/marketplace-banner.jpg)] bg-origin-padding bg-cover bg-no-repeat my-5 mx-10">
         <div className="flex flex-col items-start justify-between space-y-4 px-8 py-4">
-          <div className="z-10 max-w-2xl w-full text-left">
+          <div className="z-10 max-w-3xl w-full text-left">
             <h1 className="text-xl md:text-[26px] font-light text-white pb-2">
               Add AI Agents to your assistant in minutes
             </h1>
@@ -1118,7 +1119,7 @@ export default function Marketplace() {
             </p>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Content */}
       <div className="w-full px-4 md:px-6 lg:px-8">
@@ -1161,52 +1162,18 @@ export default function Marketplace() {
                 exit={{ opacity: 0, y: -20 }}
                 className="space-y-4 sm:space-y-6"
               >
-                <section className="flex flex-col justify-start items-start gap-5">
+                <section className="flex flex-col justify-start items-start gap-5 pt-5">
                   <h2 className="text-2xl font-bold bg-gradient-to-tr from-purple-300 to-purple-600 bg-clip-text text-transparent">
                     Featured
                   </h2>
                   <div className="w-full">
-                    <Carousel
-                      opts={{
-                        align: 'start',
-                        loop: true,
-                      }}
-                      className="w-full group"
-                    >
-                      <CarouselContent className="-ml-2 md:-ml-4">
-                        {featuredItem.map((item: any, index: number) => (
-                          <CarouselItem
-                            key={item.id}
-                            className="pl-2 md:pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5"
-                          >
-                            <Card
-                              className="hover:shadow-lg hover:border-purple-400 transition-all duration-200 cursor-pointer h-full"
-                              onClick={() => handleFeaturedItemClick(item)}
-                            >
-                              <CardContent className="p-4 flex flex-col h-full">
-                                <div className="flex flex-col gap-3 grow">
-                                  {/* Icon and Title together */}
-                                  <div className="flex items-center gap-3">
-                                    <div className="shrink-0 size-10 bg-gradient-to-br from-blue-100 to-purple-200 dark:from-blue-900/30 dark:to-purple-800/30 rounded-lg flex items-center justify-center text-xl shadow-sm border border-blue-200 dark:border-blue-700/50">
-                                      {item.icon || '🔧'}
-                                    </div>
-                                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-2">
-                                      {item.title}
-                                    </h4>
-                                  </div>
-                                  {/* Description below */}
-                                  <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-1 leading-relaxed">
-                                    {item.description}
-                                  </p>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          </CarouselItem>
-                        ))}
-                      </CarouselContent>
-                      <CarouselPrevious className="left-2 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      <CarouselNext className="right-2 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </Carousel>
+                    <InfiniteMovingCards
+                      items={featuredItem}
+                      direction="left"
+                      speed="slow"
+                      pauseOnHover={true}
+                      onClick={(item) => handleFeaturedItemClick(item)}
+                    />
                   </div>
                 </section>
 
