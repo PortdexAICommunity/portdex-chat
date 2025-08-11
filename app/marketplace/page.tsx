@@ -183,7 +183,7 @@ const MemoizedMCPServerCard = React.memo(
   ),
 );
 
-const MemoizedWorkflowCard = memo(WorkflowCard);
+const MemoizedWorkflowCard = React.memo(WorkflowCard);
 MemoizedAIModelCard.displayName = 'MemoizedAIModelCard';
 MemoizedMCPServerCard.displayName = 'MemoizedMCPServerCard';
 MemoizedWorkflowCard.displayName = 'MemoizedWorkflowCard';
@@ -243,7 +243,7 @@ const FeaturedItemDialog = ({
   const handleUseAssistant = () => {
     const assistantModelId = `assistant-${item.id}`;
     // Persist assistant selection via server action and then navigate to chat page
-    startTransition(() => {
+    React.startTransition(() => {
       saveChatModelAsCookie(assistantModelId).then(() => {
         // Persist assistant details in localStorage for client use
         localStorage.setItem('selected-assistant', JSON.stringify(item));
@@ -342,6 +342,7 @@ const ITEMS_PER_PAGE = 24;
 const FEATURED_ITEMS = 6;
 
 export default function Marketplace() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [selectedItem, setSelectedItem] = useState<
     DataTypes | MCPDataTypes | MCPServerType | WorkflowType | null
@@ -1118,36 +1119,17 @@ export default function Marketplace() {
       <div className="w-full px-4 md:px-6 lg:px-8">
         <div className="">
           <AnimatePresence mode="wait">
-            {/* Show loading only when no data is available */}
+            {/* Show loading when workflows are loading - hide all content until workflows are ready */}
             {activeTab === 'home' &&
-              (!allAssistantsData ||
-                !allAiModelsData ||
-                !allMcpServersData ||
-                !allWorkflowsData) &&
-              (isLoading ||
-                aiModelsLoading ||
-                mcpIsLoading ||
-                workflowsLoading ||
-                allAssistantsLoading ||
-                allAiModelsLoading ||
-                allMcpServersLoading ||
-                allWorkflowsLoading) && (
+              !allWorkflowsData &&
+              (allWorkflowsLoading || workflowsLoading) && (
                 <div className="py-16 flex justify-center items-center">
                   <LoaderThree />
                 </div>
               )}
-            {activeTab === 'home' &&
-              (error || aiModelsError || mcpError || workflowsError) &&
-              !allAssistantsData &&
-              !allAiModelsData &&
-              !allMcpServersData &&
-              !allWorkflowsData && (
-                <div className="py-16 text-center text-red-500">
-                  Failed to load marketplace data.
-                </div>
-              )}
 
-            {activeTab === 'home' && (
+            {/* Show all content only when workflows are loaded */}
+            {activeTab === 'home' && allWorkflowsData && (
               <motion.div
                 key="home"
                 initial={{ opacity: 0, y: 20 }}
@@ -1163,6 +1145,7 @@ export default function Marketplace() {
                     {/* CTA BUTTON */}
                     <div>
                       <button
+                        onClick={() => router.push('/')}
                         type="button"
                         className="relative inline-flex h-8 overflow-hidden rounded-full p-px focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50"
                       >
@@ -1203,6 +1186,18 @@ export default function Marketplace() {
                 {/* <FAQSection faqs={marketplaceFAQs} /> */}
               </motion.div>
             )}
+
+            {/* Show error only when all data failed to load */}
+            {activeTab === 'home' &&
+              (error || aiModelsError || mcpError || workflowsError) &&
+              !allAssistantsData &&
+              !allAiModelsData &&
+              !allMcpServersData &&
+              !allWorkflowsData && (
+                <div className="py-16 text-center text-red-500">
+                  Failed to load marketplace data.
+                </div>
+              )}
 
             {activeTab === 'assistants' && !isLoading && (
               <motion.div
