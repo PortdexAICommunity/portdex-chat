@@ -80,8 +80,8 @@ Remember: Your responses should reflect your expertise in ${assistant.category.t
 		assistant.type === "assistant"
 			? "an AI assistant"
 			: assistant.type === "plugin"
-			? "a specialized tool"
-			: `a ${assistant.type}`
+				? "a specialized tool"
+				: `a ${assistant.type}`
 	}.`;
 };
 
@@ -198,7 +198,7 @@ export const systemPrompt = ({
 	if (selectedAssistant) {
 		const assistantPrompt = createAssistantPrompt(selectedAssistant);
 
-		if (selectedChatModel === "chat-model-reasoning") {
+		if (selectedChatModel === "chat-model-automate") {
 			return `${assistantPrompt}\n\n${requestPrompt}`;
 		} else {
 			return `${assistantPrompt}\n\n${requestPrompt}\n\n${artifactsPrompt}`;
@@ -206,7 +206,7 @@ export const systemPrompt = ({
 	}
 
 	// Default prompts for base models
-	if (selectedChatModel === "chat-model-reasoning") {
+	if (selectedChatModel === "chat-model-automate") {
 		return `${regularPrompt}\n\n${requestPrompt}`;
 	} else {
 		return `${regularPrompt}\n\n${requestPrompt}\n\n${artifactsPrompt}`;
@@ -254,15 +254,15 @@ Improve the following contents of the document based on the given prompt.
 ${currentContent}
 `
 		: type === "code"
-		? `\
+			? `\
 Improve the following code snippet based on the given prompt.
 
 ${currentContent}
 `
-		: type === "sheet"
-		? `\
+			: type === "sheet"
+				? `\
 Improve the following spreadsheet based on the given prompt.
 
 ${currentContent}
 `
-		: "";
+				: "";
