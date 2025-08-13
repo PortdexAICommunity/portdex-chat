@@ -1,4 +1,5 @@
 import { getServerSession } from "@/lib/amplify-server";
+import { ensureUserInDatabase } from "@/utils/amplify-utils";
 import { getDynamicEntitlements } from "@/lib/ai/entitlements";
 import { extractAssistantId, isAssistantModel } from "@/lib/ai/models";
 import { systemPrompt, type RequestHints } from "@/lib/ai/prompts";
@@ -71,6 +72,14 @@ export async function POST(request: Request) {
 
 	const { readable, writable } = new TransformStream();
 	const writer = writable.getWriter();
+	let isWriterClosed = false;
+	async function safeCloseWriter() {
+		if (isWriterClosed) return;
+		try {
+			await writer.close();
+		} catch (_) {}
+		isWriterClosed = true;
+	}
 
 	const response = new Response(readable, {
 		headers: {
@@ -95,7 +104,7 @@ export async function POST(request: Request) {
 				writer.write(
 					`data: ${JSON.stringify({ error: "Invalid request" })}\n\n`
 				);
-				await writer.close();
+				await safeCloseWriter();
 				return;
 			}
 
@@ -103,7 +112,7 @@ export async function POST(request: Request) {
 			if (!session?.user) {
 				logWithTimestamp("Unauthorized request - no session user");
 				writer.write(`data: ${JSON.stringify({ error: "Unauthorized" })}\n\n`);
-				await writer.close();
+				await safeCloseWriter();
 				return;
 			}
 
@@ -161,7 +170,7 @@ export async function POST(request: Request) {
 						error: "Forbidden: Model not available",
 					})}\n\n`
 				);
-				await writer.close();
+				await safeCloseWriter();
 				return;
 			}
 
@@ -208,8 +217,41 @@ export async function POST(request: Request) {
 			if (chat?.userId && chat.userId !== session.user.id) {
 				logWithTimestamp("Forbidden - chat belongs to another user");
 				writer.write(`data: ${JSON.stringify({ error: "Forbidden" })}\n\n`);
-				await writer.close();
+				await safeCloseWriter();
 				return;
+			}
+
+			// Ensure chat exists before starting stream for authenticated users
+			if (session.user.type !== "guest" && !chat) {
+				try {
+					// Ensure DB user exists, in case earlier session bootstrap missed it
+					await ensureUserInDatabase(
+						session.user.id,
+						session.user.email || `user-${session.user.id}@placeholder.local`
+					);
+
+					logWithTimestamp("Creating new chat (pre-stream)");
+					const title = await generateTitleFromUserMessage({ message });
+					await saveChat({
+						id,
+						userId: session.user.id,
+						title,
+						visibility: selectedVisibilityType,
+					});
+					// Mark chat as created to avoid duplicate creation in background ops
+					chat = { id, userId: session.user.id } as any;
+					logWithTimestamp("Chat created successfully (pre-stream)");
+				} catch (createChatError) {
+					logWithTimestamp(
+						"Failed to create chat (pre-stream)",
+						createChatError
+					);
+					writer.write(
+						`data: ${JSON.stringify({ error: "Failed to create chat" })}\n\n`
+					);
+					await safeCloseWriter();
+					return;
+				}
 			}
 
 			// Get geolocation hints
@@ -266,17 +308,7 @@ export async function POST(request: Request) {
 				}
 
 				try {
-					if (!chat) {
-						logWithTimestamp("Creating new chat");
-						const title = await generateTitleFromUserMessage({ message });
-						await saveChat({
-							id,
-							userId: session.user.id,
-							title,
-							visibility: selectedVisibilityType,
-						});
-						logWithTimestamp("Chat created successfully");
-					}
+					// Chat is guaranteed to exist at this point (pre-stream ensure)
 
 					// Save user message
 					logWithTimestamp("Saving user message");
@@ -510,7 +542,7 @@ export async function POST(request: Request) {
 				})}\n\n`
 			);
 		} finally {
-			await writer.close();
+			await safeCloseWriter();
 			logWithTimestamp(`Request completed in ${Date.now() - startTime}ms`);
 		}
 	})();

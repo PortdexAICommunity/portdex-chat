@@ -82,7 +82,7 @@ export function useAuth() {
 		try {
 			await awsSignOut();
 			// Refresh the page after successful sign out
-			window.location.reload();
+			// window.location.reload();
 		} catch (error) {
 			console.error("Error signing out: ", error);
 		}

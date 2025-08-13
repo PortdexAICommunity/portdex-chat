@@ -93,7 +93,7 @@ export function MCPServerCard({ server, onClick }: MCPServerCardProps) {
           <div className="flex items-start gap-3">
             {/* Content */}
             <div className="flex-1 min-w-0">
-              <div className="flex gap-4 items-start">
+              <div className="flex gap-4 items-start overflow-hidden">
                 {/* Icon */}
                 <div className="shrink-0 relative">
                   <div className="size-10 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-lg">
