@@ -492,9 +492,9 @@ export async function POST(request: Request) {
 				logWithTimestamp("Starting to process stream");
 
 				// Check if we have the API key for non-test environments
-				if (!process.env.PORTDEX_API_KEY && !isProductionEnvironment) {
-					throw new Error("Missing PORTDEX_API_KEY environment variable");
-				}
+				// if (!process.env.PORTDEX_API_KEY && !isProductionEnvironment) {
+				// 	throw new Error("Missing PORTDEX_API_KEY environment variable");
+				// }
 
 				const reader = result.toDataStream().getReader();
 
