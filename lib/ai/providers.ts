@@ -7,9 +7,8 @@ import {
 	titleModel,
 } from "./models.test";
 import { qwen } from "qwen-ai-provider";
-// import { portdex } from "./portdex";
 import { deepseek } from "@ai-sdk/deepseek";
-import { anthropic } from "@ai-sdk/anthropic";
+// import { anthropic } from "@ai-sdk/anthropic";
 
 // Dynamic provider creation based on selected assistant
 export const createDynamicProvider = (
