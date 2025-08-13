@@ -14,7 +14,6 @@ import {
 export const user = pgTable("User", {
 	id: uuid("id").primaryKey().notNull().defaultRandom(),
 	email: varchar("email", { length: 64 }).notNull(),
-	is_guest: boolean("is_guest").default(false).notNull(),
 });
 
 export type User = InferSelectModel<typeof user>;

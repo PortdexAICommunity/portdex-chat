@@ -75,8 +75,11 @@ export async function createUser(id: string, email: string) {
 		// Then check if user exists by email
 		const existingUsersByEmail = await getUser(email);
 		if (existingUsersByEmail.length > 0) {
-			console.log(`User with email ${email} already exists`);
-			return existingUsersByEmail[0];
+			// Email exists with a different ID (e.g., migrated from NextAuth/Supabase)
+			// We must still create a row with the Cognito userId to satisfy FKs
+			console.log(
+				`Email ${email} already exists for a different user. Creating a new user with Cognito id ${id}.`
+			);
 		}
 
 		// Create new user with specified ID
@@ -85,7 +88,6 @@ export async function createUser(id: string, email: string) {
 			.values({
 				id,
 				email,
-				// Remove is_guest since it doesn't exist in the database
 			})
 			.returning();
 

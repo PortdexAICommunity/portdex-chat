@@ -1,139 +1,105 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { AuthForm } from "@/components/auth-form";
-import { SubmitButton } from "@/components/submit-button";
-import { toast } from "@/components/toast";
+import { useRouter } from 'next/navigation';
 import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { registerUser } from "@/app/(auth)/actions";
-import { GUEST_MESSAGE_LIMIT } from "@/lib/ai/entitlements";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { GUEST_MESSAGE_LIMIT } from '@/lib/ai/entitlements';
 
 interface RateLimitDialogProps {
-	open: boolean;
-	onOpenChange: (open: boolean) => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export const RateLimitDialog = ({
-	open,
-	onOpenChange,
+  open,
+  onOpenChange,
 }: RateLimitDialogProps) => {
-	const [isSuccessful, setIsSuccessful] = useState(false);
-	const [showSignUp, setShowSignUp] = useState(false);
-	const router = useRouter();
+  const router = useRouter();
 
-	const handleSignUp = async (email: string, password: string) => {
-		try {
-			const result = await registerUser(email, password);
+  const handleSignIn = () => {
+    onOpenChange(false);
+    router.push('/login');
+  };
 
-			if (result.status === "success") {
-				setIsSuccessful(true);
-				toast({
-					type: "success",
-					description: result.message || "Account created successfully!",
-				});
-				// Close dialog and redirect to login
-				setTimeout(() => {
-					onOpenChange(false);
-					router.push("/login");
-				}, 1500);
-			} else {
-				toast({
-					type: "error",
-					description: result.message || "Registration failed",
-				});
-			}
-		} catch (error) {
-			toast({
-				type: "error",
-				description: "An unexpected error occurred",
-			});
-		}
-	};
+  const handleClose = () => {
+    onOpenChange(false);
+  };
 
-	const handleSignIn = () => {
-		onOpenChange(false);
-		router.push("/login");
-	};
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md overflow-hidden rounded-xl border bg-background/60 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-2xl p-0">
+        <div className="relative">
+          <div className="pointer-events-none absolute inset-0 -z-10">
+            <div className="absolute -top-24 -right-24 size-48 rounded-full bg-purple-400/20 blur-3xl" />
+            <div className="absolute -bottom-24 -left-24 size-48 rounded-full bg-indigo-400/20 blur-3xl" />
+          </div>
 
-	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-md">
-				<DialogHeader>
-					<DialogTitle className="text-center">
-						{showSignUp ? "Create Your Account" : "Message Limit Reached"}
-					</DialogTitle>
-					<DialogDescription className="text-center">
-						{showSignUp ? (
-							"Sign up to continue chatting and get unlimited messages"
-						) : (
-							<>
-								You&apos;ve reached your limit of{" "}
-								<strong>{GUEST_MESSAGE_LIMIT} messages</strong> as a guest user.
-								<br />
-								Create an account to continue the conversation!
-							</>
-						)}
-					</DialogDescription>
-				</DialogHeader>
+          <div className="px-6 pt-6 pb-2">
+            <DialogHeader>
+              <div className="mx-auto mb-3 flex size-12 items-center justify-center rounded-full bg-purple-300 text-white">
+                <span aria-hidden className="text-3xl text-purple-800">
+                  ⚠
+                </span>
+              </div>
+              <DialogTitle className="text-center text-xl font-semibold">
+                Message limit reached
+              </DialogTitle>
+              <DialogDescription className="text-center text-sm">
+                You&apos;ve reached your limit of{' '}
+                <span className="font-semibold">{GUEST_MESSAGE_LIMIT}</span>{' '}
+                messages as a guest. Sign in to continue the conversation with
+                unlimited access.
+              </DialogDescription>
+            </DialogHeader>
+          </div>
 
-				{showSignUp ? (
-					<div className="space-y-4">
-						<AuthForm onSubmit={handleSignUp}>
-							<SubmitButton isSuccessful={isSuccessful}>
-								Create Account
-							</SubmitButton>
-						</AuthForm>
+          <div className="px-6 pb-6">
+            <div className="mb-4 grid grid-cols-2 gap-3 text-center text-xs text-muted-foreground">
+              <div className="rounded-md border bg-card px-3 py-2">
+                <div className="text-2xl">✦</div>
+                <div>Unlimited messages</div>
+              </div>
+              <div className="rounded-md border bg-card px-3 py-2">
+                <div className="text-xl">✔︎</div>
+                <div>Save chat history</div>
+              </div>
+              <div className="rounded-md border bg-card px-3 py-2">
+                <div className="text-xl">✔︎</div>
+                <div>Marketplace</div>
+              </div>
+              <div className="rounded-md border bg-card px-3 py-2">
+                <div className="text-2xl">✦</div>
+                <div>Premium features</div>
+              </div>
+            </div>
 
-						<div className="text-center">
-							<Button
-								variant="ghost"
-								onClick={() => setShowSignUp(false)}
-								className="text-sm text-muted-foreground"
-							>
-								← Back to options
-							</Button>
-						</div>
-					</div>
-				) : (
-					<div className="space-y-4">
-						<div className="space-y-3">
-							<Button
-								onClick={() => setShowSignUp(true)}
-								className="w-full"
-								size="lg"
-							>
-								Create Free Account
-							</Button>
-
-							<Separator className="my-4" />
-
-							<Button
-								onClick={handleSignIn}
-								variant="outline"
-								className="w-full"
-								size="lg"
-							>
-								Sign In to Existing Account
-							</Button>
-						</div>
-
-						<div className="text-center text-sm text-muted-foreground">
-							<p>✨ Unlimited messages</p>
-							<p>💾 Save chat history</p>
-							<p>🚀 Access to premium features</p>
-						</div>
-					</div>
-				)}
-			</DialogContent>
-		</Dialog>
-	);
+            <div className="flex flex-col gap-3">
+              <Button
+                onClick={handleSignIn}
+                className="w-full"
+                size="lg"
+                aria-label="Sign in to continue"
+              >
+                Sign in / Create new account
+              </Button>
+              <Button
+                onClick={handleClose}
+                variant="ghost"
+                className="w-full"
+                aria-label="Cancel and stay as guest"
+              >
+                Not now
+              </Button>
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 };

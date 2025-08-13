@@ -1,8 +1,4 @@
-import {
-	customProvider,
-	extractReasoningMiddleware,
-	wrapLanguageModel,
-} from "ai";
+import { customProvider } from "ai";
 import { isTestEnvironment } from "../constants";
 import {
 	artifactModel,
@@ -11,7 +7,8 @@ import {
 	titleModel,
 } from "./models.test";
 import { qwen } from "qwen-ai-provider";
-import { portdex } from "./portdex";
+import { deepseek } from "@ai-sdk/deepseek";
+// import { anthropic } from "@ai-sdk/anthropic";
 
 // Dynamic provider creation based on selected assistant
 export const createDynamicProvider = (
@@ -19,14 +16,13 @@ export const createDynamicProvider = (
 ) => {
 	const baseLanguageModels: Record<string, any> = {
 		"chat-model": isTestEnvironment ? chatModel : qwen("qwen-plus-latest"),
-		"chat-model-reasoning": isTestEnvironment
+		"chat-model-automate": isTestEnvironment
 			? reasoningModel
-			: wrapLanguageModel({
-					model: portdex("thinker"),
-					middleware: extractReasoningMiddleware({ tagName: "think" }),
-			  }),
-		"title-model": isTestEnvironment ? titleModel : portdex("chatter"),
-		"artifact-model": isTestEnvironment ? artifactModel : portdex("chatter"),
+			: deepseek("deepseek-chat"),
+		"title-model": isTestEnvironment ? titleModel : deepseek("deepseek-chat"),
+		"artifact-model": isTestEnvironment
+			? artifactModel
+			: deepseek("deepseek-chat"),
 	};
 
 	// Add dynamic assistant model if one is selected
@@ -34,7 +30,7 @@ export const createDynamicProvider = (
 		const assistantModelId = `assistant-${selectedAssistant.id}`;
 		baseLanguageModels[assistantModelId] = isTestEnvironment
 			? chatModel
-			: portdex("chatter");
+			: deepseek("deepseek-chat");
 	}
 
 	return customProvider({

@@ -38,22 +38,26 @@ export async function getServerSession(): Promise<Session | null> {
 
 				if (user) {
 					const userId = user.userId;
-					const email = user.signInDetails?.loginId || "";
+					// Prefer email from user.signInDetails; fallback to idToken; finally, generate a placeholder to satisfy NOT NULL
+					const tokenEmail =
+						authSession.tokens?.idToken?.payload?.email?.toString() || null;
+					const resolvedEmail =
+						user.signInDetails?.loginId ||
+						tokenEmail ||
+						`user-${userId}@placeholder.local`;
 
 					console.log(
-						`getServerSession: User authenticated: ${userId}, ${email}`
+						`getServerSession: User authenticated: ${userId}, ${resolvedEmail}`
 					);
 
-					// Ensure the user exists in our database
-					if (email) {
-						await ensureUserInDatabase(userId, email);
-					}
+					// Ensure the user exists in our database (always pass a non-empty email string)
+					await ensureUserInDatabase(userId, resolvedEmail);
 
 					return {
 						user: {
 							id: userId,
 							name: user.username,
-							email: email || null,
+							email: resolvedEmail || null,
 							image: null,
 							type: "regular",
 						},
@@ -77,14 +81,13 @@ export async function getServerSession(): Promise<Session | null> {
 			}
 
 			const userId = idToken.sub?.toString() || "unknown";
-			const email = idToken.email?.toString() || null;
+			const email =
+				idToken.email?.toString() || `user-${userId}@placeholder.local`;
 
 			console.log(`getServerSession: Using token data: ${userId}, ${email}`);
 
-			// Ensure the user exists in our database if we have an email
-			if (email) {
-				await ensureUserInDatabase(userId, email);
-			}
+			// Ensure the user exists in our database
+			await ensureUserInDatabase(userId, email);
 
 			return {
 				user: {
