@@ -82,6 +82,14 @@ const config: Config = {
 				},
 			},
 			keyframes: {
+				"width-expand-shrink": {
+					"0%, 100%": {
+						width: "2rem",
+					},
+					"50%": {
+						width: "8rem",
+					},
+				},
 				"accordion-down": {
 					from: {
 						height: "0",
@@ -105,6 +113,8 @@ const config: Config = {
 				},
 			},
 			animation: {
+				"animate-width-expand-shrink":
+					"width-expand-shrink 2.5s ease-in-out infinite",
 				"accordion-down": "accordion-down 0.2s ease-out",
 				"accordion-up": "accordion-up 0.2s ease-out",
 				scroll:
