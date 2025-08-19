@@ -1,17 +1,20 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { AI_PLATFORMS } from '@/lib/constant/marketplace-constant';
 
 interface TagsProps {
   selectedTags?: string[];
   onTagsChange?: (tags: string[]) => void;
+  tags?: string[]; // optional custom tag list; defaults to AI_PLATFORMS
 }
 
-export default function Tags({ selectedTags = [], onTagsChange }: TagsProps) {
+export default function Tags({
+  selectedTags = [],
+  onTagsChange,
+  tags,
+}: TagsProps) {
   const [localSelectedTags, setLocalSelectedTags] =
     useState<string[]>(selectedTags);
 
@@ -31,12 +34,12 @@ export default function Tags({ selectedTags = [], onTagsChange }: TagsProps) {
     }
   };
 
-  const clearAllTags = () => {
-    setLocalSelectedTags([]);
-    if (onTagsChange) {
-      onTagsChange([]);
-    }
-  };
+  // const clearAllTags = () => {
+  //   setLocalSelectedTags([]);
+  //   if (onTagsChange) {
+  //     onTagsChange([]);
+  //   }
+  // };
 
   const TagBadge = ({
     tag,
@@ -47,7 +50,7 @@ export default function Tags({ selectedTags = [], onTagsChange }: TagsProps) {
   }) => (
     <Badge
       variant={localSelectedTags.includes(tag) ? 'default' : variant}
-      className={`cursor-pointer transition-all duration-200 hover:scale-105 text-xs sm:text-sm px-2 py-1 sm:px-3 sm:py-1 ${
+      className={`cursor-pointer transition-all duration-200 hover:scale-105 text-xs px-2 py-1 sm:px-3 sm:py-1 ${
         localSelectedTags.includes(tag)
           ? 'bg-purple-300 text-purple-800'
           : 'bg-muted hover:bg-purple-300 text-muted-foreground hover:text-purple-800 transition-all duration-200'
@@ -58,12 +61,14 @@ export default function Tags({ selectedTags = [], onTagsChange }: TagsProps) {
     </Badge>
   );
 
+  const availableTags = tags && tags.length > 0 ? tags : AI_PLATFORMS;
+
   return (
     <div className="w-full mx-auto p-4 space-y-6">
       {/* AI Platforms Tags */}
       <div className="space-y-2">
         <div className="flex flex-wrap gap-2">
-          {AI_PLATFORMS.map((platform) => (
+          {availableTags.map((platform) => (
             <TagBadge key={platform} tag={platform} variant="outline" />
           ))}
         </div>

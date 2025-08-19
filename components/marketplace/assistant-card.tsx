@@ -17,6 +17,8 @@ import Image from 'next/image';
 import { useState } from 'react';
 // import { EyeIcon, GlobeIcon } from "../icons";
 import { GitHubLogoIcon } from '@radix-ui/react-icons';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { ImageOff } from 'lucide-react';
 
 interface AssistantCardProps {
   assistant: DataTypes;
@@ -56,20 +58,12 @@ export function AssistantCard({ assistant, onClick }: AssistantCardProps) {
                         {assistant.icon}
                       </div>
                     ) : (
-                      // Fallback to avatar with error handling
-                      <Image
-                        src={
-                          imageError
-                            ? '/logo.webp'
-                            : `https://avatar.vercel.sh/${assistant.creator}`
-                        }
-                        alt={assistant.creator ?? 'MCP Server'}
-                        width={48}
-                        height={48}
-                        className="rounded-full size-12 object-cover bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700"
-                        onError={() => setImageError(true)}
-                        unoptimized={imageError} // Use unoptimized for fallback
-                      />
+                      <Avatar>
+                        <AvatarImage src={assistant.icon} alt={name} />
+                        <AvatarFallback>
+                          <ImageOff />
+                        </AvatarFallback>
+                      </Avatar>
                     )}
                   </div>
                 </div>
