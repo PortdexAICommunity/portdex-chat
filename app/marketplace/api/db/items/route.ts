@@ -1,4 +1,3 @@
-// app/marketplace/api/db/items/route.ts
 import { NextResponse } from "next/server";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
@@ -14,11 +13,18 @@ export async function GET(request: Request) {
 	const search = url.searchParams.get("search");
 	const tags = url.searchParams.get("tags"); // comma-separated; we will ILIKE each token
 
-	const connectionString = process.env.MARKETPLACE_POSTGRES_URL;
+	const baseUrl = process.env.POSTGRES_URL;
+	if (!baseUrl) {
+		return NextResponse.json(
+			{ error: "POSTGRES_URL is not set" },
+			{ status: 500 }
+		);
+	}
+	const connectionString = `${baseUrl}/marketplace`;
 	const tableName = process.env.MARKETPLACE_TABLE ?? "software";
 	if (!connectionString) {
 		return NextResponse.json(
-			{ error: "MARKETPLACE_POSTGRES_URL is not set" },
+			{ error: "POSTGRES_URL is not set" },
 			{ status: 500 }
 		);
 	}

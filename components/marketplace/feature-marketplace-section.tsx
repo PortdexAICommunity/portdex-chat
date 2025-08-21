@@ -811,11 +811,13 @@ export function FeaturedMarketplaceSection({
                                   <div className="size-10 rounded-lg bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900/30 dark:to-green-800/30 flex items-center justify-center text-lg shadow-sm border border-green-200 dark:border-green-700/50 shrink-0">
                                     {typeof choiceItem.item.icon === 'string' &&
                                     choiceItem.item.icon.startsWith('http') ? (
-                                      <img
-                                        src={choiceItem.item.icon}
-                                        alt={choiceItem.item.name}
-                                        className="size-8 rounded"
-                                      />
+                                      <Avatar>
+                                        <AvatarImage
+                                          src={choiceItem.item.icon}
+                                          alt={choiceItem.item.name}
+                                        />
+                                        <AvatarFallback>EP</AvatarFallback>
+                                      </Avatar>
                                     ) : (
                                       <span className="text-lg">🛠️</span>
                                     )}

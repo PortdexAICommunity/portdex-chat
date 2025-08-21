@@ -21,6 +21,7 @@ import {
   Calendar,
   Download,
   ExternalLink,
+  ImageOff,
   Server,
   Sparkles,
   Star,
@@ -28,6 +29,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { toast } from 'sonner';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
 interface DetailDialogProps {
   isOpen: boolean;
@@ -85,7 +87,7 @@ export function DetailDialog({
     } else if (isAIModel && aiModel) {
       toast.info('Different Model support is coming soon. Stay tuned!');
     } else if (isSoftware) {
-      toast.info('Software download will be available soon. Stay tuned!');
+      window.open(item.url, '_blank');
     } else if (isTemplate) {
       toast.info('Template download is coming soon. Thanks for your patience!');
     } else if (isWorkflow) {
@@ -109,7 +111,7 @@ export function DetailDialog({
     if (isPlugin) return 'Install Plugin';
     if (isMcpServer) return 'View on GitHub';
     if (isAIModel) return 'Use AI Model';
-    if (isSoftware) return 'Download Software';
+    if (isSoftware) return 'Open Software';
     if (isTemplate) return 'Download Template';
     if (isWorkflow) return 'View Details';
     if (isLLMApp) return 'View on GitHub';
@@ -117,7 +119,7 @@ export function DetailDialog({
   };
 
   const getButtonIcon = () => {
-    if (isMcpServer || isAssistant || isLLMApp)
+    if (isMcpServer || isAssistant || isLLMApp || isSoftware)
       return <ExternalLink className="size-4 mr-2" />;
     return <Download className="size-4 mr-2" />;
   };
@@ -226,13 +228,12 @@ export function DetailDialog({
                     <div className="absolute -bottom-3 -right-3 size-16 bg-white dark:bg-gray-900 rounded-2xl flex items-center justify-center shadow-lg border-4 border-white dark:border-gray-700/50 p-2">
                       {typeof aiModel.icon === 'string' &&
                       aiModel.icon.startsWith('http') ? (
-                        <img
-                          src={aiModel.icon}
-                          alt={aiModel.name}
-                          width={48}
-                          height={48}
-                          className="rounded-lg object-contain"
-                        />
+                        <Avatar>
+                          <AvatarImage src={aiModel.icon} alt={aiModel.name} />
+                          <AvatarFallback>
+                            <ImageOff />
+                          </AvatarFallback>
+                        </Avatar>
                       ) : (
                         <div className="text-2xl">
                           {typeof aiModel.icon === 'string'

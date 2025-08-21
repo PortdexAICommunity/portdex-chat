@@ -16,7 +16,7 @@ import {
 import { useAuth } from '@/hooks/use-auth';
 import { useTheme } from 'next-themes';
 import { generateUsername } from '@/hooks/username-generator';
-// import { signInWithRedirect } from 'aws-amplify/auth';
+import { signInWithRedirect } from 'aws-amplify/auth';
 // Client components cannot import server actions; call a warming API route instead
 
 export function SidebarUserNav() {
@@ -40,8 +40,8 @@ export function SidebarUserNav() {
   }
 
   const handleSignIn = () => {
-    router.push('/login');
-    // signInWithRedirect();
+    // router.push('/login');
+    signInWithRedirect();
   };
 
   async function handleSignOut() {
