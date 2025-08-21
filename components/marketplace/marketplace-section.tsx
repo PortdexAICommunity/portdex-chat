@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Pagination } from '@/components/marketplace/pagination';
 import type { DataTypes } from '@/lib/types';
 import { motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
@@ -38,6 +39,12 @@ interface MarketplaceSectionProps {
   itemType: 'assistant' | 'ai-model' | 'software' | 'template';
   shouldUseStaggeredAnimation: boolean;
   hideTitle?: boolean;
+  // Pagination props (optional). If provided, the section will render Pagination.
+  currentPage?: number;
+  pageSize?: number;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (size: number) => void;
+  isLoadingPage?: boolean;
 }
 
 export function MarketplaceSection({
@@ -51,6 +58,11 @@ export function MarketplaceSection({
   itemType,
   shouldUseStaggeredAnimation,
   hideTitle = false,
+  currentPage,
+  pageSize,
+  onPageChange,
+  onPageSizeChange,
+  isLoadingPage,
 }: MarketplaceSectionProps) {
   return (
     <motion.section
@@ -127,6 +139,23 @@ export function MarketplaceSection({
               </>
             )}
           </Button>
+        </div>
+      )}
+
+      {/* Built-in Pagination (only when props provided) */}
+      {typeof currentPage === 'number' && typeof pageSize === 'number' && (
+        <div className="mt-8">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={Math.ceil(
+              (filteredItems?.length ?? 0) / (pageSize || 1),
+            )}
+            pageSize={pageSize}
+            totalItems={filteredItems?.length ?? 0}
+            onPageChange={onPageChange || (() => {})}
+            onPageSizeChange={onPageSizeChange || (() => {})}
+            isLoading={!!isLoadingPage}
+          />
         </div>
       )}
 

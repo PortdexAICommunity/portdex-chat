@@ -22,11 +22,7 @@ import {
   PREDEFINED_ASSISTANT_CATEGORIES,
   AI_PLATFORMS,
 } from '@/lib/constant/marketplace-constant';
-import {
-  homeMarketplaceItems,
-  siteTemplates,
-  softwareTools,
-} from '@/lib/constants';
+import { homeMarketplaceItems, siteTemplates } from '@/lib/constants';
 import modelsData from '@/lib/models.json';
 import type {
   DataTypes,
@@ -51,14 +47,7 @@ import {
   Sparkles,
   Download,
 } from 'lucide-react';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  memo,
-  startTransition,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import {
   AIAgentIcon,
@@ -135,6 +124,24 @@ const aiModelsFetcher = (url: string) =>
   fetch(url).then((res) => res.json()) as Promise<{
     models: DataTypes[];
     total: number;
+  }>;
+
+// Software DB fetcher
+const softwareDbFetcher = (url: string) =>
+  fetch(url).then((res) => res.json()) as Promise<{
+    items: Array<{
+      id: number;
+      created_at?: string;
+      name: string;
+      category: string;
+      description: string;
+      link?: string | null;
+      icon_url: string;
+      tags?: string | null;
+    }>;
+    total: number;
+    page: number;
+    pageSize: number;
   }>;
 
 // MCP Servers fetcher
@@ -392,6 +399,7 @@ export default function Marketplace() {
   const [softwareFilters, setSoftwareFilters] = useState({
     selectedCategory: null as string | null,
     searchTerm: '',
+    selectedTags: [] as string[],
   });
   const [templatesFilters, setTemplatesFilters] = useState({
     selectedCategory: null as string | null,
@@ -554,6 +562,17 @@ export default function Marketplace() {
     swrConfig,
   );
 
+  // Fetch software items from DB immediately on mount so the Software tab is ready
+  const {
+    data: softwareDbData,
+    isLoading: softwareDbLoading,
+    error: softwareDbError,
+  } = useSWR(
+    'marketplace/api/db/items?page=1&pageSize=1000',
+    softwareDbFetcher,
+    swrConfig,
+  );
+
   // const { data: allAiModelsData, isLoading: allAiModelsLoading } = useSWR<{
   //   models: DataTypes[];
   //   total: number;
@@ -711,10 +730,71 @@ export default function Marketplace() {
     () => getCreatorsWithCounts(aiModels),
     [aiModels, getCreatorsWithCounts],
   );
-  const softwareCategories = useMemo(
-    () => getCategoriesWithCounts(softwareTools),
-    [getCategoriesWithCounts],
+  // Transform DB items to DataTypes shape
+  const allSoftwareItems = useMemo<DataTypes[]>(() => {
+    const raw = softwareDbData?.items ?? [];
+    return raw.map((it) => ({
+      id: String(it.id),
+      name: it.name,
+      creator: 'Community',
+      description: it.description ?? '',
+      category: it.category ?? 'Software',
+      icon: it.icon_url ?? '💻',
+      url: it.link ?? undefined,
+      tags: (it.tags ?? '')
+        .split(',')
+        .map((t) => t.trim())
+        .filter((t) => t.length > 0),
+    }));
+  }, [softwareDbData]);
+
+  // Split editor's choice vs regular software items
+  const normalizeCategory = (cat?: string) =>
+    (cat || '').toLowerCase().replace(/['’]/g, '');
+  const editorsChoiceSoftware = useMemo(
+    () =>
+      allSoftwareItems.filter((it) => {
+        const c = normalizeCategory(it.category);
+        return (
+          c === 'editors pick' ||
+          c === 'editor pick' ||
+          c.includes('editors pick') ||
+          c.includes('editor pick')
+        );
+      }),
+    [allSoftwareItems],
   );
+
+  const softwareItems = useMemo(
+    () =>
+      allSoftwareItems.filter((it) => {
+        const c = normalizeCategory(it.category);
+        return !(
+          c === 'editors pick' ||
+          c === 'editor pick' ||
+          c.includes('editors pick') ||
+          c.includes('editor pick')
+        );
+      }),
+    [allSoftwareItems],
+  );
+
+  const softwareCategories = useMemo(
+    () => getCategoriesWithCounts(softwareItems),
+    [getCategoriesWithCounts, softwareItems],
+  );
+
+  const softwareTags = useMemo(() => {
+    const tagMap = new Map<string, number>();
+    softwareItems.forEach((item) => {
+      (item.tags ?? []).forEach((tag) => {
+        tagMap.set(tag, (tagMap.get(tag) || 0) + 1);
+      });
+    });
+    return Array.from(tagMap.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [softwareItems]);
   const templateCategories = useMemo(
     () => getCategoriesWithCounts(siteTemplates),
     [getCategoriesWithCounts],
@@ -856,10 +936,29 @@ export default function Marketplace() {
     () => getFilteredAIModels(aiModels, aiModelsFilters),
     [aiModels, aiModelsFilters, getFilteredAIModels],
   );
-  const filteredSoftware = useMemo(
-    () => getFilteredItems(softwareTools, softwareFilters),
-    [softwareFilters, getFilteredItems],
-  );
+  const filteredSoftware = useMemo(() => {
+    const items = softwareItems;
+    return items.filter((item) => {
+      const matchesCategory =
+        !softwareFilters.selectedCategory ||
+        item.category === softwareFilters.selectedCategory;
+      const matchesSearch =
+        !softwareFilters.searchTerm ||
+        item.name
+          .toLowerCase()
+          .includes(softwareFilters.searchTerm.toLowerCase()) ||
+        item.description
+          .toLowerCase()
+          .includes(softwareFilters.searchTerm.toLowerCase()) ||
+        item.category
+          ?.toLowerCase()
+          .includes(softwareFilters.searchTerm.toLowerCase());
+      const matchesTags =
+        softwareFilters.selectedTags.length === 0 ||
+        softwareFilters.selectedTags.some((tag) => item.tags?.includes(tag));
+      return matchesCategory && matchesSearch && matchesTags;
+    });
+  }, [softwareItems, softwareFilters]);
   const filteredTemplates = useMemo(
     () => getFilteredItems(siteTemplates, templatesFilters),
     [templatesFilters, getFilteredItems],
@@ -1162,6 +1261,8 @@ export default function Marketplace() {
                     onDownload={handleWorkflowDownload}
                     title="Featured Items"
                     defaultShowAssistantsAndWorkflows={true}
+                    editorsChoiceSoftware={editorsChoiceSoftware}
+                    softwareItems={softwareItems}
                     onNavigateToTab={(tab) => {
                       setActiveTab(tab as TabType);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1343,7 +1444,7 @@ export default function Marketplace() {
               </motion.div>
             )}
 
-            {activeTab === 'softwares' && !isLoading && (
+            {activeTab === 'softwares' && !softwareDbLoading && (
               <motion.div
                 key="softwares"
                 initial={{ opacity: 0, y: 20 }}
@@ -1373,6 +1474,7 @@ export default function Marketplace() {
                     setSoftwareFilters({
                       selectedCategory: null,
                       searchTerm: '',
+                      selectedTags: [],
                     })
                   }
                   title="Software List"
@@ -1381,6 +1483,16 @@ export default function Marketplace() {
 
                 {/* Main Content */}
                 <div className="flex-1 space-y-6">
+                  <Tags
+                    selectedTags={softwareFilters.selectedTags}
+                    onTagsChange={(tags) =>
+                      setSoftwareFilters((prev) => ({
+                        ...prev,
+                        selectedTags: tags,
+                      }))
+                    }
+                    tags={softwareTags.map((t) => t.name)}
+                  />
                   <MarketplaceSection
                     title=""
                     filteredItems={filteredSoftware}
@@ -1392,22 +1504,12 @@ export default function Marketplace() {
                     itemType="software"
                     shouldUseStaggeredAnimation={shouldUseStaggeredAnimation}
                     hideTitle={true}
+                    currentPage={softwareCurrentPage}
+                    pageSize={softwarePageSize}
+                    onPageChange={handleSoftwarePageChange}
+                    onPageSizeChange={handleSoftwarePageSizeChange}
+                    isLoadingPage={softwareDbLoading}
                   />
-
-                  {/* Pagination Controls */}
-                  {filteredSoftware.length > 0 && (
-                    <Pagination
-                      currentPage={softwareCurrentPage}
-                      totalPages={Math.ceil(
-                        filteredSoftware.length / softwarePageSize,
-                      )}
-                      pageSize={softwarePageSize}
-                      totalItems={filteredSoftware.length}
-                      onPageChange={handleSoftwarePageChange}
-                      onPageSizeChange={handleSoftwarePageSizeChange}
-                      isLoading={false}
-                    />
-                  )}
                 </div>
               </motion.div>
             )}

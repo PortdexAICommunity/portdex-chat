@@ -110,7 +110,7 @@ export function Pagination({
             Rows per page:
           </span>
           <Select
-            value={pageSize.toString()}
+            value={pageSize ? '10' : pageSize.toString()}
             onValueChange={(value) => onPageSizeChange(Number(value))}
             disabled={isLoading}
           >

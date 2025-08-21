@@ -10,14 +10,20 @@ export async function GET() {
 		if (!session?.user || session.user.type === "guest") {
 			const user = await AuthGetCurrentUserServer();
 			if (user) {
-				const userId = user.userId;
-				const email =
-					user.signInDetails?.loginId || `user-${userId}@placeholder.local`;
-				await ensureUserInDatabase(userId, email);
-				return new Response(JSON.stringify({ warmed: true }), {
-					status: 200,
-					headers: { "Content-Type": "application/json" },
-				});
+				try {
+					const user = await AuthGetCurrentUserServer();
+					if (user) {
+						const userId = user.userId;
+						const email =
+							user.signInDetails?.loginId || `user-${userId}@placeholder.local`;
+						await ensureUserInDatabase(userId, email);
+					}
+				} catch (err: any) {
+					// Swallow only UserUnAuthenticatedException, rethrow others
+					if (err.name !== "UserUnAuthenticatedException") {
+						console.error("Warmup error:", err);
+					}
+				}
 			}
 		}
 		return new Response(JSON.stringify({ warmed: !!session?.user }), {

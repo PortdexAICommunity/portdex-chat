@@ -5,13 +5,14 @@ import { motion } from 'framer-motion';
 import { WorkflowCard } from './workflow-card';
 import { Badge } from '../ui/badge';
 import { Card, CardContent } from '../ui/card';
-import type { WorkflowType } from '@/lib/types';
+import type { WorkflowType, DataTypes } from '@/lib/types';
 
 // Import llm-apps data
 import llmAppsData from '@/lib/llm-apps.json';
 import { softwareTools, siteTemplates } from '@/lib/constants';
 import modelsData from '@/lib/models.json';
-import { AIAgentIcon, GitHubIcon } from '../icons';
+import { AIAgentIcon } from '../icons';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
 type FilterType =
   | 'all'
@@ -40,6 +41,16 @@ interface FeaturedItemsProps {
   title?: string;
   defaultShowAssistantsAndWorkflows?: boolean;
   onNavigateToTab?: (tab: string) => void;
+  editorsChoiceSoftware?: Array<{
+    id: string;
+    name: string;
+    description: string;
+    category: string;
+    icon: string;
+    url?: string;
+    tags?: string[];
+  }>;
+  softwareItems?: DataTypes[];
 }
 
 export function FeaturedMarketplaceSection({
@@ -49,6 +60,8 @@ export function FeaturedMarketplaceSection({
   title = 'Featured Items',
   defaultShowAssistantsAndWorkflows = false,
   onNavigateToTab,
+  editorsChoiceSoftware = [],
+  softwareItems = [],
 }: FeaturedItemsProps) {
   const [selectedFilter, setSelectedFilter] = useState<FilterType>('all');
   const [selectedTags, setSelectedTags] = useState<Record<string, string[]>>({
@@ -82,6 +95,9 @@ export function FeaturedMarketplaceSection({
     models: 8,
   });
 
+  // Editor's Pick expand/collapse state (only for the Editor's Pick row)
+  const [editorsExpanded, setEditorsExpanded] = useState(false);
+
   // Function to get random items from an array (consistent based on array length)
   const getRandomItems = (items: any[], count: number, seed?: string) => {
     if (items.length === 0) return [];
@@ -100,6 +116,9 @@ export function FeaturedMarketplaceSection({
   // Get categories and items from llm-apps.json
   const categories = llmAppsData.metadata.categories;
   const categoryItems = llmAppsData.categories;
+  // Prefer dynamic software from props if provided
+  const softwareSource =
+    softwareItems && softwareItems.length > 0 ? softwareItems : softwareTools;
 
   // Function to get the primary type from an item (prefer the first type if multiple)
   const getPrimaryType = (item: any): string => {
@@ -151,17 +170,17 @@ export function FeaturedMarketplaceSection({
     return Array.from(tags).sort();
   }, [categoryItems]);
 
-  // Get Editor's Choice items - one from each type
+  // Get Editor's Choice items - one from each type (prefer software editor picks if provided)
   const editorsChoiceItems = useMemo(() => {
+    if (editorsChoiceSoftware.length > 0) {
+      return editorsChoiceSoftware.map((s) => ({ item: s, type: 'software' }));
+    }
+    // fallback to previous behavior if none provided
     const choiceItems: Array<{ item: any; type: string }> = [];
-
-    // Get one item from each type
     const types = ['General', 'RAG', 'Voice Agent', 'MCP'];
-
     types.forEach((type) => {
       const items = itemsByType[type] || [];
       if (items.length > 0) {
-        // Get a random item from this type
         const randomIndex = Math.floor(Math.random() * items.length);
         choiceItems.push({
           item: items[randomIndex],
@@ -169,9 +188,8 @@ export function FeaturedMarketplaceSection({
         });
       }
     });
-
     return choiceItems;
-  }, [itemsByType]);
+  }, [editorsChoiceSoftware, itemsByType]);
 
   // Filter items by selected tags for a specific section
   const filterItemsByTags = (items: any[], sectionType: string) => {
@@ -191,7 +209,7 @@ export function FeaturedMarketplaceSection({
           (acc, items) => acc + items.length,
           0,
         ) +
-        softwareTools.length +
+        softwareSource.length +
         siteTemplates.length +
         modelsData.length
       : workflows.length +
@@ -199,7 +217,7 @@ export function FeaturedMarketplaceSection({
           (acc, items) => acc + items.length,
           0,
         ) +
-        softwareTools.length +
+        softwareSource.length +
         siteTemplates.length +
         modelsData.length,
     General: filterItemsByTags(itemsByType.General || [], 'General').length,
@@ -210,7 +228,7 @@ export function FeaturedMarketplaceSection({
     ).length,
     MCP: filterItemsByTags(itemsByType.MCP || [], 'MCP').length,
     workflow: workflows.length,
-    software: softwareTools.length,
+    software: softwareSource.length,
     template: siteTemplates.length,
     models: modelsData.length,
   };
@@ -244,7 +262,7 @@ export function FeaturedMarketplaceSection({
         'workflow',
       ),
       software: getRandomItems(
-        softwareTools,
+        softwareSource,
         Math.max(expandedItems.software, 6),
         'software',
       ),
@@ -264,7 +282,7 @@ export function FeaturedMarketplaceSection({
       workflows,
       expandedItems,
       selectedTags,
-      softwareTools,
+      softwareSource,
       siteTemplates,
       modelsData,
     ],
@@ -657,7 +675,7 @@ export function FeaturedMarketplaceSection({
                 </button>
 
                 {/* Voice Agent */}
-                <button
+                {/* <button
                   type="button"
                   onClick={() => {
                     setSelectedFilter('Voice Agent');
@@ -678,7 +696,7 @@ export function FeaturedMarketplaceSection({
                   <Badge variant="secondary" className="text-xs shrink-0 ml-2">
                     {counts['Voice Agent'] > 50 ? '50+' : counts['Voice Agent']}
                   </Badge>
-                </button>
+                </button> */}
 
                 {/* Software */}
                 <button
@@ -700,7 +718,7 @@ export function FeaturedMarketplaceSection({
                     <span className="text-left truncate">Software</span>
                   </div>
                   <Badge variant="secondary" className="text-xs shrink-0 ml-2">
-                    {counts.software > 50 ? '50+' : counts.software}
+                    {counts.software > 50 ? '200+' : counts.software}
                   </Badge>
                 </button>
 
@@ -761,9 +779,12 @@ export function FeaturedMarketplaceSection({
                       </div>
                     </div>
 
-                    {/* Editor's Choice Items Grid */}
+                    {/* Editor's Choice Items Grid (show 4 by default) */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-                      {editorsChoiceItems.map((choiceItem, index) => (
+                      {(editorsExpanded
+                        ? editorsChoiceItems
+                        : editorsChoiceItems.slice(0, 4)
+                      ).map((choiceItem, index) => (
                         <motion.div
                           key={`editors-choice-${index}`}
                           initial={{ opacity: 0, y: 20 }}
@@ -778,6 +799,57 @@ export function FeaturedMarketplaceSection({
                               }
                               onDownload={onDownload}
                             />
+                          ) : choiceItem.type === 'software' ? (
+                            <Card
+                              className="h-full cursor-pointer hover:border-purple-300 dark:hover:border-purple-700 relative overflow-hidden"
+                              onClick={() =>
+                                onItemClick(choiceItem.item, 'software')
+                              }
+                            >
+                              <CardContent className="p-4 flex flex-col h-full">
+                                <div className="flex items-start gap-3 mb-3">
+                                  <div className="size-10 rounded-lg bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900/30 dark:to-green-800/30 flex items-center justify-center text-lg shadow-sm border border-green-200 dark:border-green-700/50 shrink-0">
+                                    {typeof choiceItem.item.icon === 'string' &&
+                                    choiceItem.item.icon.startsWith('http') ? (
+                                      <Avatar>
+                                        <AvatarImage
+                                          src={choiceItem.item.icon}
+                                          alt={choiceItem.item.name}
+                                        />
+                                        <AvatarFallback>EP</AvatarFallback>
+                                      </Avatar>
+                                    ) : (
+                                      <span className="text-lg">🛠️</span>
+                                    )}
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <h3 className="text-gray-900 dark:text-white font-semibold text-base mb-1 line-clamp-1">
+                                      {choiceItem.item.name}
+                                    </h3>
+                                    <p className="text-gray-600 dark:text-gray-400 text-sm font-medium line-clamp-1">
+                                      {choiceItem.item.category}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-3 mb-3 grow">
+                                  {choiceItem.item.description}
+                                </p>
+
+                                <div className="flex flex-wrap gap-1 mt-auto">
+                                  {choiceItem.item.tags
+                                    ?.slice(0, 3)
+                                    .map((tag: string, tagIndex: number) => (
+                                      <Badge
+                                        key={tagIndex}
+                                        className="text-xs bg-purple-300 dark:bg-purple-900 text-purple-800 dark:text-purple-300 border"
+                                      >
+                                        {tag}
+                                      </Badge>
+                                    ))}
+                                </div>
+                              </CardContent>
+                            </Card>
                           ) : (
                             <Card
                               className="h-full cursor-pointer hover:border-purple-300 dark:hover:border-purple-700 relative overflow-hidden"
@@ -825,6 +897,57 @@ export function FeaturedMarketplaceSection({
                         </motion.div>
                       ))}
                     </div>
+
+                    {/* Editor's Pick controls */}
+                    {editorsChoiceItems.length > 4 && (
+                      <div className="flex items-center justify-center pt-2 gap-3">
+                        {!editorsExpanded ? (
+                          <button
+                            type="button"
+                            onClick={() => setEditorsExpanded(true)}
+                            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+                          >
+                            <span>View More</span>
+                            <svg
+                              className="size-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 5l7 7-7 7"
+                              />
+                            </svg>
+                          </button>
+                        ) : (
+                          <div className="flex items-center gap-3">
+                            <button
+                              type="button"
+                              onClick={() => setEditorsExpanded(false)}
+                              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+                            >
+                              <span>View Less</span>
+                              <svg
+                                className="size-4 rotate-180"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M9 5l7 7-7 7"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -910,9 +1033,18 @@ export function FeaturedMarketplaceSection({
                               <CardContent className="p-4 flex flex-col h-full">
                                 <div className="flex items-start gap-3 mb-3">
                                   <div className="size-10 rounded-lg bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900/30 dark:to-purple-800/30 flex items-center justify-center text-lg shadow-sm border border-purple-200 dark:border-purple-700/50 shrink-0">
-                                    <span className="text-lg">
+                                    {/* <span className="text-lg">
                                       {item.icon || '🛠️'}
-                                    </span>
+                                    </span> */}
+                                    <Avatar>
+                                      <Avatar>
+                                        <AvatarImage
+                                          src={item.icon}
+                                          alt={item.name}
+                                        />
+                                        <AvatarFallback>SW</AvatarFallback>
+                                      </Avatar>
+                                    </Avatar>
                                   </div>
                                   <div className="min-w-0 flex-1">
                                     <h3 className="text-gray-900 dark:text-white font-semibold text-base mb-1 line-clamp-1">
@@ -992,11 +1124,13 @@ export function FeaturedMarketplaceSection({
                                   <div className="shrink-0">
                                     {item.icon?.startsWith('http') ? (
                                       <div className="size-10 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-                                        <img
-                                          src={item.icon}
-                                          alt={item.name}
-                                          className="w-full h-full object-cover bg-white"
-                                        />
+                                        <Avatar>
+                                          <AvatarImage
+                                            src={item.icon}
+                                            alt={item.name}
+                                          />
+                                          <AvatarFallback>EP</AvatarFallback>
+                                        </Avatar>
                                       </div>
                                     ) : (
                                       <div className="size-10 rounded-lg bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900/30 dark:to-purple-800/30 flex items-center justify-center text-lg shadow-sm border border-purple-200 dark:border-purple-700/50">
@@ -1321,11 +1455,13 @@ export function FeaturedMarketplaceSection({
                                 <div className="shrink-0">
                                   {item.item.icon?.startsWith('http') ? (
                                     <div className="size-10 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-                                      <img
-                                        src={item.item.icon}
-                                        alt={item.item.name}
-                                        className="w-full h-full object-cover bg-white"
-                                      />
+                                      <Avatar>
+                                        <AvatarImage
+                                          src={item.item.icon}
+                                          alt={item.item.name}
+                                        />
+                                        <AvatarFallback>MD</AvatarFallback>
+                                      </Avatar>
                                     </div>
                                   ) : (
                                     <div className="size-10 rounded-lg bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900/30 dark:to-purple-800/30 flex items-center justify-center text-lg shadow-sm border border-purple-200 dark:border-purple-700/50">

@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
-const client = postgres(process.env.POSTGRES_URL || "");
+const client = postgres(`${process.env.POSTGRES_URL}/Portdex-Chat` || "");
 const db = drizzle(client);
 
 export async function GET(request: NextRequest) {
@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
 			status: "healthy",
 			database: "connected",
 			timestamp: new Date().toISOString(),
-			postgres_url_set: !!process.env.POSTGRES_URL,
+			postgres_url_set: !!`${process.env.POSTGRES_URL}/Portdex-Chat`,
 			test_query: result,
 		});
 	} catch (error) {
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
 				status: "unhealthy",
 				database: "disconnected",
 				error: error instanceof Error ? error.message : "Unknown error",
-				postgres_url_set: !!process.env.POSTGRES_URL,
+				postgres_url_set: !!`${process.env.POSTGRES_URL}/Portdex-Chat`,
 				timestamp: new Date().toISOString(),
 			},
 			{ status: 503 }
