@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { WorkflowCard } from './workflow-card';
 import { Badge } from '../ui/badge';
@@ -13,6 +13,7 @@ import { softwareTools, siteTemplates } from '@/lib/constants';
 import modelsData from '@/lib/models.json';
 import { AIAgentIcon } from '../icons';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { PackageIcon } from 'lucide-react';
 
 type FilterType =
   | 'all'
@@ -90,7 +91,7 @@ export function FeaturedMarketplaceSection({
     'Voice Agent': 4,
     MCP: 4,
     workflow: 8,
-    software: 4,
+    software: 20,
     template: 4,
     models: 8,
   });
@@ -192,14 +193,17 @@ export function FeaturedMarketplaceSection({
   }, [editorsChoiceSoftware, itemsByType]);
 
   // Filter items by selected tags for a specific section
-  const filterItemsByTags = (items: any[], sectionType: string) => {
-    const sectionTags = selectedTags[sectionType] || [];
-    if (sectionTags.length === 0) return items;
-    return items.filter((item) => {
-      if (!item.tags || !Array.isArray(item.tags)) return false;
-      return sectionTags.some((tag) => item.tags.includes(tag));
-    });
-  };
+  const filterItemsByTags = useCallback(
+    (items: any[], sectionType: string) => {
+      const sectionTags = selectedTags[sectionType] || [];
+      if (sectionTags.length === 0) return items;
+      return items.filter((item) => {
+        if (!item.tags || !Array.isArray(item.tags)) return false;
+        return sectionTags.some((tag) => item.tags.includes(tag));
+      });
+    },
+    [selectedTags],
+  );
 
   // Count items for each type
   const counts = {
@@ -277,15 +281,7 @@ export function FeaturedMarketplaceSection({
         'models',
       ),
     }),
-    [
-      itemsByType,
-      workflows,
-      expandedItems,
-      selectedTags,
-      softwareSource,
-      siteTemplates,
-      modelsData,
-    ],
+    [itemsByType, workflows, expandedItems, softwareSource, filterItemsByTags],
   );
 
   // Function to handle load more for a specific type
@@ -381,7 +377,7 @@ export function FeaturedMarketplaceSection({
           type: 'workflow' as const,
         }));
       case 'software':
-        return softwareTools.map((item) => ({
+        return softwareSource.map((item) => ({
           item,
           type: 'software' as const,
         }));
@@ -450,7 +446,7 @@ export function FeaturedMarketplaceSection({
                 type: 'software' as const,
                 title: 'Software',
                 items: randomItems.software.slice(0, expandedItems.software),
-                total: softwareTools.length,
+                total: counts.software,
                 expanded: expandedItems.software,
               },
               {
@@ -471,7 +467,7 @@ export function FeaturedMarketplaceSection({
               item,
               type: 'workflow' as const,
             })),
-            ...softwareTools.map((item) => ({
+            ...softwareSource.map((item) => ({
               item,
               type: 'software' as const,
             })),
@@ -497,7 +493,7 @@ export function FeaturedMarketplaceSection({
             item,
             type: 'workflow' as const,
           })),
-          ...softwareTools.map((item) => ({
+          ...softwareSource.map((item) => ({
             item,
             type: 'software' as const,
           })),
@@ -1012,7 +1008,10 @@ export function FeaturedMarketplaceSection({
 
                     {/* Section Items Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-                      {section.items.map((item, index) => (
+                      {(section.type === 'software'
+                        ? section.items.slice(0, 20)
+                        : section.items
+                      ).map((item, index) => (
                         <motion.div
                           key={`${section.type}-${index}`}
                           initial={{ opacity: 0, y: 20 }}
@@ -1218,7 +1217,28 @@ export function FeaturedMarketplaceSection({
 
                     {/* Section Footer */}
                     <div className="flex items-center justify-center pt-4">
-                      {section.total > section.expanded ? (
+                      {section.type === 'software' ? (
+                        <button
+                          type="button"
+                          onClick={() => handleViewMore('software')}
+                          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+                        >
+                          <span>View More Software</span>
+                          <svg
+                            className="size-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 5l7 7-7 7"
+                            />
+                          </svg>
+                        </button>
+                      ) : section.total > section.expanded ? (
                         <button
                           type="button"
                           onClick={() => handleViewMore(section.type)}
@@ -1352,7 +1372,10 @@ export function FeaturedMarketplaceSection({
                 {/* Items Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
                   {Array.isArray(filteredItems) &&
-                    filteredItems.map((item, index) => (
+                    (selectedFilter === 'software'
+                      ? filteredItems.slice(0, 20)
+                      : filteredItems
+                    ).map((item, index) => (
                       <motion.div
                         key={`${item.type}-${index}`}
                         initial={{ opacity: 0, y: 20 }}
@@ -1374,7 +1397,15 @@ export function FeaturedMarketplaceSection({
                               <div className="flex items-start gap-3 mb-3">
                                 <div className="size-10 rounded-lg bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900/30 dark:to-green-800/30 flex items-center justify-center text-lg shadow-sm border border-green-200 dark:border-green-700/50 shrink-0">
                                   <span className="text-lg">
-                                    {item.item.icon || '🛠️'}
+                                    <Avatar>
+                                      <AvatarImage
+                                        src={item.item.icon}
+                                        alt={item.item.name}
+                                      />
+                                      <AvatarFallback>
+                                        <PackageIcon />
+                                      </AvatarFallback>
+                                    </Avatar>
                                   </span>
                                 </div>
                                 <div className="min-w-0 flex-1">
@@ -1546,6 +1577,34 @@ export function FeaturedMarketplaceSection({
                       </motion.div>
                     ))}
                 </div>
+
+                {/* View more for Software filter */}
+                {selectedFilter === 'software' &&
+                  Array.isArray(filteredItems) &&
+                  filteredItems.length > 20 && (
+                    <div className="flex items-center justify-center pt-4">
+                      <button
+                        type="button"
+                        onClick={() => handleViewMore('software')}
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+                      >
+                        <span>View More Software</span>
+                        <svg
+                          className="size-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
               </div>
             )}
 
