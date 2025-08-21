@@ -3,13 +3,14 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
 export async function GET() {
-	const connectionString = process.env.MARKETPLACE_POSTGRES_URL;
-	if (!connectionString) {
+	const baseUrl = process.env.POSTGRES_URL;
+	if (!baseUrl) {
 		return NextResponse.json(
-			{ error: "MARKETPLACE_POSTGRES_URL is not set" },
+			{ error: "POSTGRES_URL is not set" },
 			{ status: 500 }
 		);
 	}
+	const connectionString = `${baseUrl}/marketplace`;
 
 	const client = postgres(connectionString, { max: 1 });
 	// Create a drizzle instance so Drizzle Studio can discover this DB

@@ -5,17 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import type { DataTypes } from '@/lib/types';
 import { parseCreatorAndName } from '@/lib/utils';
 import { motion } from 'framer-motion';
-// import {
-// 	Link2Icon,
-// 	LinkIcon,
-// 	SquareArrowOutUpRightIcon,
-// 	Unlink2,
-// 	UnlinkIcon,
-// } from "lucide-react";
-import Image from 'next/image';
-// import Link from 'next/link';
 import { useState } from 'react';
-// import { EyeIcon, GlobeIcon } from "../icons";
 import { GitHubLogoIcon } from '@radix-ui/react-icons';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { ImageOff } from 'lucide-react';
