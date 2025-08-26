@@ -1140,7 +1140,7 @@ export default function Marketplace() {
               },
               {
                 id: 'assistants',
-                label: 'Assistants',
+                label: 'Agents',
                 icon: AIAgentIcon,
               },
               {

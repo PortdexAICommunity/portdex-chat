@@ -110,6 +110,12 @@ export function FeaturedMarketplaceSection({
   // Editor's Pick expand/collapse state (only for the Editor's Pick row)
   const [editorsExpanded, setEditorsExpanded] = useState(false);
 
+  // Fixed tags for the Agents (General) section
+  const fixedAgentTags = useMemo(
+    () => ['finance', 'investment', 'analysis', 'content creation', 'coaching'],
+    [],
+  );
+
   // Function to get random items from an array (consistent based on array length)
   const getRandomItems = (items: any[], count: number, seed?: string) => {
     if (items.length === 0) return [];
@@ -442,7 +448,7 @@ export function FeaturedMarketplaceSection({
               },
               {
                 type: 'General' as const,
-                title: 'Assistants',
+                title: 'Agents',
                 items: randomItems.General.slice(0, expandedItems.General),
                 total: counts.General,
                 expanded: expandedItems.General,
@@ -548,7 +554,7 @@ export function FeaturedMarketplaceSection({
           {/* Filter Categories */}
           <div className="space-y-2 lg:space-y-3 pt-2">
             <h3 className="text-sm font-medium text-gray-900 dark:text-white uppercase tracking-wide">
-              Types
+              Categories
             </h3>
 
             <div className="h-auto max-h-[300px] w-full overflow-y-auto lg:overflow-y-visible">
@@ -618,7 +624,7 @@ export function FeaturedMarketplaceSection({
                     <div className="size-5 lg:size-6 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shrink-0">
                       <span className="text-xs text-white font-medium">A</span>
                     </div>
-                    <span className="text-left truncate">Assistants</span>
+                    <span className="text-left truncate">Agents</span>
                   </div>
                   <Badge variant="secondary" className="text-xs shrink-0 ml-2">
                     {/* {counts.General > 1000 ? '1500+' : counts.General} */}
@@ -996,12 +1002,15 @@ export function FeaturedMarketplaceSection({
                         {section.items.length > 0 &&
                           section.type !== 'workflow' && (
                             <div className="flex flex-wrap gap-1">
-                              {Array.from(
-                                new Set(
-                                  section.items
-                                    .flatMap((item) => item.tags || [])
-                                    .slice(0, 3),
-                                ),
+                              {(section.type === 'General'
+                                ? fixedAgentTags
+                                : Array.from(
+                                    new Set(
+                                      section.items
+                                        .flatMap((item) => item.tags || [])
+                                        .slice(0, 3),
+                                    ),
+                                  )
                               ).map((tag: string) => (
                                 <Badge
                                   key={tag}
@@ -1306,7 +1315,7 @@ export function FeaturedMarketplaceSection({
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-4">
                         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                           {selectedFilter === 'General'
-                            ? 'Assistant'
+                            ? 'Agents'
                             : selectedFilter}
                         </h2>
                         <Badge
@@ -1324,12 +1333,15 @@ export function FeaturedMarketplaceSection({
                       {Array.isArray(filteredItems) &&
                         filteredItems.length > 0 && (
                           <div className="flex flex-wrap gap-2">
-                            {Array.from(
-                              new Set(
-                                filteredItems
-                                  .flatMap((item) => item.item.tags || [])
-                                  .slice(0, 6),
-                              ),
+                            {(selectedFilter === 'General'
+                              ? fixedAgentTags
+                              : Array.from(
+                                  new Set(
+                                    filteredItems
+                                      .flatMap((item) => item.item.tags || [])
+                                      .slice(0, 6),
+                                  ),
+                                )
                             ).map((tag: string) => (
                               <Badge
                                 key={tag}
