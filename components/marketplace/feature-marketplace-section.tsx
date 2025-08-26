@@ -442,7 +442,7 @@ export function FeaturedMarketplaceSection({
               },
               {
                 type: 'General' as const,
-                title: 'Assistants',
+                title: 'Agents',
                 items: randomItems.General.slice(0, expandedItems.General),
                 total: counts.General,
                 expanded: expandedItems.General,
@@ -548,7 +548,7 @@ export function FeaturedMarketplaceSection({
           {/* Filter Categories */}
           <div className="space-y-2 lg:space-y-3 pt-2">
             <h3 className="text-sm font-medium text-gray-900 dark:text-white uppercase tracking-wide">
-              Types
+              Categories
             </h3>
 
             <div className="h-auto max-h-[300px] w-full overflow-y-auto lg:overflow-y-visible">
@@ -1306,7 +1306,7 @@ export function FeaturedMarketplaceSection({
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-4">
                         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                           {selectedFilter === 'General'
-                            ? 'Assistant'
+                            ? 'Agents'
                             : selectedFilter}
                         </h2>
                         <Badge
