@@ -58,3 +58,4 @@ amplifyconfiguration*
 
 # YoYo AI version control directory
 .yoyo/
+.bmad-core/

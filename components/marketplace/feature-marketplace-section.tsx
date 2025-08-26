@@ -52,6 +52,16 @@ interface FeaturedItemsProps {
     tags?: string[];
   }>;
   softwareItems?: DataTypes[];
+  mcpServers?: Array<{
+    name: string;
+    url: string;
+    description: string;
+    category: string;
+    official?: boolean;
+    languages?: string[];
+    scope?: string[];
+    operating_systems?: string[];
+  }>;
 }
 
 export function FeaturedMarketplaceSection({
@@ -63,6 +73,7 @@ export function FeaturedMarketplaceSection({
   onNavigateToTab,
   editorsChoiceSoftware = [],
   softwareItems = [],
+  mcpServers = [],
 }: FeaturedItemsProps) {
   const [selectedFilter, setSelectedFilter] = useState<FilterType>('all');
   const [selectedTags, setSelectedTags] = useState<Record<string, string[]>>({
@@ -155,8 +166,26 @@ export function FeaturedMarketplaceSection({
         }
       });
 
+    // If MCP servers are provided from API, prefer those over static data
+    if (mcpServers && mcpServers.length > 0) {
+      organized.MCP = mcpServers.map((server) => ({
+        title: server.name,
+        description: server.description,
+        category: server.category || 'MCP',
+        tags: Array.from(
+          new Set([
+            ...(server.languages || []),
+            ...(server.scope || []),
+            ...(server.operating_systems || []),
+          ]),
+        ),
+        url: server.url,
+        __source: 'api-mcp',
+      }));
+    }
+
     return organized;
-  }, [categoryItems]);
+  }, [categoryItems, mcpServers]);
 
   // Get all unique tags from items
   const allTags = useMemo(() => {
@@ -1277,7 +1306,7 @@ export function FeaturedMarketplaceSection({
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-4">
                         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                           {selectedFilter === 'General'
-                            ? 'Agent'
+                            ? 'Assistant'
                             : selectedFilter}
                         </h2>
                         <Badge
@@ -1370,7 +1399,7 @@ export function FeaturedMarketplaceSection({
                 )}
 
                 {/* Items Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                   {Array.isArray(filteredItems) &&
                     (selectedFilter === 'software'
                       ? filteredItems.slice(0, 20)
