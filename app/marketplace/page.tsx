@@ -451,7 +451,7 @@ export default function Marketplace() {
     error,
   } = useSWR(
     activeTab === 'assistants'
-      ? `marketplace/api/agents?page=${currentPage}&pageSize=${assistantsPageSize}${
+      ? `/marketplace/api/agents?page=${currentPage}&pageSize=${assistantsPageSize}${
           assistantsFilters.selectedCategory
             ? `&category=${encodeURIComponent(
                 assistantsFilters.selectedCategory,
@@ -462,7 +462,7 @@ export default function Marketplace() {
             ? `&search=${encodeURIComponent(assistantsFilters.searchTerm)}`
             : ''
         }`
-      : `marketplace/api/agents?page=1&pageSize=${FEATURED_ITEMS}`, // For home page featured items
+      : `/marketplace/api/agents?page=1&pageSize=${FEATURED_ITEMS}`, // For home page featured items
     fetcher,
     swrConfig,
   );
@@ -511,7 +511,7 @@ export default function Marketplace() {
     isLoading: mcpIsLoading,
     error: mcpError,
   } = useSWR(
-    `marketplace/api/mcp-servers?page=${mcpCurrentPage}&pageSize=${mcpPageSize}${
+    `/marketplace/api/mcp-servers?page=${mcpCurrentPage}&pageSize=${mcpPageSize}${
       mcpFilters.selectedCategory
         ? `&category=${encodeURIComponent(mcpFilters.selectedCategory)}`
         : ''
@@ -525,7 +525,7 @@ export default function Marketplace() {
   );
 
   const { data: categoriesData } = useSWR(
-    'marketplace/api/mcp-servers/categories',
+    '/marketplace/api/mcp-servers/categories',
     (url: string) =>
       fetch(url).then((res) => res.json()) as Promise<{ categories: string[] }>,
     swrConfig,
@@ -539,7 +539,7 @@ export default function Marketplace() {
     isValidating: workflowsValidating,
   } = useSWR(
     activeTab === 'workflows' || activeTab === 'home'
-      ? `marketplace/api/workflows?page=${workflowsCurrentPage}&pageSize=${workflowsPageSize}${
+      ? `/marketplace/api/workflows?page=${workflowsCurrentPage}&pageSize=${workflowsPageSize}${
           workflowsFilters.selectedCategory
             ? `&category=${encodeURIComponent(
                 workflowsFilters.selectedCategory,
@@ -557,7 +557,9 @@ export default function Marketplace() {
 
   // Fetch all data without pagination or filtering for FeaturedMarketplaceSection
   const { data: allAssistantsData, isLoading: allAssistantsLoading } = useSWR(
-    activeTab === 'home' ? 'marketplace/api/agents?page=1&pageSize=1000' : null,
+    activeTab === 'home'
+      ? '/marketplace/api/agents?page=1&pageSize=1000'
+      : null,
     fetcher,
     swrConfig,
   );
@@ -568,7 +570,7 @@ export default function Marketplace() {
     isLoading: softwareDbLoading,
     error: softwareDbError,
   } = useSWR(
-    'marketplace/api/db/items?page=1&pageSize=1000',
+    '/marketplace/api/db/items?page=1&pageSize=1000',
     softwareDbFetcher,
     swrConfig,
   );
@@ -594,7 +596,7 @@ export default function Marketplace() {
 
   const { data: allMcpServersData, isLoading: allMcpServersLoading } = useSWR(
     activeTab === 'home'
-      ? 'marketplace/api/mcp-servers?page=1&pageSize=1000'
+      ? '/marketplace/api/mcp-servers?page=1&pageSize=1000'
       : null,
     mcpServersFetcher,
     swrConfig,
@@ -602,7 +604,7 @@ export default function Marketplace() {
 
   const { data: allWorkflowsData, isLoading: allWorkflowsLoading } = useSWR(
     activeTab === 'home'
-      ? 'marketplace/api/workflows?page=1&pageSize=1000'
+      ? '/marketplace/api/workflows?page=1&pageSize=1000'
       : null,
     workflowsFetcher,
     workflowSwrConfig,
@@ -1063,6 +1065,8 @@ export default function Marketplace() {
 
   if (!mounted) return null;
 
+  console.log('mcp', paginatedMcpServers);
+
   return (
     <div className="min-h-screen max-w-sm md:max-w-3xl lg:max-w-full w-full transition-colors duration-200">
       {/* Header */}
@@ -1263,6 +1267,7 @@ export default function Marketplace() {
                     defaultShowAssistantsAndWorkflows={true}
                     editorsChoiceSoftware={editorsChoiceSoftware}
                     softwareItems={softwareItems}
+                    mcpServers={allMcpServers}
                     onNavigateToTab={(tab) => {
                       setActiveTab(tab as TabType);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
