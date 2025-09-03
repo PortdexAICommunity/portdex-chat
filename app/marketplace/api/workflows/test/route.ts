@@ -138,7 +138,7 @@ export async function GET() {
 
 		const allObjects = response.Contents || [];
 		const jsonFiles = allObjects.filter(
-			(obj) => obj.Key && obj.Key.endsWith(".json") && !obj.Key.endsWith("/")
+			(obj) => obj.Key?.endsWith(".json") && !obj.Key.endsWith("/")
 		);
 
 		if (jsonFiles.length > 0) {
@@ -195,7 +195,7 @@ export async function GET() {
 
 		const listResponse = await s3Client.send(listCommand);
 		const jsonFiles = (listResponse.Contents || []).filter(
-			(obj) => obj.Key && obj.Key.endsWith(".json")
+			(obj) => obj.Key?.endsWith(".json")
 		);
 
 		if (jsonFiles.length === 0) {

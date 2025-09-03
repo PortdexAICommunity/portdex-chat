@@ -17,6 +17,12 @@ export const chatModels: Array<ChatModel> = [
 		name: "Automation model",
 		description: "Uses advanced automation",
 	},
+	{
+		id: "chat-model-product-list",
+		name: "Product Search",
+		description:
+			"List the prices of products from\ndifferent vendors and compare them",
+	},
 ];
 
 // Dynamic assistant model creation

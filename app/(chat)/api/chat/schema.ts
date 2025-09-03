@@ -29,6 +29,7 @@ export const postRequestBodySchema = z.object({
 			(model) =>
 				model === "chat-model" ||
 				model === "chat-model-automate" ||
+				model === "chat-model-product-list" ||
 				model.startsWith("assistant-"),
 			{
 				message:

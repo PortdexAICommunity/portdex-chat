@@ -14,8 +14,6 @@ import {
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import '@aws-amplify/ui-react/styles.css';
-import { signInWithRedirect } from 'aws-amplify/auth';
-import { toast } from 'sonner';
 
 const formFields = {
   signIn: {

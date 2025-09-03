@@ -7,7 +7,10 @@ import { createDynamicProvider } from "@/lib/ai/providers";
 import { createDocument } from "@/lib/ai/tools/create-document";
 import { getWeather } from "@/lib/ai/tools/get-weather";
 import { requestSuggestions } from "@/lib/ai/tools/request-suggestions";
-import { searchProducts } from "@/lib/ai/tools/search-products";
+import {
+	searchProducts,
+	eBayScrapingTool,
+} from "@/lib/ai/tools/search-products";
 import { updateDocument } from "@/lib/ai/tools/update-document";
 import { homeMarketplaceItems, isProductionEnvironment } from "@/lib/constants";
 import {
@@ -407,7 +410,15 @@ export async function POST(request: Request) {
 					searchProducts: searchProducts({
 						session,
 						dataStream: toolDataWriter,
+						mcpTools: toolSet,
+						selectedChatModel,
 					}),
+					// Add eBay scraping tool when MCP is available
+					...(isAssistantModel(selectedChatModel) && customClient
+						? {
+								eBayScrapingTool,
+							}
+						: {}),
 					// Only include MCP tools for assistant models
 					...(isAssistantModel(selectedChatModel) ? toolSet : {}),
 				},

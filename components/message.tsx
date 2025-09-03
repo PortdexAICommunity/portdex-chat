@@ -10,7 +10,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { memo, useState } from "react";
 import { DocumentToolCall, DocumentToolResult } from "./document";
 import { DocumentPreview } from "./document-preview";
-import { GlobeIcon, PencilEditIcon, SparklesIcon } from "./icons";
+import { PencilEditIcon, SparklesIcon } from "./icons";
 import { Markdown } from "./markdown";
 import { MessageActions } from "./message-actions";
 import { MessageEditor } from "./message-editor";
@@ -20,7 +20,6 @@ import { ProductSearchResults } from "./product-search-results";
 import { Button } from "./ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { Weather } from "./weather";
-import { AnimatedBadge } from "./animation/shinny-badge";
 import { MCPToolResult } from "./mcp-tool-result";
 
 const PurePreviewMessage = ({

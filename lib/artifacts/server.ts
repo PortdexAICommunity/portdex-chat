@@ -1,7 +1,5 @@
 import "server-only";
 
-import { cookies } from "next/headers";
-
 interface Session {
 	user: {
 		id: string;

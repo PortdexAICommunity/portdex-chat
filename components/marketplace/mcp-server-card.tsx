@@ -3,7 +3,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { motion } from 'framer-motion';
-import { ExternalLink, GitBranch, Star, Users } from 'lucide-react';
+import { ExternalLink, GitBranch, Star, } from 'lucide-react';
 
 interface MCPServer {
   id: string;

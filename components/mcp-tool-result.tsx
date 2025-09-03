@@ -25,7 +25,7 @@ const formatValue = (value: any): string => {
 const renderValue = (
   key: string,
   value: any,
-  depth: number = 0
+  depth = 0
 ): React.ReactNode => {
   if (value === null || value === undefined) {
     return (

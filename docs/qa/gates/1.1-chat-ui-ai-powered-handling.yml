@@ -1,0 +1,13 @@
+schema: 1
+story: "1.1"
+story_title: "Story 1.1: Chat UI with AI-powered query handling"
+gate: PASS
+status_reason: "All ACs met with solid implementation; minor test documentation follow-ups suggested."
+reviewer: "Quinn (Test Architect)"
+updated: "2025-08-26T00:00:00Z"
+
+waiver: { active: false }
+
+top_issues: []
+# Optional sections can be added later if needed
+

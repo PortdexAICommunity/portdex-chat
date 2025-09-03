@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+
 // import { getServerSession } from "@/lib/amplify-server";
 import type { Metadata } from "next";
 

@@ -50,7 +50,7 @@ export const Spotlight = ({
 				}}
 				transition={{
 					duration,
-					repeat: Infinity,
+					repeat: Number.POSITIVE_INFINITY,
 					repeatType: "reverse",
 					ease: "easeInOut",
 				}}
@@ -99,7 +99,7 @@ export const Spotlight = ({
 				}}
 				transition={{
 					duration,
-					repeat: Infinity,
+					repeat: Number.POSITIVE_INFINITY,
 					repeatType: "reverse",
 					ease: "easeInOut",
 				}}

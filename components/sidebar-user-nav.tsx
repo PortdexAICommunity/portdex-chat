@@ -106,7 +106,7 @@ export function SidebarUserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 
-        {isGuest ? (
+        {isGuest ? (  
           <>
             <DropdownMenuItem
               data-testid="user-nav-item-theme"

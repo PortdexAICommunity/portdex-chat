@@ -6,8 +6,6 @@ import { Card, CardContent } from '../ui/card';
 import type { HomeMarketplaceItem } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import { saveChatModelAsCookie } from '@/app/(chat)/actions';
-import { Button } from '../ui/button';
-import { Download } from 'lucide-react';
 
 export const InfiniteMovingCards = ({
   items,

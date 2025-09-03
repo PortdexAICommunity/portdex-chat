@@ -27,7 +27,6 @@ import {
   Star,
   User,
 } from 'lucide-react';
-import Image from 'next/image';
 import { toast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 

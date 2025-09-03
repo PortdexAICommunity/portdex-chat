@@ -19,6 +19,9 @@ export const createDynamicProvider = (
 		"chat-model-automate": isTestEnvironment
 			? reasoningModel
 			: deepseek("deepseek-chat"),
+		"chat-model-product-list": isTestEnvironment
+			? chatModel
+			: deepseek("deepseek-chat"),
 		"title-model": isTestEnvironment ? titleModel : deepseek("deepseek-chat"),
 		"artifact-model": isTestEnvironment
 			? artifactModel

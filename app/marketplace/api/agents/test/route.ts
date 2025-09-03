@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import path from "path";
-import { readFileSync, existsSync } from "fs";
+import { type NextRequest, NextResponse } from "next/server";
+import path from "node:path";
+import { readFileSync, existsSync } from "node:fs";
 
 export async function GET(req: NextRequest) {
 	try {
@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
 		};
 
 		if (existsSync(scrapedDataPath)) {
-			const stats = require("fs").statSync(scrapedDataPath);
+			const stats = require("node:fs").statSync(scrapedDataPath);
 			result.fileSize = `${(stats.size / 1024 / 1024).toFixed(2)}MB`;
 
 			// Try to load a small sample
@@ -24,10 +24,10 @@ export async function GET(req: NextRequest) {
 
 			result.totalAgents = data.length;
 			result.validAgents = data.filter(
-				(a: any) => a && a.name && a.name.trim()
+				(a: any) => a?.name?.trim()
 			).length;
 			result.sampleNames = data
-				.filter((a: any) => a && a.name && a.name.trim())
+				.filter((a: any) => a?.name?.trim())
 				.slice(0, 3)
 				.map((a: any) => a.name);
 		}

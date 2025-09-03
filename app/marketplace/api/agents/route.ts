@@ -1,7 +1,7 @@
 import type { DataTypes } from "@/lib/types";
 import { type NextRequest, NextResponse } from "next/server";
-import path from "path";
-import { readFileSync } from "fs";
+import path from "node:path";
+import { readFileSync } from "node:fs";
 
 const GITHUB_RAW_URL =
 	"https://raw.githubusercontent.com/punkpeye/awesome-mcp-servers/main/README.md";
@@ -361,7 +361,7 @@ function getAgentDescription(name: string, tags: any[]): string {
 
 // Cache for scraped agents to avoid re-parsing the large file on every request
 let scrapedAgentsCache: DataTypes[] | null = null;
-let cacheTimestamp: number = 0;
+let cacheTimestamp = 0;
 const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes for large file
 let isLoading = false;
 
@@ -389,7 +389,7 @@ function loadScrapedAgents(): DataTypes[] {
 		console.log("Checking for scraped data file at:", scrapedDataPath);
 
 		// Check if file exists
-		if (!require("fs").existsSync(scrapedDataPath)) {
+		if (!require("node:fs").existsSync(scrapedDataPath)) {
 			console.warn("Scrape data file not found at:", scrapedDataPath);
 			isLoading = false;
 			return [];
@@ -425,8 +425,7 @@ function loadScrapedAgents(): DataTypes[] {
 		const filterStartTime = Date.now();
 		const validAgents = scrapedData.filter(
 			(agent: any) =>
-				agent &&
-				agent.name &&
+				agent?.name &&
 				agent.name.trim() !== "" &&
 				typeof agent.name === "string"
 		);
@@ -497,7 +496,7 @@ export async function GET(req: NextRequest) {
 		// Get GitHub MCP servers
 		console.log("Fetching GitHub MCP servers...");
 		const readme = await (await fetch(GITHUB_RAW_URL)).text();
-		let mcpServers = parseServers(readme);
+		const mcpServers = parseServers(readme);
 
 		const mcpAgents: DataTypes[] = mcpServers.map((item) => ({
 			category: item.category,

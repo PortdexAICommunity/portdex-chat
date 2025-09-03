@@ -1,6 +1,7 @@
 import { Artifact } from "@/components/create-artifact";
 import { DocumentSkeleton } from "@/components/document-skeleton";
 import { CopyIcon, FilterIcon, SearchIcon } from "@/components/icons";
+import { CollapsibleFilterPanel } from "@/components/collapsible-filter-panel";
 import { toast } from "sonner";
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
@@ -24,12 +25,19 @@ interface Product {
 	category: string;
 	rating: number;
 	reviews: number;
+	moq?: number;
+	verified?: boolean;
 }
 
 interface ProductSearchMetadata {
 	products: Product[];
 	query: string;
 	totalResults: number;
+	minPrice?: number;
+	maxPrice?: number;
+	minMOQ?: number;
+	verifiedSuppliersOnly?: boolean;
+	minRating?: number;
 }
 
 type SortOption = "name" | "price-low" | "price-high" | "rating" | "reviews";
@@ -50,9 +58,11 @@ const handleViewDetails = (product: Product) => {
 function ProductCard({
 	product,
 	viewMode,
+	onViewDetails,
 }: {
 	product: Product;
 	viewMode: ViewMode;
+	onViewDetails: (product: Product) => void;
 }) {
 	const isGridView = viewMode === "grid";
 
@@ -85,9 +95,16 @@ function ProductCard({
 							<h3 className="font-semibold text-lg line-clamp-2 group-hover:text-primary transition-colors">
 								{product.name}
 							</h3>
-							<Badge variant="secondary" className="mt-1 text-xs">
-								{product.category}
-							</Badge>
+							<div className="flex items-center gap-2 mt-1">
+								<Badge variant="secondary" className="text-xs">
+									{product.category}
+								</Badge>
+								{product.verified && (
+									<Badge variant="default" className="text-xs">
+										Verified
+									</Badge>
+								)}
+							</div>
 						</div>
 
 						<p className="text-muted-foreground text-sm line-clamp-2">
@@ -133,7 +150,7 @@ function ProductCard({
 							<Button
 								size="sm"
 								variant="outline"
-								onClick={() => handleViewDetails(product)}
+								onClick={() => onViewDetails(product)}
 								aria-label={`View details for ${product.name}`}
 							>
 								<ExternalLink className="size-4" />
@@ -165,9 +182,16 @@ function ProductCard({
 								<h3 className="font-semibold text-lg group-hover:text-primary transition-colors">
 									{product.name}
 								</h3>
-								<Badge variant="secondary" className="mt-1">
-									{product.category}
-								</Badge>
+								<div className="flex items-center gap-2 mt-1">
+									<Badge variant="secondary">
+										{product.category}
+									</Badge>
+									{product.verified && (
+										<Badge variant="default">
+											Verified
+										</Badge>
+									)}
+								</div>
 							</div>
 							<div className="text-right">
 								<div className="text-xl font-bold text-green-600">
@@ -207,15 +231,7 @@ function ProductCard({
 							<Button
 								size="sm"
 								variant="outline"
-								onClick={() => handleAddToWishlist(product)}
-							>
-								<Heart className="size-4 mr-1" />
-								Wishlist
-							</Button>
-							<Button
-								size="sm"
-								variant="outline"
-								onClick={() => handleViewDetails(product)}
+								onClick={() => onViewDetails(product)}
 							>
 								<ExternalLink className="size-4 mr-1" />
 								Details
@@ -225,6 +241,53 @@ function ProductCard({
 				</div>
 			</CardContent>
 		</Card>
+	);
+}
+
+function ProductDetailView({ product, onBack }: { product: Product; onBack: () => void }) {
+	return (
+		<div className="p-6">
+			<Button variant="ghost" onClick={onBack} className="mb-4">
+				&larr; Back to results
+			</Button>
+			<div className="space-y-4">
+				<img
+					src={product.image}
+					alt={product.name}
+					className="w-full h-64 object-cover rounded-lg"
+				/>
+				<div>
+					<h2 className="text-2xl font-bold">{product.name}</h2>
+					<div className="flex items-center gap-2 mt-1">
+						<Badge variant="secondary">{product.category}</Badge>
+						{product.verified && <Badge variant="default">Verified</Badge>}
+					</div>
+				</div>
+				<div className="flex items-center justify-between">
+					<div className="text-3xl font-bold text-green-600">
+						${product.price.toFixed(2)}
+					</div>
+					<div className="flex items-center space-x-1">
+						<div className="flex">
+							{[...Array(5)].map((_, i) => (
+								<span key={`detail-star-${i}`} className={`text-lg ${i < product.rating ? "text-yellow-500" : "text-gray-300"}`}>★</span>
+							))}
+						</div>
+						<span className="text-muted-foreground">({product.reviews} reviews)</span>
+					</div>
+				</div>
+				<p className="text-muted-foreground">{product.description}</p>
+				<div className="flex space-x-2 pt-4">
+					<Button size="lg" className="flex-1" onClick={() => handleAddToCart(product)}>
+						<ShoppingCart className="size-5 mr-2" />
+						Add to Cart
+					</Button>
+					<Button size="lg" variant="outline" onClick={() => handleAddToWishlist(product)}>
+						<Heart className="size-5" />
+					</Button>
+				</div>
+			</div>
+		</div>
 	);
 }
 
@@ -249,6 +312,11 @@ export const productSearchArtifact = new Artifact<
 				products: data.products,
 				query: data.query,
 				totalResults: data.totalResults,
+				minPrice: data.minPrice,
+				maxPrice: data.maxPrice,
+				minMOQ: data.minMOQ,
+				verifiedSuppliersOnly: data.verifiedSuppliersOnly,
+				minRating: data.minRating,
 			});
 
 			setArtifact((draftArtifact) => {
@@ -274,7 +342,12 @@ export const productSearchArtifact = new Artifact<
 	}) => {
 		const [sortBy, setSortBy] = useState<SortOption>("name");
 		const [viewMode, setViewMode] = useState<ViewMode>("grid");
-		const [selectedCategory, setSelectedCategory] = useState<string>("all");
+		const [minPrice, setMinPrice] = useState<number | undefined>(metadata?.minPrice);
+		const [maxPrice, setMaxPrice] = useState<number | undefined>(metadata?.maxPrice);
+		const [minMOQ, setMinMOQ] = useState<number | undefined>(metadata?.minMOQ);
+		const [verifiedSuppliersOnly, setVerifiedSuppliersOnly] = useState<boolean | undefined>(metadata?.verifiedSuppliersOnly);
+		const [minRating, setMinRating] = useState<number | undefined>(metadata?.minRating);
+		const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
 		if (isLoading) {
 			return <DocumentSkeleton artifactKind="product-search" />;
@@ -282,18 +355,20 @@ export const productSearchArtifact = new Artifact<
 
 		if (!metadata || !metadata.products || metadata.products.length === 0) {
 			return (
-				<div className="flex items-center justify-center h-96">
-					<div className="text-center space-y-4">
-						<div className="mx-auto size-16 bg-muted rounded-full flex items-center justify-center">
-							<SearchIcon size={32} />
-						</div>
-						<div>
-							<h3 className="text-lg font-medium text-foreground mb-2">
-								No products found
-							</h3>
-							<p className="text-muted-foreground">
-								Try adjusting your search terms or filters.
-							</p>
+				<div className="fixed top-0 right-0 h-full w-[30%] bg-background border-l z-50 overflow-y-auto shadow-2xl">
+					<div className="p-6 space-y-6">
+						<div className="text-center space-y-4">
+							<div className="mx-auto size-16 bg-muted rounded-full flex items-center justify-center">
+								<SearchIcon size={32} />
+							</div>
+							<div>
+								<h3 className="text-lg font-medium text-foreground mb-2">
+									No products found
+								</h3>
+								<p className="text-muted-foreground">
+									Try adjusting your search terms or filters.
+								</p>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -310,9 +385,27 @@ export const productSearchArtifact = new Artifact<
 		const filteredAndSortedProducts = useMemo(() => {
 			let filtered = metadata.products;
 
-			// Filter by category
-			if (selectedCategory !== "all") {
-				filtered = filtered.filter((p) => p.category === selectedCategory);
+			// Filter by price range
+			if (minPrice !== undefined) {
+				filtered = filtered.filter((p) => p.price >= minPrice);
+			}
+			if (maxPrice !== undefined) {
+				filtered = filtered.filter((p) => p.price <= maxPrice);
+			}
+
+			// Filter by MOQ
+			if (minMOQ !== undefined) {
+				filtered = filtered.filter((p) => (p.moq ?? 1) >= minMOQ);
+			}
+
+			// Filter by supplier verification
+			if (verifiedSuppliersOnly === true) {
+				filtered = filtered.filter((p) => p.verified === true);
+			}
+
+			// Filter by rating
+			if (minRating !== undefined) {
+				filtered = filtered.filter((p) => p.rating >= minRating);
 			}
 
 			// Sort products
@@ -334,103 +427,136 @@ export const productSearchArtifact = new Artifact<
 			});
 
 			return sorted;
-		}, [metadata.products, selectedCategory, sortBy]);
+		}, [metadata.products, sortBy, minPrice, maxPrice, minMOQ, verifiedSuppliersOnly, minRating]);
+
+		const handleClearFilters = () => {
+			setMinPrice(undefined);
+			setMaxPrice(undefined);
+			setMinMOQ(undefined);
+			setVerifiedSuppliersOnly(undefined);
+			setMinRating(undefined);
+		};
+
+		const handleViewDetails = (product: Product) => {
+			setSelectedProduct(product);
+		};
+
+		const handleBack = () => {
+			setSelectedProduct(null);
+		};
 
 		return (
-			<div className="p-6 space-y-6">
-				{/* Header */}
-				<div className="space-y-4">
-					<div>
-						<h1 className="text-3xl font-bold tracking-tight">
-							Search Results
-						</h1>
-						<p className="text-muted-foreground">
-							Found {filteredAndSortedProducts.length} of{" "}
-							{metadata.totalResults} products for "{metadata.query}"
-						</p>
-					</div>
+			<div className="fixed top-0 right-0 h-full w-[30%] bg-background border-l z-50 overflow-y-auto shadow-2xl">
+				<div className="p-6 space-y-6">
+					{selectedProduct ? (
+						<ProductDetailView product={selectedProduct} onBack={handleBack} />
+					) : (
+						<>
+							{/* Header */}
+							<div className="space-y-4">
+								<div>
+									<h1 className="text-3xl font-bold tracking-tight">
+										Search Results
+									</h1>
+									<p className="text-muted-foreground">
+										Found {filteredAndSortedProducts.length} of{" "}
+										{metadata.totalResults} products for "{metadata.query}"
+									</p>
+								</div>
 
-					{/* Controls */}
-					<div className="flex flex-wrap items-center justify-between gap-4">
-						<div className="flex flex-wrap items-center gap-4">
-							{/* Category Filter */}
-							<div className="flex items-center space-x-2">
-								<span className="text-sm font-medium">Category:</span>
-								<select
-									value={selectedCategory}
-									onChange={(e) => setSelectedCategory(e.target.value)}
-									className="px-3 py-1 text-sm border border-border rounded-md bg-background"
-								>
-									{categories.map((category) => (
-										<option key={category} value={category}>
-											{category === "all" ? "All Categories" : category}
-										</option>
-									))}
-								</select>
+								{/* Controls */}
+								<div className="flex flex-wrap items-center justify-between gap-4">
+									<div className="w-full">
+										<CollapsibleFilterPanel
+											onFiltersChange={(filters) => {
+												setMinPrice(filters.minPrice);
+												setMaxPrice(filters.maxPrice);
+												setMinMOQ(filters.minMOQ);
+												setVerifiedSuppliersOnly(filters.verifiedSuppliersOnly);
+												setMinRating(filters.minRating);
+											}}
+											initialFilters={{
+												minPrice: metadata?.minPrice,
+												maxPrice: metadata?.maxPrice,
+												minMOQ: metadata?.minMOQ,
+												verifiedSuppliersOnly: metadata?.verifiedSuppliersOnly,
+												minRating: metadata?.minRating,
+											}}
+											appliedFiltersCount={
+												(metadata?.minPrice ? 1 : 0) +
+												(metadata?.maxPrice ? 1 : 0) +
+												(metadata?.minMOQ ? 1 : 0) +
+												(metadata?.verifiedSuppliersOnly ? 1 : 0) +
+												(metadata?.minRating ? 1 : 0)
+											}
+										/>
+									</div>
+
+									{/* Sort Options */}
+									<div className="flex items-center space-x-2">
+										<span className="text-sm font-medium">Sort by:</span>
+										<select
+											value={sortBy}
+											onChange={(e) => setSortBy(e.target.value as SortOption)}
+											className="px-3 py-1 text-sm border border-border rounded-md bg-background"
+										>
+											<option value="name">Name</option>
+											<option value="price-low">Price: Low to High</option>
+											<option value="price-high">Price: High to Low</option>
+											<option value="rating">Rating</option>
+											<option value="reviews">Most Reviews</option>
+										</select>
+									</div>
+
+									{/* View Mode Toggle */}
+									<div className="flex items-center space-x-1 border border-border rounded-md p-1">
+										<Button
+											size="sm"
+											variant={viewMode === "grid" ? "default" : "ghost"}
+											onClick={() => setViewMode("grid")}
+											className="px-3"
+										>
+											<Grid3X3 className="size-4" />
+										</Button>
+										<Button
+											size="sm"
+											variant={viewMode === "list" ? "default" : "ghost"}
+											onClick={() => setViewMode("list")}
+											className="px-3"
+										>
+											<List className="size-4" />
+										</Button>
+									</div>
+								</div>
 							</div>
 
-							{/* Sort Options */}
-							<div className="flex items-center space-x-2">
-								<span className="text-sm font-medium">Sort by:</span>
-								<select
-									value={sortBy}
-									onChange={(e) => setSortBy(e.target.value as SortOption)}
-									className="px-3 py-1 text-sm border border-border rounded-md bg-background"
-								>
-									<option value="name">Name</option>
-									<option value="price-low">Price: Low to High</option>
-									<option value="price-high">Price: High to Low</option>
-									<option value="rating">Rating</option>
-									<option value="reviews">Most Reviews</option>
-								</select>
+							{/* Products Display */}
+							<div
+								className={
+									viewMode === "grid"
+										? "grid grid-cols-1 md:grid-cols-2 gap-6"
+										: "space-y-4"
+								}
+							>
+								{filteredAndSortedProducts.map((product) => (
+									<ProductCard
+										key={product.id}
+										product={product}
+										viewMode={viewMode}
+										onViewDetails={handleViewDetails}
+									/>
+								))}
 							</div>
-						</div>
 
-						{/* View Mode Toggle */}
-						<div className="flex items-center space-x-1 border border-border rounded-md p-1">
-							<Button
-								size="sm"
-								variant={viewMode === "grid" ? "default" : "ghost"}
-								onClick={() => setViewMode("grid")}
-								className="px-3"
-							>
-								<Grid3X3 className="size-4" />
-							</Button>
-							<Button
-								size="sm"
-								variant={viewMode === "list" ? "default" : "ghost"}
-								onClick={() => setViewMode("list")}
-								className="px-3"
-							>
-								<List className="size-4" />
-							</Button>
-						</div>
-					</div>
-				</div>
-
-				{/* Products Display */}
-				<div
-					className={
-						viewMode === "grid"
-							? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-							: "space-y-4"
-					}
-				>
-					{filteredAndSortedProducts.map((product) => (
-						<ProductCard
-							key={product.id}
-							product={product}
-							viewMode={viewMode}
-						/>
-					))}
-				</div>
-
-				{/* Results Summary */}
-				<div className="text-center pt-6 border-t border-border">
-					<p className="text-sm text-muted-foreground">
-						Showing {filteredAndSortedProducts.length} of{" "}
-						{metadata.totalResults} products
-					</p>
+							{/* Results Summary */}
+							<div className="text-center pt-6 border-t border-border">
+								<p className="text-sm text-muted-foreground">
+									Showing {filteredAndSortedProducts.length} of{" "}
+									{metadata.totalResults} products
+								</p>
+							</div>
+						</>
+					)}
 				</div>
 			</div>
 		);

@@ -243,6 +243,35 @@ export const sheetPrompt = `
 You are a spreadsheet creation assistant. Create a spreadsheet in csv format based on the given prompt. The spreadsheet should contain meaningful column headers and data.
 `;
 
+export const mcpScrapingPrompt = `
+You are an expert web scraper using the crawling_exa tool to extract structured product data from eBay search results.
+
+**Scraping Instructions:**
+1. Extract comprehensive product information from the eBay search page
+2. Focus on the main product listings, not sponsored or recommended items
+3. For each product, extract these exact fields:
+   - title: The full product title/name
+   - price: The current price (include currency symbol)
+   - image: Direct URL to the main product image
+   - seller: Seller name or store name
+   - condition: Product condition (New, Used, Refurbished, etc.)
+   - shipping: Shipping cost or "Free Shipping"
+   - location: Seller's location
+   - watchers: Number of watchers/bids (if available)
+   - link: Direct link to the product listing
+
+**Data Quality Requirements:**
+- Extract at least 10-15 products from the search results
+- Ensure all prices are valid numbers with currency symbols
+- Use actual product images, not placeholder images
+- Include seller reputation information when available
+- Filter out any duplicate or low-quality listings
+- Return data in a clean, structured JSON format
+
+**Response Format:**
+Return the data as a valid JSON array of product objects. Do not include any explanatory text outside the JSON structure.
+`;
+
 export const updateDocumentPrompt = (
 	currentContent: string | null,
 	type: ArtifactKind

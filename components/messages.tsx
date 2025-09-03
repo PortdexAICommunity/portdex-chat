@@ -7,7 +7,6 @@ import { motion } from "framer-motion";
 import { memo } from "react";
 import { Spotlight } from "./animation/spotlight";
 import { AnimatedBadge } from "./animation/shinny-badge";
-import { Greeting } from "./greeting";
 import { PreviewMessage, ThinkingMessage } from "./message";
 import type { HomeMarketplaceItem } from "@/lib/types";
 
@@ -64,7 +63,7 @@ function PureMessages({
 				</div>
 
 				{/* Content */}
-				<div className="relative z-50 w-full max-w-4xl mx-auto text-center space-y-4">
+				<div className="relative z-50 w-full  mx-auto text-center space-y-4">
 					<motion.div
 						initial={{ opacity: 0, y: 20 }}
 						animate={{ opacity: 1, y: 0 }}
@@ -88,8 +87,7 @@ function PureMessages({
 						</p>
 
 						{/* Use Cases with Shinny Badges */}
-						{selectedAssistant &&
-							selectedAssistant.useCases &&
+						{selectedAssistant?.useCases &&
 							selectedAssistant.useCases.length > 0 && (
 								<div className="flex flex-wrap justify-center gap-2 mt-4">
 									{selectedAssistant.useCases.map((useCase, index) => (

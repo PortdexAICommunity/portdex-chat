@@ -1,5 +1,5 @@
-import { getServerSession } from "@/lib/amplify-server";
-import { NextRequest, NextResponse } from "next/server";
+
+import { type NextRequest, NextResponse } from "next/server";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 
 // Initialize S3 client
