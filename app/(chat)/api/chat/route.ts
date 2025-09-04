@@ -7,7 +7,7 @@ import { createDynamicProvider } from "@/lib/ai/providers";
 import { createDocument } from "@/lib/ai/tools/create-document";
 import { getWeather } from "@/lib/ai/tools/get-weather";
 import { requestSuggestions } from "@/lib/ai/tools/request-suggestions";
-import { searchProducts } from "@/lib/ai/tools/search-products";
+import { searchProductsGenerative } from "@/lib/ai/tools/search-products-generative";
 import { updateDocument } from "@/lib/ai/tools/update-document";
 import { homeMarketplaceItems, isProductionEnvironment } from "@/lib/constants";
 import {
@@ -377,6 +377,16 @@ export async function POST(request: Request) {
 				`Starting AI response streaming with ${activeTools.length} active tools`
 			);
 
+			// Log the active tools for debugging
+			console.log("🔧 Active tools:", activeTools);
+
+			// Log searchProducts tool specifically
+			console.log("🔍 searchProducts tool loaded:", {
+				hasExecute: typeof searchProductsGenerative.execute === "function",
+				hasDescription: !!searchProductsGenerative.description,
+				hasParameters: !!searchProductsGenerative.parameters,
+			});
+
 			// Start AI response streaming immediately - don't wait for database operations
 			const result = streamText({
 				model: provider.languageModel(selectedChatModel),
@@ -404,15 +414,29 @@ export async function POST(request: Request) {
 						session,
 						dataStream: toolDataWriter,
 					}),
-					searchProducts: searchProducts({
-						session,
-						dataStream: toolDataWriter,
-					}),
+					searchProducts: searchProductsGenerative,
 					// Only include MCP tools for assistant models
 					...(isAssistantModel(selectedChatModel) ? toolSet : {}),
 				},
 				onFinish: async ({ response }) => {
 					logWithTimestamp("AI response finished");
+
+					// Debug: Log tool results (simplified)
+					if (response.messages) {
+						const toolInvocations = response.messages.flatMap(
+							(msg: any) => (msg as any).toolInvocations || []
+						);
+						if (toolInvocations.length > 0) {
+							console.log(
+								`🔧 Tool executions completed:`,
+								toolInvocations.length
+							);
+							toolInvocations.forEach((toolInv: any, idx: number) => {
+								console.log(`   ✅ ${toolInv.toolName}: ${toolInv.state}`);
+							});
+						}
+					}
+
 					// Only close MCP client if it was initialized
 					if (customClient) {
 						try {
