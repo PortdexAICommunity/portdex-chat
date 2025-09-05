@@ -45,8 +45,11 @@ export async function POST(request: NextRequest) {
 			return NextResponse.json({ error: errorMessage }, { status: 400 });
 		}
 
-		// Get filename from formData since Blob doesn't have name property
-		const filename = (formData.get("file") as File).name;
+		// Derive filename safely without referencing global File
+		const uploaded = formData.get("file") as any;
+		const rawName = typeof uploaded?.name === "string" ? uploaded.name : null;
+		const filename =
+			rawName && rawName.trim() ? rawName.trim() : `upload-${Date.now()}.bin`;
 		const fileBuffer = await file.arrayBuffer();
 
 		try {
