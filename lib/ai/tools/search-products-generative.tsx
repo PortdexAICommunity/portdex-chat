@@ -3,6 +3,14 @@ import { type DataStreamWriter, tool } from "ai";
 import { z } from "zod";
 import { scrapeEbayProducts } from "@/lib/ebay-scraper";
 import Image from "next/image";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface Product {
 	id: string;
@@ -66,14 +74,14 @@ const ProductCard = ({ product }: { product: any }) => (
     {/* Product Image */}
     <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden mb-3">
       <Image
-        src={product.image || "/placeholder.svg?height=120&width=200"}
+        src={product.image || ""}
         alt={product.name}
         width={200}
         height={120}
         className="size-full object-cover"
         onError={(e) => {
           const target = e.target as HTMLImageElement;
-          target.src = "/placeholder.svg?height=120&width=200";
+          target.src = "";
         }}
       />
     </div>
@@ -140,10 +148,16 @@ const ProductSearchResults = ({
   products,
   totalResults,
   searchQuery,
+  currentPage,
+  pageSize,
+  totalPages,
 }: {
   products: any[];
   totalResults: number;
   searchQuery: string;
+  currentPage: number;
+  pageSize: number;
+  totalPages: number;
 }) => (
   <div className="rounded-2xl overflow-hidden border border-border shadow-sm">
     {/* Header */}
@@ -154,7 +168,7 @@ const ProductSearchResults = ({
             Product Search Results
           </h3>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Found {totalResults} products for &quot;{searchQuery}&quot;
+            Found {totalResults} products for &quot;{searchQuery}&quot; (Page {currentPage} of {totalPages})
           </p>
         </div>
         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
@@ -171,6 +185,44 @@ const ProductSearchResults = ({
         ))}
       </div>
     </div>
+
+    {/* Pagination */}
+    {totalPages > 1 && (
+      <div className="p-4 border-t border-border">
+        <Pagination>
+          <PaginationContent>
+            {currentPage > 1 && (
+              <PaginationItem>
+                <PaginationPrevious href="#" />
+              </PaginationItem>
+            )}
+
+            {/* Page numbers */}
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              const pageNum = Math.max(1, currentPage - 2) + i;
+              if (pageNum > totalPages) return null;
+
+              return (
+                <PaginationItem key={pageNum}>
+                  <PaginationLink
+                    href="#"
+                    isActive={pageNum === currentPage}
+                  >
+                    {pageNum}
+                  </PaginationLink>
+                </PaginationItem>
+              );
+            })}
+
+            {currentPage < totalPages && (
+              <PaginationItem>
+                <PaginationNext href="#" />
+              </PaginationItem>
+            )}
+          </PaginationContent>
+        </Pagination>
+      </div>
+    )}
   </div>
 );
 
@@ -196,7 +248,9 @@ export const searchProductsGenerative = tool({
     "Search for products based on user query. Use this when the user is looking for products to buy or wants to see product recommendations. This tool provides rich, interactive product search results with generative UI.",
   parameters: z.object({
     query: z.string().describe("Search query for products"),
-    maxResults: z.number().default(15).describe("Maximum results to return"),
+    maxResults: z.number().default(60).describe("Maximum results to return"),
+    page: z.number().default(1).describe("Page number for pagination"),
+    pageSize: z.number().default(12).describe("Number of products per page"),
     category: z.string().optional().describe("Filter products by category"),
     minPrice: z.number().optional().describe("Minimum price filter"),
     maxPrice: z.number().optional().describe("Maximum price filter"),
@@ -204,7 +258,9 @@ export const searchProductsGenerative = tool({
   }),
   execute: async ({
     query,
-    maxResults = 15,
+    maxResults = 60,
+    page = 1,
+    pageSize = 12,
     category,
     minPrice,
     maxPrice,
@@ -212,11 +268,17 @@ export const searchProductsGenerative = tool({
   }: {
     query: string;
     maxResults?: number;
+    page?: number;
+    pageSize?: number;
     category?: string;
     minPrice?: number;
     maxPrice?: number;
     minMOQ?: number;
   }) => {
+    // Ensure parameters are valid
+    maxResults = Math.max(1, Math.min(maxResults || 60, 100)); // Cap at 100, minimum 1
+    page = Math.max(1, page || 1);
+    pageSize = Math.max(6, Math.min(pageSize || 12, 24)); // 6-24 products per page
     try {
       console.log("🚀 EXECUTING: Generative searchProducts tool called with:", { query, maxResults, category, minPrice, maxPrice, minMOQ });
       console.log("⏰ Timestamp:", new Date().toISOString());
@@ -225,10 +287,12 @@ export const searchProductsGenerative = tool({
 
       // Scrape eBay products directly using our server action
       console.log("🔍 Starting eBay scraping...");
-      let filteredProducts: Product[] = await scrapeEbayProducts(query, maxResults);
+      let allProducts: Product[] = await scrapeEbayProducts(query, maxResults);
+      console.log("🔍 Scraped products count:", allProducts.length);
+      console.log("🔍 Max results:", maxResults);
 
       // If scraping fails or returns no results, fall back to minimal mock data
-      if (filteredProducts.length === 0) {
+      if (allProducts.length === 0) {
         console.log(
           "⚠️  No products found from eBay scraping, using minimal fallback data"
         );
@@ -251,22 +315,30 @@ export const searchProductsGenerative = tool({
           },
         ];
 
-        filteredProducts = fallbackProducts;
+        allProducts = fallbackProducts;
         console.log(
           "📋 Using fallback demo data:",
-          filteredProducts.map((p) => p.name)
+          allProducts.map((p) => p.name)
         );
       }
 
+      // Start with all products for filtering
+      let filteredProducts = [...allProducts];
+
       // Apply category filter to scraped results if specified
       if (category && filteredProducts.length > 0) {
+        console.log("🔍 Applying category filter:", category);
+        const beforeCount = filteredProducts.length;
         filteredProducts = filteredProducts.filter((product) =>
           product.category.toLowerCase().includes(category.toLowerCase())
         );
+        console.log(`🔍 Category filter: ${beforeCount} -> ${filteredProducts.length} products`);
       }
 
       // Apply price range filter to scraped results if specified
       if ((minPrice !== undefined || maxPrice !== undefined) && filteredProducts.length > 0) {
+        console.log("🔍 Applying price filter:", { minPrice, maxPrice });
+        const beforeCount = filteredProducts.length;
         filteredProducts = filteredProducts.filter((product) => {
           if (minPrice !== undefined && product.price < minPrice) {
             return false;
@@ -276,10 +348,13 @@ export const searchProductsGenerative = tool({
           }
           return true;
         });
+        console.log(`🔍 Price filter: ${beforeCount} -> ${filteredProducts.length} products`);
       }
 
       // Apply MOQ filter to scraped results if specified
       if (minMOQ !== undefined && filteredProducts.length > 0) {
+        console.log("🔍 Applying MOQ filter:", minMOQ);
+        const beforeCount = filteredProducts.length;
         // For fallback products, we'll use the mock MOQ value
         filteredProducts = filteredProducts.filter((product) => {
           // For fallback products, we use the mock MOQ value of 1
@@ -287,29 +362,36 @@ export const searchProductsGenerative = tool({
           const productMOQ = product.moq ?? 1;
           return productMOQ >= minMOQ;
         });
+        console.log(`🔍 MOQ filter: ${beforeCount} -> ${filteredProducts.length} products`);
       }
 
-      // Limit results
-      filteredProducts = filteredProducts.slice(0, maxResults);
+      // Return ALL products for client-side pagination
+      const totalProducts = filteredProducts.length;
 
-      console.log(`📊 Found ${filteredProducts.length} matching products for query: "${query}"`);
+      console.log(`📊 Found ${totalProducts} total matching products for query: "${query}"`);
+      console.log(`📄 All products returned for client-side pagination`);
 
       const result = {
         id,
         title: `Product Search Results: ${query}`,
         kind: "generative-product-search",
-        content: `Found ${filteredProducts.length} products matching "${query}". Results displayed with rich interactive UI.`,
-        products: filteredProducts,
+        content: `Found ${totalProducts} products matching "${query}". Results displayed with rich interactive UI and pagination.`,
+        products: filteredProducts, // Return ALL products for client-side pagination
         isGenerative: true,
         searchQuery: query,
-        totalResults: filteredProducts.length,
+        totalResults: totalProducts,
+        currentPage: 1, // Start at page 1
+        pageSize: 12, // Default page size for UI
+        totalPages: Math.ceil(totalProducts / 12),
       };
 
-      console.log("✅ Generative searchProducts tool completed successfully with", filteredProducts.length, "products");
+      console.log("✅ Generative searchProducts tool completed successfully with", filteredProducts.length, "products shown");
       console.log("📤 Returning result:", {
         id: result.id,
         isGenerative: result.isGenerative,
         totalResults: result.totalResults,
+        currentPage: result.currentPage,
+        totalPages: result.totalPages,
         hasProducts: result.products && result.products.length > 0
       });
 

@@ -92,7 +92,7 @@ export function SimpleGenerativeChat() {
           <div className="text-center text-muted-foreground py-8">
             <Search className="mx-auto mb-4 size-12 opacity-50" />
             <p>Start by asking me to find products!</p>
-            <p className="text-sm mt-2">Try: "Find me wireless headphones"</p>
+            <p className="text-sm mt-2">Try: &quot;Find me wireless headphones&quot;</p>
           </div>
         )}
 
@@ -134,7 +134,7 @@ export function SimpleGenerativeChat() {
                       </div>
 
                       <div className="aspect-video bg-muted rounded-lg overflow-hidden mb-3">
-                        <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-600">
+                        <div className="size-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-600">
                           🎧
                         </div>
                       </div>
@@ -179,7 +179,7 @@ export function SimpleGenerativeChat() {
                       </div>
 
                       <div className="aspect-video bg-muted rounded-lg overflow-hidden mb-3">
-                        <div className="w-full h-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center text-green-600">
+                        <div className="size-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center text-green-600">
                           🪑
                         </div>
                       </div>

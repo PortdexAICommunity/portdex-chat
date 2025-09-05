@@ -1,7 +1,17 @@
 'use client';
 
+import React from 'react';
 import { X } from 'lucide-react';
 import { Button } from './ui/button';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from './ui/pagination';
+import { toast } from 'sonner';
 
 interface GenerativeUIPanelProps {
   isVisible: boolean;
@@ -27,9 +37,9 @@ export function GenerativeUIPanel({
           variant="ghost"
           size="sm"
           onClick={onClose}
-          className="h-8 w-8 p-0"
+          className="size-8 p-0"
         >
-          <X className="h-4 w-4" />
+          <X className="size-4" />
         </Button>
       </div>
 
@@ -69,19 +79,48 @@ interface GenerativeUIProduct {
 interface ProductGridProps {
   products: GenerativeUIProduct[];
   content?: string;
+  currentPage?: number;
+  pageSize?: number;
+  totalPages?: number;
+  totalResults?: number;
 }
 
-export function ProductGrid({ products, content }: ProductGridProps) {
+export function ProductGrid({ products, content, currentPage, pageSize, totalPages, totalResults }: ProductGridProps) {
+  // State for client-side pagination
+  const [currentPageState, setCurrentPageState] = React.useState(currentPage || 1);
+  const actualPageSize = pageSize || 12;
+
+  // Calculate pagination
+  const totalProducts = products.length;
+  const actualTotalPages = Math.ceil(totalProducts / actualPageSize);
+  const startIndex = (currentPageState - 1) * actualPageSize;
+  const endIndex = startIndex + actualPageSize;
+  const currentPageProducts = products.slice(startIndex, endIndex);
+
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= actualTotalPages) {
+      setCurrentPageState(page);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {content && (
         <div className="bg-muted/50 p-4 rounded-xl">
-          <p className="text-sm text-muted-foreground">{content}</p>
+          <p className="text-sm text-muted-foreground">
+            {content}
+            {totalResults && (
+              <span className="block mt-2 text-xs">
+                Page {currentPageState} of {actualTotalPages} • {currentPageProducts.length} products shown
+              </span>
+            )}
+          </p>
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {products.map((product, index) => (
+        {currentPageProducts.map((product, index) => (
           <div
             key={product.id || index}
             className="border border-border rounded-lg p-4 hover:shadow-md transition-shadow bg-card"
@@ -101,7 +140,7 @@ export function ProductGrid({ products, content }: ProductGridProps) {
                   {product.category}
                 </span>
                 <div className="text-lg font-bold text-green-600">
-                  {product.price}
+                  ${product.price}
                 </div>
               </div>
             </div>
@@ -109,12 +148,12 @@ export function ProductGrid({ products, content }: ProductGridProps) {
             {/* Product Image */}
             <div className="aspect-video bg-muted rounded-lg overflow-hidden mb-3">
               <img
-                src={product.image || '/placeholder.svg?height=120&width=200'}
+                src={product.image || ''}
                 alt={product.name}
                 className="size-full object-cover"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
-                  target.src = '/placeholder.svg?height=120&width=200';
+                  target.src = '';
                 }}
               />
             </div>
@@ -173,6 +212,7 @@ export function ProductGrid({ products, content }: ProductGridProps) {
 
             {/* Action Button */}
             <button
+              onClick={() => toast.info("Product View feature coming soon!")}
               type="button"
               className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-foreground bg-background border border-border rounded-md hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
             >
@@ -182,12 +222,57 @@ export function ProductGrid({ products, content }: ProductGridProps) {
         ))}
       </div>
 
-      <div className="mt-6 p-3 bg-blue-50 rounded-lg border border-blue-200">
+      {/* Pagination */}
+      {(actualTotalPages > 1 || totalProducts > actualPageSize) && (
+        <div className="flex justify-center mt-6">
+          <Pagination>
+            <PaginationContent>
+              {currentPageState > 1 && (
+                <PaginationItem>
+                  <PaginationPrevious
+                    className="cursor-pointer"
+                    onClick={() => handlePageChange(currentPageState - 1)}
+                  />
+                </PaginationItem>
+              )}
+
+              {/* Page numbers */}
+              {Array.from({ length: Math.min(5, actualTotalPages) }, (_, i) => {
+                const pageNum = Math.max(1, currentPageState - 2) + i;
+                if (pageNum > actualTotalPages) return null;
+
+                return (
+                  <PaginationItem key={pageNum}>
+                    <PaginationLink
+                      onClick={() => handlePageChange(pageNum)}
+                      isActive={pageNum === currentPageState}
+                      className="cursor-pointer"
+                    >
+                      {pageNum}
+                    </PaginationLink>
+                  </PaginationItem>
+                );
+              })}
+
+              {currentPageState < actualTotalPages && (
+                <PaginationItem>
+                  <PaginationNext
+                    className="cursor-pointer"
+                    onClick={() => handlePageChange(currentPageState + 1)}
+                  />
+                </PaginationItem>
+              )}
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
+
+      {/* <div className="mt-6 p-3 bg-blue-50 rounded-lg border border-blue-200">
         <p className="text-sm text-blue-800">
           🎨 <strong>Generative UI:</strong> These rich product cards were
           generated directly by the AI tool!
         </p>
-      </div>
+      </div> */}
     </div>
   );
 }

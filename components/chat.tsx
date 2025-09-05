@@ -93,6 +93,10 @@ export function Chat({
     products?: any[];
     content?: string;
     type?: string;
+    currentPage?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalResults?: number;
   } | null>(null);
   const [hasUserManuallyHiddenPanel, setHasUserManuallyHiddenPanel] =
     useState(false);
@@ -429,7 +433,10 @@ export function Chat({
           <div className="flex-1 w-[70%]">
             <GenerativeUIPanel
               isVisible={isGenerativeUIPanelVisible}
-              onClose={() => setIsGenerativeUIPanelVisible(false)}
+              onClose={() => {
+                setIsGenerativeUIPanelVisible(false);
+                setHasUserManuallyHiddenPanel(true);
+              }}
               content={
                 generativeUIContent ? (
                   generativeUIContent.type === 'products' &&
@@ -437,6 +444,10 @@ export function Chat({
                     <ProductGrid
                       products={generativeUIContent.products}
                       content={generativeUIContent.content}
+                      currentPage={generativeUIContent.currentPage}
+                      pageSize={generativeUIContent.pageSize}
+                      totalPages={generativeUIContent.totalPages}
+                      totalResults={generativeUIContent.totalResults}
                     />
                   ) : (
                     <div className="p-6">
@@ -447,7 +458,7 @@ export function Chat({
                   )
                 ) : null
               }
-              title="Generative UI Results"
+              title="Results"
             />
           </div>
         )}

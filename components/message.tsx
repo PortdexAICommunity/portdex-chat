@@ -278,7 +278,8 @@ export const PurePreviewMessage = ({
                                   result.content ||
                                   'Here are the products I found for you:',
                                 type: 'products',
-                              });
+                                ...(result as any),
+                              } as any);
                             }
                             return (
                               <div className="max-w-4xl w-full">
@@ -299,17 +300,15 @@ export const PurePreviewMessage = ({
                                           <>
                                             <EyeOffIcon
                                               size={14}
-                                              className="mr-2"
                                             />
-                                            Hide Panel
+                                            <span className="ml-2">Hide Generative UI</span>
                                           </>
                                         ) : (
                                           <>
                                             <EyeIcon
                                               size={14}
-                                              className="mr-2"
                                             />
-                                            Show Panel
+                                            <span className="ml-2">Show Generative UI</span>
                                           </>
                                         )}
                                       </Button>

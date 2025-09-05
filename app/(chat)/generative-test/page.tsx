@@ -17,7 +17,7 @@ export default function GenerativeTestPage() {
               <div className="text-center">
                 <h2 className="text-xl font-semibold mb-4">🎨 Generative UI is Now Active!</h2>
                 <p className="text-muted-foreground mb-6">
-                  The searchProducts tool is integrated into your main chat. When you ask for products, you'll see rich, interactive product cards with images, ratings, and details instead of plain text.
+                  The searchProducts tool is integrated into your main chat. When you ask for products, you&apos;ll see rich, interactive product cards with images, ratings, and details instead of plain text.
                 </p>
               </div>
 
@@ -44,7 +44,7 @@ export default function GenerativeTestPage() {
                   </div>
 
                   <div className="aspect-video bg-muted rounded-lg overflow-hidden mb-3">
-                    <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-600 text-2xl">
+                    <div className="size-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-600 text-2xl">
                       🎧
                     </div>
                   </div>
@@ -88,7 +88,7 @@ export default function GenerativeTestPage() {
                   </div>
 
                   <div className="aspect-video bg-muted rounded-lg overflow-hidden mb-3">
-                    <div className="w-full h-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center text-green-600 text-2xl">
+                    <div className="size-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center text-green-600 text-2xl">
                       🪑
                     </div>
                   </div>
@@ -126,7 +126,7 @@ export default function GenerativeTestPage() {
 
               <div className="text-center text-muted-foreground">
                 <p>🎯 <strong>Generative UI Integration Complete!</strong></p>
-                <p className="text-sm mt-2">Go to your main chat and try asking for products like "wireless headphones" or "office chairs" to see the rich Generative UI in action.</p>
+                <p className="text-sm mt-2">Go to your main chat and try asking for products like &quot;wireless headphones&quot; or &quot;office chairs&quot; to see the rich Generative UI in action.</p>
               </div>
             </div>
           </div>

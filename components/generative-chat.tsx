@@ -9,7 +9,7 @@ import { Send } from "lucide-react";
 // Inner chat component that uses the AI context
 function GenerativeChatInner({ chatId }: { chatId: string }) {
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useUIStateHook() as [UIState["messages"], (messages: UIState["messages"]) => void];
+  const [messages, setMessages] = useUIStateHook();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,13 +72,13 @@ function GenerativeChatInner({ chatId }: { chatId: string }) {
       // In a real implementation, you'd handle the streaming response properly
       setTimeout(() => {
         setMessages((prevMessages: UIState["messages"]) =>
-          prevMessages.map((msg: UIState["messages"][0]) =>
+          prevMessages.map((msg) =>
             msg.id === assistantMessageId
               ? {
                   ...msg,
                   display: (
                     <div>
-                      I've processed your request for: "{userMessage}"
+                      I&apos;ve processed your request for: &quot;{userMessage}&quot;
                       <br />
                       <br />
                       The searchProducts tool should now return rich UI components when you search for products!

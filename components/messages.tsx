@@ -24,6 +24,10 @@ interface MessagesProps {
     products?: any[];
     content?: string;
     type?: string;
+    currentPage?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalResults?: number;
   }) => void;
   isGenerativeUIPanelVisible?: boolean;
   onToggleGenerativeUIPanel?: () => void;
@@ -97,7 +101,7 @@ function PureMessages({
             </p>
 
             {/* Use Cases with Shinny Badges */}
-            {selectedAssistant?.useCases?.length > 0 && (
+            {selectedAssistant && selectedAssistant.useCases && selectedAssistant.useCases.length > 0 && (
               <div className="flex flex-wrap justify-center gap-2 mt-4">
                 {selectedAssistant.useCases.map((useCase, index) => (
                   <AnimatedBadge

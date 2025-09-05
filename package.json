@@ -63,6 +63,7 @@
 		"ai": "4.3.13",
 		"aws-amplify": "^6.15.3",
 		"bcrypt-ts": "^5.0.2",
+		"cheerio": "^1.1.2",
 		"class-variance-authority": "^0.7.0",
 		"classnames": "^2.5.1",
 		"clsx": "^2.1.1",
