@@ -62,7 +62,7 @@ export default function GenerativeTestPage() {
                     <span className="text-xs text-muted-foreground">(5/5)</span>
                   </div>
 
-                  <button className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-foreground bg-background border border-border rounded-md hover:bg-muted transition-colors">
+                  <button type="button" className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-foreground bg-background border border-border rounded-md hover:bg-muted transition-colors">
                     View Details
                   </button>
                 </div>
@@ -107,7 +107,7 @@ export default function GenerativeTestPage() {
                     <span className="text-xs text-muted-foreground">(4/5)</span>
                   </div>
 
-                  <button className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-foreground bg-background border border-border rounded-md hover:bg-muted transition-colors">
+                  <button type="button" className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-foreground bg-background border border-border rounded-md hover:bg-muted transition-colors">
                     View Details
                   </button>
                 </div>
