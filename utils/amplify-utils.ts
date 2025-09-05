@@ -45,7 +45,6 @@ export async function getFetchUserAttributes() {
 			nextServerContext: { cookies },
 			operation: (contextSpec) => fetchUserAttributes(contextSpec),
 		});
-		console.log("currentUser", currentUser);
 		return currentUser;
 	} catch (error) {
 		console.log(error);
@@ -61,7 +60,6 @@ export async function AuthGetCurrentUserServer() {
 			nextServerContext: { cookies },
 			operation: (contextSpec) => getCurrentUser(contextSpec),
 		});
-		console.log("currentUser", currentUser);
 		return currentUser;
 	} catch (error) {
 		// Log the error but don't rethrow

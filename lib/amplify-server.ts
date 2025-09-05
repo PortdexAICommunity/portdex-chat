@@ -24,14 +24,11 @@ export async function getServerSession(): Promise<Session | null> {
 
 		// If we couldn't get an auth session at all, return guest
 		if (!authSession) {
-			console.log("getServerSession: No auth session, returning guest");
 			return createGuestSession();
 		}
 
 		// Check for authenticated user based on tokens
 		if (authSession.tokens) {
-			console.log("getServerSession: Authenticated user with tokens");
-
 			try {
 				// Try to get the current user if we have tokens
 				const user = await AuthGetCurrentUserServer();
@@ -45,10 +42,6 @@ export async function getServerSession(): Promise<Session | null> {
 						user.signInDetails?.loginId ||
 						tokenEmail ||
 						`user-${userId}@placeholder.local`;
-
-					console.log(
-						`getServerSession: User authenticated: ${userId}, ${resolvedEmail}`
-					);
 
 					// Ensure the user exists in our database (always pass a non-empty email string)
 					await ensureUserInDatabase(userId, resolvedEmail);

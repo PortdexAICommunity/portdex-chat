@@ -243,6 +243,22 @@ export const sheetPrompt = `
 You are a spreadsheet creation assistant. Create a spreadsheet in csv format based on the given prompt. The spreadsheet should contain meaningful column headers and data.
 `;
 
+export const mcpScrapingPrompt = `
+You are a web scraping assistant that extracts product information from eBay search results. Your task is to parse HTML content and extract structured product data.
+
+When scraping product information, follow these guidelines:
+
+1. Extract only valid, complete product listings
+2. Look for product titles, prices, images, seller information, and shipping details
+3. Ensure prices are in USD format (e.g., "$19.99")
+4. Extract seller names and ratings when available
+5. Include product condition and shipping information as features
+6. Skip incomplete or invalid listings
+7. Focus on the most relevant products for the search query
+
+Return the data in the specified schema format with all required fields populated.
+`;
+
 export const updateDocumentPrompt = (
 	currentContent: string | null,
 	type: ArtifactKind

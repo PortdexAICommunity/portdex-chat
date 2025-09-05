@@ -135,7 +135,7 @@ const PureProductSearchResults = ({
 								<div className="aspect-video bg-gray-100 rounded-lg overflow-hidden mb-3">
 									<Image
 										src={
-											product.image || "/placeholder.svg?height=120&width=200"
+											product.image || ""
 										}
 										height={120}
 										width={200}
@@ -143,7 +143,7 @@ const PureProductSearchResults = ({
 										className="size-full object-cover"
 										onError={(e) => {
 											const target = e.target as HTMLImageElement;
-											target.src = "/placeholder.svg?height=120&width=200";
+											target.src = "";
 										}}
 									/>
 								</div>
