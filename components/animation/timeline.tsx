@@ -1,6 +1,7 @@
 'use client';
 import { useScroll, useTransform, motion } from 'framer-motion';
 import React, {
+  memo,
   useCallback,
   useEffect,
   useMemo,
@@ -17,7 +18,7 @@ interface TimelineProps {
   data: readonly TimelineEntry[];
 }
 
-const TimelineItem = React.memo(
+const TimelineItem = memo(
   ({ item, index }: { item: TimelineEntry; index: number }) => (
     <div className="flex justify-start pt-10 md:pt-40 md:gap-10 text-white">
       <div className="sticky flex flex-col md:flex-row z-40 items-center top-40 self-start max-w-xs lg:max-w-sm md:w-full">
@@ -41,7 +42,7 @@ const TimelineItem = React.memo(
 
 TimelineItem.displayName = 'TimelineItem';
 
-export const Timeline = React.memo(({ data }: TimelineProps): JSX.Element => {
+export const Timeline = memo(({ data }: TimelineProps): JSX.Element => {
   const ref = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(0);

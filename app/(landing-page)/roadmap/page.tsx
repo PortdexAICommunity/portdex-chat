@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import { Calendar, MapPin, Target } from 'lucide-react';
 import { fadeIn, staggerContainer } from '@/lib/animation-constant';
-import React from 'react';
+import React, { memo } from 'react';
 
 interface RoadmapData {
   title: string;
@@ -172,4 +172,4 @@ const RoadmapPage = (): JSX.Element => {
   );
 };
 
-export default React.memo(RoadmapPage);
+export default memo(RoadmapPage);

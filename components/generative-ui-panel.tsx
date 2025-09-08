@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { Button } from './ui/button';
 import {
@@ -87,7 +87,7 @@ interface ProductGridProps {
 
 export function ProductGrid({ products, content, currentPage, pageSize, totalPages, totalResults }: ProductGridProps) {
   // State for client-side pagination
-  const [currentPageState, setCurrentPageState] = React.useState(currentPage || 1);
+  const [currentPageState, setCurrentPageState] = useState(currentPage || 1);
   const actualPageSize = pageSize || 12;
 
   // Calculate pagination

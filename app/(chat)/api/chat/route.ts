@@ -56,20 +56,7 @@ function getAssistantFromModelId(selectedChatModel: string) {
 	return assistant || null;
 }
 
-// Helper function to log with timestamp for better debugging
-function logWithTimestamp(message: string, data?: any) {
-	const timestamp = new Date().toISOString();
-	if (data) {
-		console.log(`[${timestamp}] ${message}`, data);
-	} else {
-		console.log(`[${timestamp}] ${message}`);
-	}
-}
-
 export async function POST(request: Request) {
-	const startTime = Date.now();
-	logWithTimestamp("Chat API POST request started");
-
 	const { readable, writable } = new TransformStream();
 	const writer = writable.getWriter();
 	let isWriterClosed = false;
@@ -98,9 +85,7 @@ export async function POST(request: Request) {
 			try {
 				const json = await request.json();
 				requestBody = postRequestBodySchema.parse(json);
-				logWithTimestamp("Request parsed successfully");
 			} catch (error) {
-				logWithTimestamp("Invalid request body", error);
 				writer.write(
 					`data: ${JSON.stringify({ error: "Invalid request" })}\n\n`
 				);
@@ -110,7 +95,6 @@ export async function POST(request: Request) {
 
 			const session = await getServerSession();
 			if (!session?.user) {
-				logWithTimestamp("Unauthorized request - no session user");
 				writer.write(`data: ${JSON.stringify({ error: "Unauthorized" })}\n\n`);
 				await safeCloseWriter();
 				return;
@@ -119,12 +103,6 @@ export async function POST(request: Request) {
 			const { id, message, selectedChatModel, selectedVisibilityType } =
 				requestBody;
 			const userType: "guest" | "regular" = session.user.type;
-
-			logWithTimestamp(`Processing request for chat ${id}`, {
-				userType,
-				selectedChatModel,
-				selectedVisibilityType,
-			});
 
 			// Get selected assistant (if any) for dynamic entitlements and prompts
 			const selectedAssistant = getAssistantFromModelId(selectedChatModel);
@@ -139,16 +117,13 @@ export async function POST(request: Request) {
 					const mcpUrl = selectedAssistant?.mcp_url;
 
 					if (mcpUrl) {
-						logWithTimestamp(`Initializing MCP client for ${mcpUrl}`);
 						const transport = new StreamableHTTPClientTransport(
 							new URL(mcpUrl)
 						);
 						customClient = await experimental_createMCPClient({ transport });
 						toolSet = await customClient.tools();
-						logWithTimestamp("MCP client initialized successfully");
 					}
 				} catch (mcpError) {
-					logWithTimestamp("MCP initialization failed", mcpError);
 					// Continue without MCP if it fails
 					customClient = null;
 					toolSet = {};
@@ -164,7 +139,6 @@ export async function POST(request: Request) {
 
 			// Validate that the selected model is available to the user
 			if (!availableChatModelIds.includes(selectedChatModel)) {
-				logWithTimestamp(`Model not available: ${selectedChatModel}`);
 				writer.write(
 					`data: ${JSON.stringify({
 						error: "Forbidden: Model not available",
@@ -179,34 +153,22 @@ export async function POST(request: Request) {
 			let chat = null;
 
 			if (session.user.type !== "guest") {
-				logWithTimestamp("Running database checks for regular user");
 				const [messageCountResult, chatResult] = await Promise.all([
 					getMessageCountByUserId({
 						id: session.user.id,
 						differenceInHours: 24,
-					}).catch((error) => {
-						logWithTimestamp("Failed to get message count", error);
+					}).catch(() => {
 						return 0;
 					}),
-					getChatById({ id }).catch((error) => {
-						logWithTimestamp("Failed to get chat", error);
+					getChatById({ id }).catch(() => {
 						return null;
 					}),
 				]);
 				messageCount = messageCountResult;
 				chat = chatResult;
-				logWithTimestamp(
-					`Message count: ${messageCount}, Chat found: ${!!chat}`
-				);
-			} else {
-				logWithTimestamp("Skipping database checks for guest user");
 			}
 
 			if (messageCount > maxMessagesPerDay) {
-				logWithTimestamp("Rate limit exceeded", {
-					messageCount,
-					maxMessagesPerDay,
-				});
 				writer.write(
 					`data: ${JSON.stringify({ error: "Rate limit exceeded" })}\n\n`
 				);
@@ -215,7 +177,6 @@ export async function POST(request: Request) {
 			}
 
 			if (chat?.userId && chat.userId !== session.user.id) {
-				logWithTimestamp("Forbidden - chat belongs to another user");
 				writer.write(`data: ${JSON.stringify({ error: "Forbidden" })}\n\n`);
 				await safeCloseWriter();
 				return;
@@ -230,7 +191,6 @@ export async function POST(request: Request) {
 						session.user.email || `user-${session.user.id}@placeholder.local`
 					);
 
-					logWithTimestamp("Creating new chat (pre-stream)");
 					const title = await generateTitleFromUserMessage({ message });
 					await saveChat({
 						id,
@@ -240,12 +200,7 @@ export async function POST(request: Request) {
 					});
 					// Mark chat as created to avoid duplicate creation in background ops
 					chat = { id, userId: session.user.id } as any;
-					logWithTimestamp("Chat created successfully (pre-stream)");
 				} catch (createChatError) {
-					logWithTimestamp(
-						"Failed to create chat (pre-stream)",
-						createChatError
-					);
 					writer.write(
 						`data: ${JSON.stringify({ error: "Failed to create chat" })}\n\n`
 					);
@@ -262,19 +217,13 @@ export async function POST(request: Request) {
 				city,
 				country,
 			};
-			logWithTimestamp("Geolocation hints", { city, country });
 
 			// Get previous messages for context - skip for guest users
 			let previousMessages: any[] = [];
 			if (session.user.type !== "guest") {
-				logWithTimestamp("Fetching previous messages");
-				previousMessages = await getMessagesByChatId({ id }).catch((error) => {
-					logWithTimestamp("Failed to get previous messages", error);
+				previousMessages = await getMessagesByChatId({ id }).catch(() => {
 					return [];
 				});
-				logWithTimestamp(`Found ${previousMessages.length} previous messages`);
-			} else {
-				logWithTimestamp("Skipping previous messages retrieval for guest user");
 			}
 
 			const messages = appendClientMessage({
@@ -284,26 +233,11 @@ export async function POST(request: Request) {
 
 			// Create appropriate provider based on whether an assistant is selected
 			const provider = createDynamicProvider(selectedAssistant);
-			logWithTimestamp("Provider created");
-
-			// Log environment variables (safely)
-			logWithTimestamp("Environment check", {
-				isTestEnvironment: isProductionEnvironment ? "No" : "Yes",
-				hasPortdexApiKey: process.env.PORTDEX_API_KEY ? "Yes" : "No",
-				nodeEnv: process.env.NODE_ENV,
-				envVarKeys: Object.keys(process.env)
-					.filter(
-						(key) =>
-							key.includes("PORT") || key.includes("API") || key.includes("KEY")
-					)
-					.join(", "),
-			});
 
 			// Start database operations in background - only for authenticated users
 			const saveOperationsPromise = (async () => {
 				// Skip database operations for guest users
 				if (session.user.type === "guest") {
-					logWithTimestamp("Skipping database operations for guest user");
 					return generateUUID(); // Return a fallback stream ID
 				}
 
@@ -311,7 +245,6 @@ export async function POST(request: Request) {
 					// Chat is guaranteed to exist at this point (pre-stream ensure)
 
 					// Save user message
-					logWithTimestamp("Saving user message");
 					await saveMessages({
 						messages: [
 							{
@@ -324,16 +257,13 @@ export async function POST(request: Request) {
 							},
 						],
 					});
-					logWithTimestamp("User message saved successfully");
 
 					// Create stream ID
 					const streamId = generateUUID();
 					await createStreamId({ streamId, chatId: id });
-					logWithTimestamp(`Stream ID created: ${streamId}`);
 
 					return streamId;
 				} catch (error) {
-					logWithTimestamp("Background database operations failed", error);
 					return generateUUID(); // Fallback stream ID
 				}
 			})();
@@ -373,20 +303,6 @@ export async function POST(request: Request) {
 				activeTools = baseTools;
 			}
 
-			logWithTimestamp(
-				`Starting AI response streaming with ${activeTools.length} active tools`
-			);
-
-			// Log the active tools for debugging
-			console.log("🔧 Active tools:", activeTools);
-
-			// Log searchProducts tool specifically
-			console.log("🔍 searchProducts tool loaded:", {
-				hasExecute: typeof searchProductsGenerative.execute === "function",
-				hasDescription: !!searchProductsGenerative.description,
-				hasParameters: !!searchProductsGenerative.parameters,
-			});
-
 			// Start AI response streaming immediately - don't wait for database operations
 			const result = streamText({
 				model: provider.languageModel(selectedChatModel),
@@ -419,31 +335,12 @@ export async function POST(request: Request) {
 					...(isAssistantModel(selectedChatModel) ? toolSet : {}),
 				},
 				onFinish: async ({ response }) => {
-					logWithTimestamp("AI response finished");
-
-					// Debug: Log tool results (simplified)
-					if (response.messages) {
-						const toolInvocations = response.messages.flatMap(
-							(msg: any) => (msg as any).toolInvocations || []
-						);
-						if (toolInvocations.length > 0) {
-							console.log(
-								`🔧 Tool executions completed:`,
-								toolInvocations.length
-							);
-							toolInvocations.forEach((toolInv: any, idx: number) => {
-								console.log(`   ✅ ${toolInv.toolName}: ${toolInv.state}`);
-							});
-						}
-					}
-
 					// Only close MCP client if it was initialized
 					if (customClient) {
 						try {
 							await customClient.close();
-							logWithTimestamp("MCP client closed successfully");
 						} catch (closeError) {
-							logWithTimestamp("Error closing MCP client", closeError);
+							// Continue if MCP client close fails
 						}
 					}
 					if (!session?.user?.id) return;
@@ -465,7 +362,6 @@ export async function POST(request: Request) {
 					// Wait for background operations to complete before saving assistant message
 					// Only save for authenticated users
 					if (session.user.type !== "guest") {
-						logWithTimestamp("Saving assistant message");
 						saveOperationsPromise.then(async () => {
 							try {
 								await saveMessages({
@@ -481,13 +377,10 @@ export async function POST(request: Request) {
 										},
 									],
 								});
-								logWithTimestamp("Assistant message saved successfully");
 							} catch (error) {
-								logWithTimestamp("Failed to save assistant message", error);
+								// Continue if saving fails
 							}
 						});
-					} else {
-						logWithTimestamp("Skipping assistant message save for guest user");
 					}
 				},
 				experimental_telemetry: {
@@ -496,25 +389,12 @@ export async function POST(request: Request) {
 				},
 			});
 
-			// Log provider details to help diagnose the issue
-			try {
-				logWithTimestamp("AI Provider details", {
-					type: provider.constructor.name,
-					modelName: selectedChatModel,
-					modelAvailable: !!provider.languageModel,
-				});
-			} catch (providerError) {
-				logWithTimestamp("Error inspecting provider", providerError);
-			}
-
 			// Important: Ensure the stream is consumed even if the client disconnects
 			// This is critical for AWS Amplify deployments
 			result.consumeStream();
 
 			// Process the stream with error handling
 			try {
-				logWithTimestamp("Starting to process stream");
-
 				// Check if we have the API key for non-test environments
 				// if (!process.env.PORTDEX_API_KEY && !isProductionEnvironment) {
 				// 	throw new Error("Missing PORTDEX_API_KEY environment variable");
@@ -526,26 +406,13 @@ export async function POST(request: Request) {
 				while (true) {
 					const { done, value } = await reader.read();
 					if (done) {
-						logWithTimestamp(
-							`Stream processing completed after ${chunkCount} chunks`
-						);
 						break;
 					}
 
 					chunkCount++;
-					if (chunkCount === 1) {
-						logWithTimestamp("First chunk received", {
-							valueLength: value?.length,
-						});
-					}
-
 					await writer.write(value);
 				}
-				logWithTimestamp(
-					`Request processed in ${Date.now() - startTime}ms with ${chunkCount} chunks`
-				);
 			} catch (streamError) {
-				logWithTimestamp("Stream error", streamError);
 				writer.write(
 					`data: ${JSON.stringify({
 						error: "Stream processing error",
@@ -558,7 +425,6 @@ export async function POST(request: Request) {
 			}
 		} catch (err) {
 			const error = err as Error;
-			logWithTimestamp("Fatal error", error);
 			writer.write(
 				`data: ${JSON.stringify({
 					error: "Internal server error",
@@ -567,7 +433,6 @@ export async function POST(request: Request) {
 			);
 		} finally {
 			await safeCloseWriter();
-			logWithTimestamp(`Request completed in ${Date.now() - startTime}ms`);
 		}
 	})();
 
@@ -575,71 +440,56 @@ export async function POST(request: Request) {
 }
 
 export async function GET(request: Request) {
-	const startTime = Date.now();
-	logWithTimestamp("Chat API GET request started");
-
 	const { searchParams } = new URL(request.url);
 	const chatId = searchParams.get("chatId");
 
 	if (!chatId) {
-		logWithTimestamp("Bad request - missing chatId");
 		return new ChatSDKError("bad_request:api").toResponse();
 	}
 
 	const session = await getServerSession();
 
 	if (!session?.user) {
-		logWithTimestamp("Unauthorized request - no session user");
 		return new ChatSDKError("unauthorized:chat").toResponse();
 	}
 
 	let chat: Chat;
 
 	try {
-		logWithTimestamp(`Getting chat by ID: ${chatId}`);
 		chat = await getChatById({ id: chatId });
 	} catch (error) {
-		logWithTimestamp("Failed to get chat", error);
 		return new ChatSDKError("not_found:chat").toResponse();
 	}
 
 	if (!chat) {
-		logWithTimestamp("Chat not found");
 		return new ChatSDKError("not_found:chat").toResponse();
 	}
 
 	if (chat.visibility === "private" && chat.userId !== session.user.id) {
-		logWithTimestamp("Forbidden - chat is private and belongs to another user");
 		return new ChatSDKError("forbidden:chat").toResponse();
 	}
 
-	logWithTimestamp("Getting stream IDs for chat");
 	const streamIds = await getStreamIdsByChatId({ chatId });
 
 	if (!streamIds.length) {
-		logWithTimestamp("No streams found for chat");
 		return new ChatSDKError("not_found:stream").toResponse();
 	}
 
 	const recentStreamId = streamIds.at(-1);
 
 	if (!recentStreamId) {
-		logWithTimestamp("No recent stream found");
 		return new ChatSDKError("not_found:stream").toResponse();
 	}
 
 	// For GET requests, we'll return a simple response since resumable streams are complex
-	logWithTimestamp("Getting messages for chat");
 	const messages = await getMessagesByChatId({ id: chatId });
 	const mostRecentMessage = messages.at(-1);
 
 	if (!mostRecentMessage) {
-		logWithTimestamp("No messages found for chat");
 		return new Response(JSON.stringify({ messages: [] }), { status: 200 });
 	}
 
 	if (mostRecentMessage.role !== "assistant") {
-		logWithTimestamp("Most recent message is not from assistant");
 		return new Response(JSON.stringify({ messages: [] }), { status: 200 });
 	}
 
@@ -647,11 +497,9 @@ export async function GET(request: Request) {
 	const messageCreatedAt = new Date(mostRecentMessage.createdAt);
 
 	if (differenceInSeconds(resumeRequestedAt, messageCreatedAt) > 15) {
-		logWithTimestamp("Message is too old to resume");
 		return new Response(JSON.stringify({ messages: [] }), { status: 200 });
 	}
 
-	logWithTimestamp(`GET request completed in ${Date.now() - startTime}ms`);
 	return new Response(
 		JSON.stringify({
 			messages: [mostRecentMessage],
@@ -666,39 +514,29 @@ export async function GET(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-	const startTime = Date.now();
-	logWithTimestamp("Chat API DELETE request started");
-
 	const { searchParams } = new URL(request.url);
 	const id = searchParams.get("id");
 
 	if (!id) {
-		logWithTimestamp("Bad request - missing id");
 		return new ChatSDKError("bad_request:api").toResponse();
 	}
 
 	const session = await getServerSession();
 
 	if (!session?.user) {
-		logWithTimestamp("Unauthorized request - no session user");
 		return new ChatSDKError("unauthorized:chat").toResponse();
 	}
 
 	try {
-		logWithTimestamp(`Getting chat by ID: ${id}`);
 		const chat = await getChatById({ id });
 
 		if (chat.userId !== session.user.id) {
-			logWithTimestamp("Forbidden - chat belongs to another user");
 			return new ChatSDKError("forbidden:chat").toResponse();
 		}
 
-		logWithTimestamp("Deleting chat");
 		const deletedChat = await deleteChatById({ id });
-		logWithTimestamp(`DELETE request completed in ${Date.now() - startTime}ms`);
 		return Response.json(deletedChat, { status: 200 });
 	} catch (error) {
-		logWithTimestamp("Error deleting chat", error);
 		return new ChatSDKError("bad_request:database").toResponse();
 	}
 }
