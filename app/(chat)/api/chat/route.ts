@@ -34,7 +34,7 @@ import {
 import { differenceInSeconds } from "date-fns";
 import { generateTitleFromUserMessage } from "../../actions";
 import { postRequestBodySchema, type PostRequestBody } from "./schema";
-import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
+// import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 
 export const maxDuration = 60;
 
@@ -117,6 +117,9 @@ export async function POST(request: Request) {
 					const mcpUrl = selectedAssistant?.mcp_url;
 
 					if (mcpUrl) {
+						const { StreamableHTTPClientTransport } = await import(
+							"@modelcontextprotocol/sdk/client/streamableHttp.js"
+						);
 						const transport = new StreamableHTTPClientTransport(
 							new URL(mcpUrl)
 						);
