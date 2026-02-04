@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import { Calendar, MapPin, Target } from 'lucide-react';
 import { fadeIn, staggerContainer } from '@/lib/animation-constant';
-import React from 'react';
+import React, { memo } from 'react';
 
 interface RoadmapData {
   title: string;
@@ -20,13 +20,13 @@ const ROADMAP_DATA: RoadmapData[] = [
     content: (
       <div>
         <h3 className="text-black dark:text-white text-xl font-normal mb-4">
-          Portdex.ai Beta Test Net (Blockchain Integration)
+          Maava.ai Beta Test Net (Blockchain Integration)
         </h3>
         <p className="text-black dark:text-neutral-200 text-xs md:text-sm font-normal mb-4">
-          <strong>Launch of Portdex.ai Beta Test Net</strong>
+          <strong>Launch of Maava.ai Beta Test Net</strong>
         </p>
         <p className="text-black dark:text-neutral-200 text-xs md:text-sm font-normal mb-8">
-          The initial beta release of Portdex.ai will include blockchain
+          The initial beta release of Maava.ai will include blockchain
           integration, enabling developers and businesses to begin testing the
           platform&apos;s core features. This phase will focus on AI agent
           deployment, blockchain protocol integration, and cross-chain asset
@@ -47,13 +47,13 @@ const ROADMAP_DATA: RoadmapData[] = [
           <strong>Marketplace Goes Live</strong>
         </p>
         <p className="text-black dark:text-neutral-200 text-xs md:text-sm font-normal mb-8">
-          The Portdex Marketplace will officially launch, providing content
+          The Maava Marketplace will officially launch, providing content
           creators, developers, and businesses a free space to list, sell, and
           collaborate on AI agents and digital content. The marketplace will
           support the listing and exchange of tokenized assets, with
           blockchain-backed traceability for each transaction. This milestone
           will open new opportunities for content monetization and collaboration
-          within the Portdex ecosystem.
+          within the Maava ecosystem.
         </p>
       </div>
     ),
@@ -66,16 +66,16 @@ const ROADMAP_DATA: RoadmapData[] = [
           Final Large Language Model (LLM) Release
         </h3>
         <p className="text-black dark:text-neutral-200 text-xs md:text-sm font-normal mb-4">
-          <strong>Portdex AI LLM Final Version</strong>
+          <strong>Maava AI LLM Final Version</strong>
         </p>
         <p className="text-black dark:text-neutral-200 text-xs md:text-sm font-normal mb-8">
-          Portdex will release the final version of its Large Language Model
-          (LLM) integrated into the platform. This advanced AI model will
-          enhance content creation, automation, and AI agent development,
-          providing businesses and developers with an even more powerful tool to
-          build sophisticated agents and applications. The LLM will be optimized
-          for both centralized and decentralized environments, making it a
-          versatile tool for a wide range of industries.
+          Maava will release the final version of its Large Language Model (LLM)
+          integrated into the platform. This advanced AI model will enhance
+          content creation, automation, and AI agent development, providing
+          businesses and developers with an even more powerful tool to build
+          sophisticated agents and applications. The LLM will be optimized for
+          both centralized and decentralized environments, making it a versatile
+          tool for a wide range of industries.
         </p>
       </div>
     ),
@@ -124,7 +124,7 @@ const HeroSection = () => {
             className="text-center font-bold tracking-tight text-4xl md:text-5xl lg:text-6xl"
           >
             <span className="bg-gradient-to-r from-purple-500 via-teal-500 to-green-500 bg-clip-text text-transparent">
-              Portdex Roadmap
+              Maava Roadmap
             </span>
           </motion.h1>
 
@@ -172,4 +172,4 @@ const RoadmapPage = (): JSX.Element => {
   );
 };
 
-export default React.memo(RoadmapPage);
+export default memo(RoadmapPage);

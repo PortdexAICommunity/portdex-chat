@@ -1,6 +1,6 @@
 # Docker Deployment Guide
 
-This guide explains how to build and deploy the Portdex Chat application using Docker.
+This guide explains how to build and deploy the Maava application using Docker.
 
 ## Prerequisites
 

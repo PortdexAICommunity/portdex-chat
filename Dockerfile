@@ -1,53 +1,93 @@
-# syntax=docker/dockerfile:1
-FROM node:20-alpine AS base
+# Multi-stage Dockerfile for Next.js application
 
-# Install dependencies only when needed
+# Stage 1: Base image with pnpm
+FROM node:20-alpine AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+RUN apk add --no-cache libc6-compat curl postgresql-client
+
+# Stage 2: Install dependencies
 FROM base AS deps
-RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-RUN rm -rf .next node_modules
+# Copy package files
+COPY package.json pnpm-lock.yaml ./
 
-COPY package.json pnpm-lock.yaml* ./
-RUN corepack enable pnpm && pnpm install --frozen-lockfile
+# Install Python and build tools for native modules
+RUN apk add --no-cache python3 make g++ libc-dev
 
-# Build the app with standalone output
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Stage 3: Build the application
 FROM base AS builder
 WORKDIR /app
+
+# Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
+
+# Copy source code
 COPY . .
 
-# Enable standalone output in next.config.js:
-# module.exports = { output: 'standalone' }
+# Set environment variable for build
+ENV NEXT_TELEMETRY_DISABLED 1
+ENV POSTGRES_URL "postgres://user:pass@localhost:5432/db"
 
-RUN corepack enable pnpm && pnpm build
+# Build the application (includes database migration)
+# Note: Database migration requires POSTGRES_URL environment variable
+RUN pnpm run build
 
-# Production image
-FROM node:20-alpine AS runner
+# Stage 4: Production image
+FROM base AS runner
 WORKDIR /app
 
+# Create non-root user
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
 # Set environment variables
-ENV NODE_ENV=production
-ENV PORT=3000
-ENV HOSTNAME="0.0.0.0"
+ENV NODE_ENV production
+ENV NEXT_TELEMETRY_DISABLED 1
 
-# Create non-root user for security
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs
-
-# Copy only the standalone output
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
+# Copy built application
 COPY --from=builder /app/public ./public
 
-# Copy entrypoint script and ensure it's executable
-COPY entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
+# Set the correct permission for prerender cache
+RUN mkdir .next
+RUN chown nextjs:nodejs .next
 
+# Copy built Next.js application with correct permissions
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Copy database migrations and scripts
+COPY --from=builder --chown=nextjs:nodejs /app/lib/db ./lib/db
+COPY --from=builder --chown=nextjs:nodejs /app/drizzle.config.ts ./
+COPY --from=builder --chown=nextjs:nodejs /app/package.json ./
+
+# Copy startup script
+COPY --chown=nextjs:nodejs scripts/start.sh ./start.sh
+
+# Copy node_modules needed for migrations (tsx and postgres packages)
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
+
+# Make startup script executable
+RUN chmod +x ./start.sh
+
+# Switch to non-root user
 USER nextjs
 
+# Expose port
 EXPOSE 3000
 
-# Entrypoint script ensures env vars are loaded at runtime
-ENTRYPOINT ["/bin/sh", "/app/entrypoint.sh"]
-CMD ["node", "server.js"]
+# Set environment variables
+ENV PORT 3000
+ENV HOSTNAME "0.0.0.0"
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:3000/api/health || exit 1
+
+# Start the application with migrations
+CMD ["./start.sh"] 

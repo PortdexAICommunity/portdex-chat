@@ -1081,7 +1081,7 @@ export default function Marketplace() {
               <SidebarTrigger />
 
               <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-                Portdex Marketplace
+                Maava Marketplace
               </h1>
 
               {/* Search - Only show for home tab */}
@@ -1140,7 +1140,7 @@ export default function Marketplace() {
               },
               {
                 id: 'assistants',
-                label: 'Assistants',
+                label: 'Agents',
                 icon: AIAgentIcon,
               },
               {

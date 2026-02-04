@@ -87,7 +87,7 @@ const HeroSection = () => {
             className="text-center font-bold tracking-tight text-4xl md:text-5xl lg:text-6xl"
           >
             <span className="bg-gradient-to-r from-purple-500 via-teal-500 to-green-500 bg-clip-text text-transparent">
-              Contact Portdex
+              Contact Maava
             </span>
           </motion.h1>
 
@@ -97,7 +97,7 @@ const HeroSection = () => {
             className="max-w-2xl text-base mx-auto text-muted-foreground sm:text-lg md:text-xl text-center"
           >
             Ready to transform your business with AI agents? Get in touch with
-            our team and discover how Portdex can help you build, deploy, and
+            our team and discover how Maava can help you build, deploy, and
             monetize intelligent solutions.
           </motion.p>
 
@@ -144,7 +144,7 @@ const ContactInfo = () => {
     {
       icon: Building2,
       title: 'Company Details',
-      content: 'Portdex Limited',
+      content: 'Maava Limited',
       description: 'Registered in England and Wales',
       link: null,
     },
@@ -454,7 +454,7 @@ const LocationSection = () => {
                 <div className="space-y-6">
                   <div>
                     <h3 className="text-2xl font-bold text-purple-800 mb-2">
-                      Portdex Limited
+                      Maava Limited
                     </h3>
                     <p className="text-purple-600 font-medium">
                       Registered in England and Wales

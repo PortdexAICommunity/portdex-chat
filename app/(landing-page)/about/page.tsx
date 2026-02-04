@@ -217,7 +217,7 @@ const HeroSection = () => {
             >
               <Image
                 src="/hero2.png"
-                alt="Portdex AI Interface"
+                alt="Maava AI Interface"
                 className="w-full h-auto transition-transform duration-700 ease-out"
                 width={1200}
                 height={675}
@@ -230,7 +230,7 @@ const HeroSection = () => {
         <div className="max-w-6xl mx-auto text-center mt-5 flex justify-center items-center px-4">
           <p className="text-lg md:text-xl text-muted-foreground font-sans">
             <span className="text-neutral-800 dark:text-white font-bold">
-              Portdex AI
+              Maava AI
             </span>
             :{' '}
             <span className="text-neutral-800 dark:text-white font-bold">
@@ -274,7 +274,7 @@ const HeroSection = () => {
             >
               <Image
                 src="/hero.png"
-                alt="Portdex AI Interface"
+                alt="Maava AI Interface"
                 className="w-full h-auto transition-transform duration-700 ease-out"
                 width={1200}
                 height={675}
@@ -287,7 +287,7 @@ const HeroSection = () => {
         <div className="max-w-6xl mx-auto text-center mt-5 flex justify-center items-center px-4">
           <p className="text-lg md:text-xl text-muted-foreground font-sans">
             <span className="font-bold text-neutral-800 dark:text-white">
-              Portdex AI
+              Maava AI
             </span>{' '}
             is a next-gen platform that combines{' '}
             <span className="text-neutral-800 dark:text-white font-bold">
@@ -378,7 +378,7 @@ function Features() {
       <div className="mt-32 container mx-auto px-4">
         <div className="mx-auto mb-16 max-w-3xl text-center">
           <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
-            Create and List Interoperable AI Agents on Portdex
+            Create and List Interoperable AI Agents on Maava
           </h2>
           <p className="mt-4 text-muted-foreground">
             Seamlessly Port AI Agents Across Platforms for Enhanced Flexibility

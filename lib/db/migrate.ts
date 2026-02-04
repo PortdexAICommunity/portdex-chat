@@ -12,7 +12,7 @@ const runMigrate = async () => {
 		throw new Error("POSTGRES_URL is not defined");
 	}
 
-	const connection = postgres(`${process.env.POSTGRES_URL}/Portdex-Chat`, {
+	const connection = postgres(`${process.env.POSTGRES_URL}/Maava-Chat`, {
 		max: 1,
 	});
 	const db = drizzle(connection);

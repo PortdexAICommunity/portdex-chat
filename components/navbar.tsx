@@ -18,7 +18,7 @@ export function Navbar() {
           {/* Company Logo - hidden on mobile when sidebar is open */}
           <Link href="/" className="flex items-center gap-2">
             <span className="font-bold sm:inline-block font-sans text-xl">
-              Portdex
+              Maava
             </span>
           </Link>
         </div>

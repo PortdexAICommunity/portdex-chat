@@ -36,7 +36,7 @@ export const Spotlight = ({
 			transition={{
 				duration: 1.5,
 			}}
-			className="pointer-events-none absolute inset-0 h-full w-full overflow-hidden"
+			className="pointer-events-none absolute inset-0 size-full overflow-hidden"
 			style={{
 				maskImage:
 					"radial-gradient(ellipse 100% 70% at 50% 50%, black 0%, black 40%, transparent 70%)",
@@ -144,7 +144,7 @@ export const Spotlight = ({
 
 			{/* Additional background fade layers for smoother transitions */}
 			<div
-				className="absolute inset-0 w-full h-full pointer-events-none z-30"
+				className="absolute inset-0 size-full pointer-events-none z-30"
 				style={{
 					background:
 						"radial-gradient(ellipse 120% 80% at 50% 40%, hsla(257, 30%, 50%, .02) 0%, hsla(257, 20%, 60%, .01) 60%, transparent 100%)",
@@ -153,7 +153,7 @@ export const Spotlight = ({
 			/>
 
 			<div
-				className="absolute inset-0 w-full h-full pointer-events-none z-20"
+				className="absolute inset-0 size-full pointer-events-none z-20"
 				style={{
 					background:
 						"linear-gradient(135deg, hsla(257, 25%, 70%, .015) 0%, transparent 30%, transparent 70%, hsla(257, 25%, 70%, .015) 100%)",

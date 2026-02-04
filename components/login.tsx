@@ -14,8 +14,6 @@ import {
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import '@aws-amplify/ui-react/styles.css';
-import { signInWithRedirect } from 'aws-amplify/auth';
-import { toast } from 'sonner';
 
 const formFields = {
   signIn: {
@@ -75,7 +73,7 @@ const components = {
             </Button>
           </View>
           <span className="text-center text-muted-foreground text-sm">
-            &copy; {new Date().getFullYear()} Portdex. All rights reserved.
+            &copy; {new Date().getFullYear()} Maava. All rights reserved.
           </span>
         </>
       );
@@ -94,7 +92,7 @@ const components = {
       return (
         <>
           <span className="text-center text-muted-foreground text-sm">
-            &copy; {new Date().getFullYear()} Portdex. All rights reserved.
+            &copy; {new Date().getFullYear()} Maava. All rights reserved.
           </span>
         </>
       );
@@ -118,7 +116,7 @@ function AuthenticatedApp() {
 function Login() {
   const { tokens } = useTheme();
   const theme: Theme = {
-    name: 'Portdex Chat Theme',
+    name: 'Maava Theme',
     tokens: {
       components: {
         authenticator: {

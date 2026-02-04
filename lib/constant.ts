@@ -119,41 +119,41 @@ export const helpItems = [
 
 export const FAQS = [
   {
-    question: 'What is Portdex.ai?',
+    question: 'What is Maava.ai?',
     answer:
-      'Portdex.ai is a platform designed to enable businesses and developers to collaboratively build, deploy, and manage AI agents. It provides a virtual environment and a free marketplace where developers can list and import digital content they’ve created. Portdex allows content creators to generate content on any platform or directly on Portdex and list it for free on the marketplace. Businesses can access this content and only pay for the basic model price of the AI agents they wish to use. Additionally, Portdex integrates blockchain protocols to enable developers to deploy agents on blockchain networks, enhancing the security and transparency of digital content and transactions.',
+      'Maava.ai is a platform designed to enable businesses and developers to collaboratively build, deploy, and manage AI agents. It provides a virtual environment and a free marketplace where developers can list and import digital content they’ve created. Maava allows content creators to generate content on any platform or directly on Maava and list it for free on the marketplace. Businesses can access this content and only pay for the basic model price of the AI agents they wish to use. Additionally, Maava integrates blockchain protocols to enable developers to deploy agents on blockchain networks, enhancing the security and transparency of digital content and transactions.',
   },
   {
     question:
-      'How does Portdex.ai support collaboration between businesses and developers?',
+      'How does Maava.ai support collaboration between businesses and developers?',
     answer:
-      'Portdex.ai fosters collaboration by offering a shared virtual environment where developers can create AI agents and businesses can access them. Developers can build and list their AI agents on the marketplace, while businesses can easily browse, import, and utilize these agents to optimize their workflows. The platform encourages open collaboration by providing a space for both developers and businesses to contribute and benefit from innovative AI solutions, with the added advantage of blockchain integration for secure deployment and transaction.',
+      'Maava.ai fosters collaboration by offering a shared virtual environment where developers can create AI agents and businesses can access them. Developers can build and list their AI agents on the marketplace, while businesses can easily browse, import, and utilize these agents to optimize their workflows. The platform encourages open collaboration by providing a space for both developers and businesses to contribute and benefit from innovative AI solutions, with the added advantage of blockchain integration for secure deployment and transaction.',
   },
   {
-    question: 'How does Portdex.ai integrate blockchain protocols?',
+    question: 'How does Maava.ai integrate blockchain protocols?',
     answer:
-      'Portdex.ai integrates blockchain protocols to enable developers to deploy AI agents on decentralized networks, ensuring greater transparency, security, and control over intellectual property. Blockchain integration allows content creators and developers to establish ownership rights of their AI agents and assets, ensuring that all transactions and interactions are recorded in a secure, tamper-proof manner. This gives businesses confidence in the authenticity and legitimacy of the content they access.',
+      'Maava.ai integrates blockchain protocols to enable developers to deploy AI agents on decentralized networks, ensuring greater transparency, security, and control over intellectual property. Blockchain integration allows content creators and developers to establish ownership rights of their AI agents and assets, ensuring that all transactions and interactions are recorded in a secure, tamper-proof manner. This gives businesses confidence in the authenticity and legitimacy of the content they access.',
   },
   {
     question:
-      'How does Portdex.ai support multi-asset transactions in the marketplace?',
+      'How does Maava.ai support multi-asset transactions in the marketplace?',
     answer:
-      'Portdex.ai integrates Web 3.0 and cross-chain technologies to enable multi-asset transactions within the marketplace. This means that users can engage in seamless transactions across various blockchain networks, exchanging different types of digital assets without compatibility issues. Developers and businesses can list and purchase AI agents or content using multiple assets, making the marketplace more flexible and accessible for all users.',
+      'Maava.ai integrates Web 3.0 and cross-chain technologies to enable multi-asset transactions within the marketplace. This means that users can engage in seamless transactions across various blockchain networks, exchanging different types of digital assets without compatibility issues. Developers and businesses can list and purchase AI agents or content using multiple assets, making the marketplace more flexible and accessible for all users.',
   },
   {
-    question: 'Can I create and list content on Portdex.ai?',
+    question: 'Can I create and list content on Maava.ai?',
     answer:
-      'Yes! As a content creator, you can create digital content on any platform and list it on Portdex’s marketplace for free. Portdex supports various formats and types of content, allowing you to reach a wide audience. The platform enables you to easily import and list your content without any upfront costs, helping you gain visibility and expand your reach in the AI agent marketplace. Additionally, blockchain integration allows you to securely establish and prove ownership of your content.',
+      'Yes! As a content creator, you can create digital content on any platform and list it on Maava’s marketplace for free. Maava supports various formats and types of content, allowing you to reach a wide audience. The platform enables you to easily import and list your content without any upfront costs, helping you gain visibility and expand your reach in the AI agent marketplace. Additionally, blockchain integration allows you to securely establish and prove ownership of your content.',
   },
   {
-    question: 'Do businesses have to pay to use the AI agents on Portdex.ai?',
+    question: 'Do businesses have to pay to use the AI agents on Maava.ai?',
     answer:
       'Businesses only pay for the basic model price of the AI agents they choose to use. There are no additional fees for accessing the marketplace or browsing content. The transparent pricing model ensures businesses only pay for the AI solutions they need, allowing for cost-effective integration of AI agents into their operations. Blockchain integration ensures that all transactions are secure, and Web 3.0 support enables businesses to engage in multi-asset transactions across different blockchain networks.',
   },
   {
-    question: 'What are the benefits of using Portdex.ai for developers?',
+    question: 'What are the benefits of using Maava.ai for developers?',
     answer:
-      'Portdex.ai offers several key benefits for developers:' +
+      'Maava.ai offers several key benefits for developers:' +
       '\n- Free Marketplace: Developers can list their AI agents and digital content at no cost, gaining visibility in the growing AI ecosystem.' +
       '\n- Blockchain Integration: Developers can deploy AI agents on blockchain protocols, ensuring greater security, transparency, and ownership of their content.' +
       '\n- Cross-Chain Asset Support: Developers can integrate their agents and assets across multiple blockchain networks, opening up new possibilities for interoperability.' +
@@ -161,9 +161,9 @@ export const FAQS = [
   },
   {
     question:
-      'How does Portdex.ai make it easier for businesses to adopt AI solutions?',
+      'How does Maava.ai make it easier for businesses to adopt AI solutions?',
     answer:
-      'Portdex.ai streamlines the adoption of AI solutions by providing a centralized marketplace for AI agents, with a wide range of models available for businesses. The marketplace enables businesses to browse and select the AI agents that best fit their needs, and the simple, pay-as-you-go pricing structure ensures they only pay for the basic model price. Blockchain integration ensures secure and transparent transactions, while Web 3.0 and cross-chain asset support enable multi-asset transactions, making it easier for businesses to adopt and integrate AI agents into their workflows.',
+      'Maava.ai streamlines the adoption of AI solutions by providing a centralized marketplace for AI agents, with a wide range of models available for businesses. The marketplace enables businesses to browse and select the AI agents that best fit their needs, and the simple, pay-as-you-go pricing structure ensures they only pay for the basic model price. Blockchain integration ensures secure and transparent transactions, while Web 3.0 and cross-chain asset support enable multi-asset transactions, making it easier for businesses to adopt and integrate AI agents into their workflows.',
   },
 ];
 

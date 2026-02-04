@@ -1,10 +1,11 @@
-import { MetadataRoute } from 'next';
+import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Portdex Chat - AI-Powered Blockchain Marketplace',
-    short_name: 'Portdex Chat',
-    description: 'Revolutionary AI-powered platform combining chatbot technology with blockchain marketplace features. Create, tokenize, and trade AI agents.',
+    name: 'Maava - AI-Powered Blockchain Marketplace',
+    short_name: 'Maava',
+    description:
+      'Revolutionary AI-powered platform combining chatbot technology with blockchain marketplace features. Create, tokenize, and trade AI agents.',
     start_url: '/',
     display: 'standalone',
     background_color: '#000000',
@@ -38,15 +39,15 @@ export default function manifest(): MetadataRoute.Manifest {
         sizes: '1200x630',
         type: 'image/png',
         form_factor: 'wide',
-        label: 'Portdex Chat Interface',
+        label: 'Maava Interface',
       },
       {
         src: '/hero2.png',
         sizes: '1200x630',
         type: 'image/png',
         form_factor: 'narrow',
-        label: 'Portdex Marketplace',
+        label: 'Maava Marketplace',
       },
     ],
   };
-} 
+}

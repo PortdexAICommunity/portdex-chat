@@ -7,6 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import {
 	ArrowUpDown,
 	Grid3X3,
 	List,
@@ -30,6 +38,9 @@ interface ProductSearchMetadata {
 	products: Product[];
 	query: string;
 	totalResults: number;
+	currentPage: number;
+	pageSize: number;
+	totalPages: number;
 }
 
 type SortOption = "name" | "price-low" | "price-high" | "rating" | "reviews";
@@ -240,6 +251,9 @@ export const productSearchArtifact = new Artifact<
 			products: [],
 			query: "",
 			totalResults: 0,
+			currentPage: 1,
+			pageSize: 12,
+			totalPages: 1,
 		});
 	},
 	onStreamPart: ({ streamPart, setMetadata, setArtifact }) => {
@@ -249,6 +263,9 @@ export const productSearchArtifact = new Artifact<
 				products: data.products,
 				query: data.query,
 				totalResults: data.totalResults,
+				currentPage: data.currentPage || 1,
+				pageSize: data.pageSize || 12,
+				totalPages: data.totalPages || 1,
 			});
 
 			setArtifact((draftArtifact) => {
@@ -275,6 +292,7 @@ export const productSearchArtifact = new Artifact<
 		const [sortBy, setSortBy] = useState<SortOption>("name");
 		const [viewMode, setViewMode] = useState<ViewMode>("grid");
 		const [selectedCategory, setSelectedCategory] = useState<string>("all");
+		const [currentPage, setCurrentPage] = useState<number>(metadata.currentPage || 1);
 
 		if (isLoading) {
 			return <DocumentSkeleton artifactKind="product-search" />;
@@ -333,8 +351,11 @@ export const productSearchArtifact = new Artifact<
 				}
 			});
 
-			return sorted;
-		}, [metadata.products, selectedCategory, sortBy]);
+			// Apply pagination
+			const startIndex = (currentPage - 1) * (metadata.pageSize || 12);
+			const endIndex = startIndex + (metadata.pageSize || 12);
+			return sorted.slice(startIndex, endIndex);
+		}, [metadata.products, selectedCategory, sortBy, currentPage, metadata.pageSize]);
 
 		return (
 			<div className="p-6 space-y-6">
@@ -345,8 +366,7 @@ export const productSearchArtifact = new Artifact<
 							Search Results
 						</h1>
 						<p className="text-muted-foreground">
-							Found {filteredAndSortedProducts.length} of{" "}
-							{metadata.totalResults} products for "{metadata.query}"
+							Found {metadata.totalResults} products for "{metadata.query}" • Page {currentPage} of {metadata.totalPages}
 						</p>
 					</div>
 
@@ -425,11 +445,55 @@ export const productSearchArtifact = new Artifact<
 					))}
 				</div>
 
+				{/* Pagination */}
+				{metadata.totalPages > 1 && (
+					<div className="flex justify-center pt-6">
+						<Pagination>
+							<PaginationContent>
+								{currentPage > 1 && (
+									<PaginationItem>
+										<PaginationPrevious
+											onClick={() => setCurrentPage(currentPage - 1)}
+											className="cursor-pointer"
+										/>
+									</PaginationItem>
+								)}
+
+								{/* Page numbers */}
+								{Array.from({ length: Math.min(5, metadata.totalPages) }, (_, i) => {
+									const pageNum = Math.max(1, currentPage - 2) + i;
+									if (pageNum > metadata.totalPages) return null;
+
+									return (
+										<PaginationItem key={pageNum}>
+											<PaginationLink
+												onClick={() => setCurrentPage(pageNum)}
+												isActive={pageNum === currentPage}
+												className="cursor-pointer"
+											>
+												{pageNum}
+											</PaginationLink>
+										</PaginationItem>
+									);
+								})}
+
+								{currentPage < metadata.totalPages && (
+									<PaginationItem>
+										<PaginationNext
+											onClick={() => setCurrentPage(currentPage + 1)}
+											className="cursor-pointer"
+										/>
+									</PaginationItem>
+								)}
+							</PaginationContent>
+						</Pagination>
+					</div>
+				)}
+
 				{/* Results Summary */}
 				<div className="text-center pt-6 border-t border-border">
 					<p className="text-sm text-muted-foreground">
-						Showing {filteredAndSortedProducts.length} of{" "}
-						{metadata.totalResults} products
+						Page {currentPage} of {metadata.totalPages} • Showing {filteredAndSortedProducts.length} products
 					</p>
 				</div>
 			</div>
