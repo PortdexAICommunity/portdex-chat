@@ -14,6 +14,9 @@ WORKDIR /app
 # Copy package files
 COPY package.json pnpm-lock.yaml ./
 
+# Install Python and build tools for native modules
+RUN apk add --no-cache python3 make g++ libc-dev
+
 # Install dependencies
 RUN pnpm install --frozen-lockfile
 
@@ -29,6 +32,7 @@ COPY . .
 
 # Set environment variable for build
 ENV NEXT_TELEMETRY_DISABLED 1
+ENV POSTGRES_URL "postgres://user:pass@localhost:5432/db"
 
 # Build the application (includes database migration)
 # Note: Database migration requires POSTGRES_URL environment variable
