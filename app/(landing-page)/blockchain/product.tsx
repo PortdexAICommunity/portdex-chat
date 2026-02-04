@@ -10,7 +10,7 @@ const Products = () => {
       id: 'traceability',
       title: 'Blockchain AI Asset Traceability',
       description:
-        'Portdex AI uses blockchain to ensure the traceability of AI assets, allowing businesses to track the origin, updates, and ownership of digital content with transparency and security.',
+        'Maava AI uses blockchain to ensure the traceability of AI assets, allowing businesses to track the origin, updates, and ownership of digital content with transparency and security.',
       icon: '🧩',
       category: 'Security',
       gradient: 'from-blue-500 to-purple-600',
@@ -28,7 +28,7 @@ const Products = () => {
       id: 'protocolintegration',
       title: 'Blockchain Protocol Integration',
       description:
-        'Portdex AI integrates multiple blockchain protocols to provide seamless interaction across different blockchain networks, ensuring greater interoperability and flexibility for developers and businesses.',
+        'Maava AI integrates multiple blockchain protocols to provide seamless interaction across different blockchain networks, ensuring greater interoperability and flexibility for developers and businesses.',
       icon: '🔗',
       category: 'Integration',
       gradient: 'from-orange-500 to-red-600',
@@ -37,7 +37,7 @@ const Products = () => {
       id: 'crosschain',
       title: 'Cross-Chain Assets',
       description:
-        'With cross-chain asset support, Portdex AI facilitates the movement and exchange of digital assets across various blockchain ecosystems, enhancing the accessibility and flexibility of AI solutions.',
+        'With cross-chain asset support, Maava AI facilitates the movement and exchange of digital assets across various blockchain ecosystems, enhancing the accessibility and flexibility of AI solutions.',
       icon: '🔄',
       category: 'Interoperability',
       gradient: 'from-purple-500 to-pink-600',
@@ -46,7 +46,7 @@ const Products = () => {
       id: 'tokenizedtraceability',
       title: 'Tokenized Assets Traceability',
       description:
-        'Blockchain ensures that tokenized assets on Portdex AI are traceable, providing a transparent history of transactions, transfers, and ownership for every asset listed on the platform.',
+        'Blockchain ensures that tokenized assets on Maava AI are traceable, providing a transparent history of transactions, transfers, and ownership for every asset listed on the platform.',
       icon: '🧾',
       category: 'Transparency',
       gradient: 'from-cyan-500 to-blue-600',
@@ -55,7 +55,7 @@ const Products = () => {
       id: 'tokenizationai',
       title: 'Tokenization of Assets Through AI on Blockchain',
       description:
-        'Portdex AI uses artificial intelligence to automate the tokenization of assets, securely recording ownership and transaction history on the blockchain, allowing for efficient management and exchange of digital assets.',
+        'Maava AI uses artificial intelligence to automate the tokenization of assets, securely recording ownership and transaction history on the blockchain, allowing for efficient management and exchange of digital assets.',
       icon: '🤖',
       category: 'AI & Blockchain',
       gradient: 'from-indigo-500 to-purple-600',
@@ -92,7 +92,7 @@ const Products = () => {
           viewport={{ once: true }}
         >
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
-            Blockchain Integration in Portdex
+            Blockchain Integration in Maava
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Discover how blockchain technology powers our AI platform with

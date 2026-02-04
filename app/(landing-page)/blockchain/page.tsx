@@ -59,7 +59,7 @@ const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            Portdex AI leverages blockchain technology to enhance asset
+            Maava AI leverages blockchain technology to enhance asset
             traceability, ensure IP ownership, and integrate cross-chain
             capabilities, providing a secure and transparent environment for AI
             agents and tokenized assets.

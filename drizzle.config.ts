@@ -11,6 +11,6 @@ export default defineConfig({
 	dialect: "postgresql",
 	dbCredentials: {
 		// biome-ignore lint: Forbidden non-null assertion.
-		url: `${process.env.POSTGRES_URL!}/Portdex-Chat`,
+		url: `${process.env.POSTGRES_URL!}/Maava-Chat`,
 	},
 });

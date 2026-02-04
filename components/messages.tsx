@@ -86,9 +86,7 @@ function PureMessages({
           >
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white">
               Get started with{' '}
-              <span className="text-purple-500 font-bold font-sans">
-                Portdex Chat
-              </span>
+              <span className="text-purple-500 font-bold font-sans">Maava</span>
               <br />{' '}
               {selectedAssistant
                 ? selectedAssistant.title
@@ -101,17 +99,19 @@ function PureMessages({
             </p>
 
             {/* Use Cases with Shinny Badges */}
-            {selectedAssistant && selectedAssistant.useCases && selectedAssistant.useCases.length > 0 && (
-              <div className="flex flex-wrap justify-center gap-2 mt-4">
-                {selectedAssistant.useCases.map((useCase, index) => (
-                  <AnimatedBadge
-                    key={index}
-                    text={useCase}
-                    className="text-sm"
-                  />
-                ))}
-              </div>
-            )}
+            {selectedAssistant &&
+              selectedAssistant.useCases &&
+              selectedAssistant.useCases.length > 0 && (
+                <div className="flex flex-wrap justify-center gap-2 mt-4">
+                  {selectedAssistant.useCases.map((useCase, index) => (
+                    <AnimatedBadge
+                      key={index}
+                      text={useCase}
+                      className="text-sm"
+                    />
+                  ))}
+                </div>
+              )}
           </motion.div>
         </div>
       </div>

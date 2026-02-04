@@ -61,7 +61,7 @@ pnpm dev
 
 Your app template should now be running on [localhost:3000](http://localhost:3000).
 
-# Portdex Chat
+# Maava
 
 An open-source AI chatbot built with Next.js, the Vercel AI SDK, and AWS Amplify.
 

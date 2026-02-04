@@ -194,7 +194,7 @@ const HeroSection = () => {
         <div className="max-w-6xl mx-auto text-center mt-8 flex justify-center items-center px-4">
           <p className="text-lg md:text-xl text-muted-foreground font-sans">
             <span className="text-neutral-800 dark:text-white font-bold">
-              Portdex Community
+              Maava Community
             </span>
             : Where{' '}
             <span className="text-neutral-800 dark:text-white font-bold">
